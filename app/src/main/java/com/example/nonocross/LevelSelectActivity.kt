@@ -2,6 +2,7 @@ package com.example.nonocross
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,6 +25,7 @@ class LevelSelectActivity : AppCompatActivity(), LevelSelectAdapter.StartGame {
             // use this setting to improve performance if you know that changes
             // in content do not change the layout size of the RecyclerView
             setHasFixedSize(true)
+
 
             // use a grid layout manager
             layoutManager = viewManager

@@ -12,8 +12,7 @@ data class GridData(val grid: List<List<Int>>, val rowNums: List<List<Int>>, val
 }
 
 fun getAllLevels(context: Context): List<String>{
-    val files = context.resources.assets.list("levels/")?.toList()
-    return files ?: listOf()
+    return context.resources.assets.list("levels")?.toList() ?: listOf()
 }
 
 fun generate(context: Context): GridData {

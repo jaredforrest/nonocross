@@ -45,7 +45,6 @@ class LevelSelectAdapter(
     }
     // Replace the contents of a view
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-
         val levelRowsCols = getRowsAndCols(openGridFile(context, levels[position]))
         holder.itemView.findViewById<TextView>(R.id.level_name).text = levels[position]
         holder.itemView.findViewById<TextView>(R.id.gridData).text = context.getString(
