@@ -2,12 +2,11 @@ package com.example.nonocross
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.nonocross.util.getAllLevels
 import com.example.nonocross.levelselect.LevelSelectAdapter
+import com.example.nonocross.util.getAllLevels
 
 class LevelSelectActivity : AppCompatActivity(), LevelSelectAdapter.StartGame {
     private lateinit var recyclerView: RecyclerView
