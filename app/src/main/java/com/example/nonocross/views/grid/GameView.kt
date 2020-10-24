@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup
 import com.example.nonocross.GameEngine
-import kotlinx.android.synthetic.main.activity_game.view.*
 
 //class GameView(context: Context, attributeSet: AttributeSet): ViewGroup(context, attributeSet) {
 class GameView @JvmOverloads constructor(

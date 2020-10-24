@@ -8,7 +8,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.nonocross.R
-import com.example.nonocross.util.getRowsandCols
+import com.example.nonocross.util.getRowsAndCols
 import com.example.nonocross.util.openGridFile
 
 
@@ -34,7 +34,7 @@ class LevelSelectAdapter(
         // create a new view
         val levelView = LayoutInflater.from(parent.context)
             .inflate(R.layout.level_view, parent, false) as View
-        // set the view's size, margins, paddings and layout parameters
+        // set the view's size, margins, padding and layout parameters
         //...
         levelView.setPadding(20, 60, 20, 40)
         return MyViewHolder(levelView)
@@ -46,10 +46,10 @@ class LevelSelectAdapter(
     // Replace the contents of a view
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
-        val levelRowsCols = getRowsandCols(openGridFile(context, levels[position]))
+        val levelRowsCols = getRowsAndCols(openGridFile(context, levels[position]))
         holder.itemView.findViewById<TextView>(R.id.level_name).text = levels[position]
         holder.itemView.findViewById<TextView>(R.id.gridData).text = context.getString(
-            R.string.widthxheight,
+            R.string.width_x_height,
             levelRowsCols.first,
             levelRowsCols.second
         )

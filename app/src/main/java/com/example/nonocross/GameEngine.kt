@@ -26,6 +26,5 @@ object GameEngine {
 
 object LevelDetails {
     var levelName = "Level 1"
-    var levelComplete = false
 }
 

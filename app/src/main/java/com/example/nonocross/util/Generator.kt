@@ -24,7 +24,7 @@ fun generate(context: Context): GridData {
     val text = openGridFile(context)
 
     // Count height of column (number of rows) and width of row (number of columns)
-    val (rows, cols) = getRowsandCols(text)
+    val (rows, cols) = getRowsAndCols(text)
 
     // +1 to account for \n
     val grid = List(rows) { i -> List(cols) { j -> text[i * (cols + 1) + j].toInt() - '0'.toInt() }}
@@ -38,7 +38,7 @@ fun generate(context: Context): GridData {
     return GridData(grid, rowNums, colNums)
 }
 
-fun getRowsandCols(textGrid: String): Pair<Int, Int>{
+fun getRowsAndCols(textGrid: String): Pair<Int, Int>{
     val rows = textGrid.count {it == '\n'} + 1
     val cols = textGrid.count {it != '\n'} / rows
     return Pair(rows, cols)

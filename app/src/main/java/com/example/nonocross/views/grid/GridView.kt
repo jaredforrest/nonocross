@@ -10,7 +10,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
 import androidx.appcompat.app.AppCompatActivity
-import com.example.nonocross.LevelDetails
 import com.example.nonocross.R
 import com.example.nonocross.util.GridData
 
