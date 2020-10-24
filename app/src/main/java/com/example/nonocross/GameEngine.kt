@@ -13,18 +13,11 @@ object GameEngine {
         return generate(context)
 
     }
-
-    /*fun endGame(nonocrossGrid: List<List<Cell>>) {
-        for(row in nonocrossGrid){
-            for(cell in row)
-                //if(!cell.checkCell()){return}
-        }
-        println("Grid Solved")
-    }*/
-
 }
 
 object LevelDetails {
     var levelName = "Level 1"
+    var isRandom = false
+    var randomGridRowsCols = Pair(10, 10)
 }
 

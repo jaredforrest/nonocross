@@ -21,7 +21,7 @@
         android:textColor="@color/colorPrimary" />
 
     <Button
-        android:id="@+id/play_button"
+        android:id="@+id/level_select"
         style="@style/Widget.AppCompat.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

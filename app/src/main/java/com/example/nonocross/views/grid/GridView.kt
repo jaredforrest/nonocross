@@ -10,6 +10,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
 import androidx.appcompat.app.AppCompatActivity
+import com.example.nonocross.LevelDetails
 import com.example.nonocross.R
 import com.example.nonocross.util.GridData
 
@@ -152,6 +153,7 @@ class GridView @JvmOverloads constructor(
         return true
     }
 
+    /** When the game is finished show a dialog */
     private fun gameDoneAlert() {
             AlertDialog.Builder(context)
                 .setTitle("Finished")
@@ -164,11 +166,20 @@ class GridView @JvmOverloads constructor(
                 .setNegativeButton(
                     R.string.reset
                 ) { _: DialogInterface, _: Int ->
-                    nonocrossGrid.forEach { row -> row.forEach { it.userShading = 0 } }
-                    invalidate()
+                    resetGrid()
                 }
-                .setIcon(android.R.drawable.star_big_on)
+                //.setIcon(android.R.drawable.star_big_on)
                 .show()
+    }
+
+    private fun resetGrid(){
+        if(LevelDetails.isRandom){
+            (context as AppCompatActivity).recreate()
+        }
+        else{
+            nonocrossGrid.forEach { row -> row.forEach { it.userShading = 0 } }
+            invalidate()
+        }
     }
 
 }

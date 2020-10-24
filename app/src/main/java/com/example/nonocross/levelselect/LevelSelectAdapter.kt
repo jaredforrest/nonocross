@@ -53,7 +53,7 @@ class LevelSelectAdapter(
             levelRowsCols.first,
             levelRowsCols.second
         )
-        holder.itemView.findViewById<Button>(R.id.play_button).setOnClickListener { startGame.startGame(
+        holder.itemView.findViewById<Button>(R.id.level_select).setOnClickListener { startGame.startGame(
             levels[position]
         ) }
     }
