@@ -25,7 +25,6 @@ class LevelSelectActivity : AppCompatActivity(), LevelSelectAdapter.StartGame {
             // in content do not change the layout size of the RecyclerView
             setHasFixedSize(true)
 
-
             // use a grid layout manager
             layoutManager = viewManager
 

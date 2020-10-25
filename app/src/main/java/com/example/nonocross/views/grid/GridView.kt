@@ -12,15 +12,14 @@ import android.view.ViewConfiguration
 import androidx.appcompat.app.AppCompatActivity
 import com.example.nonocross.LevelDetails
 import com.example.nonocross.R
-import com.example.nonocross.util.GridData
-
-
-@SuppressLint("ViewConstructor")
-//class GridView(context: Context, private val gridData: GridData) : View(context) {
+import com.example.nonocross.util.countColNums
+import com.example.nonocross.util.countRowNums
 
 class GridView @JvmOverloads constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0, private val gridData: GridData
-    ) : View(context, attrs, defStyleAttr) {
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+) : View(context, attrs, defStyleAttr) {
+
+    private val gridData = LevelDetails.gridData
 
     // Create grid of cells
     private lateinit var nonocrossGrid: List<List<Cell>>
@@ -90,7 +89,7 @@ class GridView @JvmOverloads constructor(
                         isFirstCell = false
                         cellShade = nonocrossGrid[inCell.first][inCell.second].click(clickFun)
                         invalidate()
-                        if(checkGridDone()) gameDoneAlert()
+                        if (checkGridDone()) gameDoneAlert()
                     }
                     loop@ for ((i, row) in nonocrossGrid.withIndex()) {
                         for ((j, cell) in row.withIndex()) {
@@ -98,14 +97,18 @@ class GridView @JvmOverloads constructor(
                                 inCell = Pair(i, j)
                                 nonocrossGrid[inCell.first][inCell.second].userShading = cellShade
                                 invalidate()
-                                if(checkGridDone()) gameDoneAlert()
+                                if (checkGridDone()) gameDoneAlert()
                                 break@loop
                             }
                         }
                     }
                 }
             }
-            //MotionEvent.ACTION_CANCEL -> Log.d("touch ev", "you have been cancelled")
+            MotionEvent.ACTION_CANCEL -> {
+                handler.removeCallbacks(mLongPressed)
+                isFirstCell = true
+                cellShade = 0
+            }
         }
         return true
     }
@@ -116,7 +119,6 @@ class GridView @JvmOverloads constructor(
         return List(gridData.rows) { i ->
             List(gridData.cols) { j ->
                 Cell(
-                    gridData.grid[i][j],
                     1 + j * (cellLength + 1) + 2 * (j / 5),
                     1 + i * (cellLength + 1) + 2 * (i / 5),
                     cellLength,
@@ -135,7 +137,6 @@ class GridView @JvmOverloads constructor(
     }
 
     private fun getPadding(i: Int, j: Int): Int {
-
         var x = 0
         if (i % 5 == 4) x += Cell.BigPadding.RIGHT.flag
         if (j % 5 == 4) x += Cell.BigPadding.TOP.flag
@@ -145,12 +146,11 @@ class GridView @JvmOverloads constructor(
     }
 
     private fun checkGridDone(): Boolean {
-        for (row in nonocrossGrid) {
-            for (cell in row) {
-                if (!cell.checkCell()) return false
-            }
-        }
-        return true
+        val userGrid =
+            List(nonocrossGrid.size) { i -> List(nonocrossGrid[0].size) { j -> nonocrossGrid[i][j].userShading } }
+        val rowNums = List(gridData.rows) { i -> countRowNums(userGrid[i]) }
+        val colNums = List(gridData.cols) { i -> countColNums(userGrid, i) }
+        return rowNums == gridData.rowNums && colNums == gridData.colNums
     }
 
     /** When the game is finished show a dialog */
@@ -168,15 +168,16 @@ class GridView @JvmOverloads constructor(
                 ) { _: DialogInterface, _: Int ->
                     resetGrid()
                 }
-                //.setIcon(android.R.drawable.star_big_on)
                 .show()
     }
 
     private fun resetGrid(){
         if(LevelDetails.isRandom){
+            // restart activity to get new random grid
             (context as AppCompatActivity).recreate()
         }
         else{
+            // reset grid
             nonocrossGrid.forEach { row -> row.forEach { it.userShading = 0 } }
             invalidate()
         }

@@ -1,3 +1,17 @@
+/**This file is part of Nonocross.
+
+Nonocross is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Nonocross is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.example.nonocross
 
 import android.content.Intent
@@ -26,12 +40,13 @@ class MainActivity : AppCompatActivity() {
         val inflater = this.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.dialogue_random_grid, null)
         val rowsPicker = dialogView.findViewById<NumberPicker>(R.id.rows_picker)
+        val colsPicker = dialogView.findViewById<NumberPicker>(R.id.cols_picker)
+        val diffPicker = dialogView.findViewById<NumberPicker>(R.id.difficulty_picker)
         rowsPicker.maxValue = 10
         rowsPicker.minValue = 2
         rowsPicker.value = 10
         rowsPicker.wrapSelectorWheel = false
-        rowsPicker.setOnValueChangedListener {_,_,_->}
-        val colsPicker = dialogView.findViewById<NumberPicker>(R.id.cols_picker)
+        rowsPicker.setOnValueChangedListener { _, _, _ -> }
         colsPicker.maxValue = 50
         colsPicker.minValue = 2
         colsPicker.value = 10
@@ -39,21 +54,26 @@ class MainActivity : AppCompatActivity() {
         colsPicker.setOnValueChangedListener { _, _, _ ->
             rowsPicker.maxValue = colsPicker.value
         }
+        diffPicker.maxValue = 10
+        diffPicker.minValue = 1
+        diffPicker.value = 5
+        diffPicker.wrapSelectorWheel = false
         AlertDialog.Builder(this)
-        .setTitle("Grid Size")
-        .setMessage("Choose Number of Rows and Columns")
-        .setView(dialogView)
-        .setPositiveButton(
-            android.R.string.ok
-        ) { _, _ -> LevelDetails.randomGridRowsCols = Pair(rowsPicker.value, colsPicker.value)
-            val intent = Intent(this, RandomGameActivity::class.java)
-            startActivity(intent)
-        }
-        .setNegativeButton(
-            android.R.string.cancel
-        ) { _, _ -> }
-        .create()
-        .show()
+            .setTitle(R.string.grid_size)
+            .setView(dialogView)
+            .setPositiveButton(
+                android.R.string.ok
+            ) { _, _ ->
+                LevelDetails.randomGridRowsCols = Pair(rowsPicker.value, colsPicker.value)
+                LevelDetails.difficulty = diffPicker.value
+                val intent = Intent(this, RandomGameActivity::class.java)
+                startActivity(intent)
+            }
+            .setNegativeButton(
+                android.R.string.cancel
+            ) { _, _ -> }
+            .create()
+            .show()
 
     }
 }

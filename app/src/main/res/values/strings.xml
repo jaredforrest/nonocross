@@ -8,4 +8,8 @@
     <string name="level_complete">Level Complete</string>
     <string name="go_back">Go Back</string>
     <string name="reset">Reset</string>
+    <string name="difficulty">Difficulty</string>
+    <string name="rows">Rows</string>
+    <string name="columns">Columns</string>
+    <string name="grid_size">Grid Size</string>
 </resources>

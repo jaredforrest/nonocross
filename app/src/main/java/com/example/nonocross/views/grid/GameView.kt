@@ -3,21 +3,25 @@ package com.example.nonocross.views.grid
 import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup
-import com.example.nonocross.GameEngine
+import com.example.nonocross.LevelDetails
+import com.example.nonocross.util.GridData
+import com.example.nonocross.util.generate
 
-//class GameView(context: Context, attributeSet: AttributeSet): ViewGroup(context, attributeSet) {
 class GameView @JvmOverloads constructor(
-        context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
-    ) : ViewGroup(context, attrs, defStyleAttr){
+    context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
+) : ViewGroup(context, attrs, defStyleAttr) {
 
-    private val gridData = GameEngine.createGrid(context)
+
+    private var gridData: GridData
 
     init {
+        generate(context)
+        gridData = LevelDetails.gridData
         val colNumsView = ColNumsView(context, gridData)
         this.addView(colNumsView, 0)
         val rowNumsView = RowNumsView(context, gridData)
         this.addView(rowNumsView, 1)
-        val nonocrossGridView = GridView(context, attrs, defStyleAttr, gridData)
+        val nonocrossGridView = GridView(context, attrs, defStyleAttr)
         nonocrossGridView.setBackgroundColor(0xFF444444.toInt())
         this.addView(nonocrossGridView, 2)
     }
@@ -25,17 +29,20 @@ class GameView @JvmOverloads constructor(
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         val minPadding = this.measuredWidth / 20
 
-        val cellLength = ((this.measuredWidth - (minPadding*2)) - gridData.cols - 1 - 2 * ((gridData.cols - 1) / 5)) / (gridData.cols + (gridData.getLongestRowNum()+1)/2)
-        val gridWidth  = cellLength * gridData.cols + gridData.cols + 1 + 2 * ((gridData.cols - 1) / 5)
-        val gridHeight = cellLength * gridData.rows + gridData.rows + 1 + 2 * ((gridData.rows - 1) / 5)
+        val cellLength =
+            ((this.measuredWidth - (minPadding * 2)) - gridData.cols - 1 - 2 * ((gridData.cols - 1) / 5)) / (gridData.cols + (gridData.longestRowNum + 1) / 2)
+        val gridWidth =
+            cellLength * gridData.cols + gridData.cols + 1 + 2 * ((gridData.cols - 1) / 5)
+        val gridHeight =
+            cellLength * gridData.rows + gridData.rows + 1 + 2 * ((gridData.rows - 1) / 5)
 
         // First draw the column numbers
 
         // Finds longest column * half of cell length
-        val colNumHeight = gridData.getLongestColNum() * (cellLength * 0.75F ).toInt()
+        val colNumHeight = gridData.longestColNum * (cellLength * 0.75F).toInt()
 
         // (Finds longest row + 1) * half of cell length
-        val rowNumWidth = gridData.getLongestRowNum() * (cellLength * 0.5F).toInt()
+        val rowNumWidth = gridData.longestRowNum * (cellLength * 0.5F).toInt()
 
         val topPadding = (this.measuredHeight - colNumHeight - gridHeight) / 3
         val leftPadding = (this.measuredWidth - rowNumWidth - gridWidth) / 2

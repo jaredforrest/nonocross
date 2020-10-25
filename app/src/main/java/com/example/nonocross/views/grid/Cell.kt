@@ -4,7 +4,6 @@ import android.graphics.Canvas
 import android.graphics.Paint
 
 class Cell(
-    private val trueShading: Int,
     _left: Int,
     _top: Int,
     private val cellLength: Int,
@@ -30,23 +29,18 @@ class Cell(
 
     fun draw(canvas: Canvas) {
         when (userShading) {
-            0 -> drawEmpty(canvas)
-            1 -> drawFull(canvas)
+            0 -> drawCell(canvas, whitePaint)
+            1 -> drawCell(canvas, bluePaint)
             -1 -> drawCross(canvas)
         }
     }
 
-    private fun drawEmpty(canvas: Canvas) {
-        canvas.drawRect(left, top, right, bottom, whitePaint)
-
-    }
-
-    private fun drawFull(canvas: Canvas) {
-        canvas.drawRect(left, top, right, bottom, bluePaint)
+    private fun drawCell(canvas: Canvas, paint: Paint) {
+        canvas.drawRect(left, top, right, bottom, paint)
     }
 
     private fun drawCross(canvas: Canvas) {
-        drawEmpty(canvas)
+        drawCell(canvas, whitePaint)
         redPaint.strokeWidth = cellLength / 15F
         canvas.drawLine(
             left + cellLength * 0.25F,
@@ -75,9 +69,4 @@ class Cell(
         userShading = lambda(userShading)
         return userShading
     }
-
-    fun checkCell(): Boolean {
-        return (userShading == this.trueShading) || (userShading + trueShading == -1)
-    }
-
 }
