@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Nonocross</string>
     <string name="game_name">Nonocross</string>
-    <string name="level_select">Level Select</string>
-    <string name="random_level">Random Level</string>
+    <string name="practice_grids">Practice Grids</string>
+    <string name="random_grid">Random Grid</string>
     <string name="play">play</string>
     <string name="width_x_height">%1$d x %2$d</string>
     <string name="level_complete">Level Complete</string>

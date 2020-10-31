@@ -1,3 +1,17 @@
+/**This file is part of Nonocross.
+
+Nonocross is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Nonocross is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.example.nonocross.levelselect
 
 import android.content.Context
@@ -8,7 +22,6 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.nonocross.R
-import com.example.nonocross.util.getRowsAndCols
 import com.example.nonocross.util.openGridFile
 
 
@@ -43,14 +56,15 @@ class LevelSelectAdapter(
     interface StartGame{
         fun startGame(levelName: String)
     }
+
     // Replace the contents of a view
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val levelRowsCols = getRowsAndCols(openGridFile(context, levels[position]))
+        val level = openGridFile(context, levels[position])
         holder.itemView.findViewById<TextView>(R.id.level_name).text = levels[position]
         holder.itemView.findViewById<TextView>(R.id.gridData).text = context.getString(
             R.string.width_x_height,
-            levelRowsCols.first,
-            levelRowsCols.second
+            level.size,
+            level[0].size
         )
         holder.itemView.findViewById<Button>(R.id.level_select).setOnClickListener { startGame.startGame(
             levels[position]

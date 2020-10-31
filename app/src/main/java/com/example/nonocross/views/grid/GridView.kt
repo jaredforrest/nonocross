@@ -1,3 +1,17 @@
+/**This file is part of Nonocross.
+
+Nonocross is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Nonocross is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.example.nonocross.views.grid
 
 import android.annotation.SuppressLint
@@ -155,28 +169,27 @@ class GridView @JvmOverloads constructor(
 
     /** When the game is finished show a dialog */
     private fun gameDoneAlert() {
-            AlertDialog.Builder(context)
-                .setTitle("Finished")
-                .setMessage(R.string.level_complete)
-                .setPositiveButton(
-                    R.string.go_back
-                ) { _: DialogInterface, _: Int ->
-                    (context as AppCompatActivity).finish()
-                }
-                .setNegativeButton(
-                    R.string.reset
-                ) { _: DialogInterface, _: Int ->
-                    resetGrid()
-                }
-                .show()
+        AlertDialog.Builder(context)
+            .setTitle("Finished")
+            .setMessage(R.string.level_complete)
+            .setPositiveButton(
+                R.string.go_back
+            ) { _: DialogInterface, _: Int ->
+                (context as AppCompatActivity).finish()
+            }
+            .setNegativeButton(
+                R.string.reset
+            ) { _: DialogInterface, _: Int ->
+                resetGrid()
+            }
+            .show()
     }
 
     private fun resetGrid(){
         if(LevelDetails.isRandom){
             // restart activity to get new random grid
             (context as AppCompatActivity).recreate()
-        }
-        else{
+        } else{
             // reset grid
             nonocrossGrid.forEach { row -> row.forEach { it.userShading = 0 } }
             invalidate()
