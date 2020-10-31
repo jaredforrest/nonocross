@@ -12,14 +12,14 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
-package com.example.nonocross.views.grid
+package com.picross.nonocross.views.grid
 
 import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup
-import com.example.nonocross.LevelDetails
-import com.example.nonocross.util.GridData
-import com.example.nonocross.util.generate
+import com.picross.nonocross.LevelDetails
+import com.picross.nonocross.util.GridData
+import com.picross.nonocross.util.generate
 
 class GameView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0

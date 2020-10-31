@@ -12,15 +12,15 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
-package com.example.nonocross
+package com.picross.nonocross
 
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.nonocross.levelselect.LevelSelectAdapter
-import com.example.nonocross.util.getAllLevels
+import com.picross.nonocross.levelselect.LevelSelectAdapter
+import com.picross.nonocross.util.getAllLevels
 
 class LevelSelectActivity : AppCompatActivity(), LevelSelectAdapter.StartGame {
     private lateinit var recyclerView: RecyclerView

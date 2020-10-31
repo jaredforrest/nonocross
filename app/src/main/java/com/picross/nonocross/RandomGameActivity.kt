@@ -12,15 +12,20 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
-package com.example.nonocross
+package com.picross.nonocross
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 
-class GameActivity : AppCompatActivity() {
+class RandomGameActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        LevelDetails.isRandom = true
         setContentView(R.layout.activity_game)
     }
-}
 
+    override fun onDestroy() {
+        super.onDestroy()
+        LevelDetails.isRandom = false
+    }
+}

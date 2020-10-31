@@ -12,7 +12,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
-package com.example.nonocross.levelselect
+package com.picross.nonocross.levelselect
 
 import android.content.Context
 import android.view.LayoutInflater
@@ -21,8 +21,8 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.nonocross.R
-import com.example.nonocross.util.openGridFile
+import com.picross.nonocross.R
+import com.picross.nonocross.util.openGridFile
 
 
 class LevelSelectAdapter(

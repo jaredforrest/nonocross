@@ -20,7 +20,7 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <com.example.nonocross.views.grid.GameView
+    <com.picross.nonocross.views.grid.GameView
         android:id="@+id/nonocrossGameView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -30,6 +30,6 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-    </com.example.nonocross.views.grid.GameView>
+    </com.picross.nonocross.views.grid.GameView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

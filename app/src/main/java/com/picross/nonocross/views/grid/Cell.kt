@@ -12,7 +12,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
-package com.example.nonocross.views.grid
+package com.picross.nonocross.views.grid
 
 import android.graphics.Canvas
 import android.graphics.Paint

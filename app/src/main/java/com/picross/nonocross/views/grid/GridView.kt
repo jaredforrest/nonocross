@@ -12,7 +12,7 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
-package com.example.nonocross.views.grid
+package com.picross.nonocross.views.grid
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
@@ -24,10 +24,10 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
 import androidx.appcompat.app.AppCompatActivity
-import com.example.nonocross.LevelDetails
-import com.example.nonocross.R
-import com.example.nonocross.util.countColNums
-import com.example.nonocross.util.countRowNums
+import com.picross.nonocross.LevelDetails
+import com.picross.nonocross.R
+import com.picross.nonocross.util.countColNums
+import com.picross.nonocross.util.countRowNums
 
 class GridView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0

@@ -12,14 +12,14 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
-package com.example.nonocross.views.grid
+package com.picross.nonocross.views.grid
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.view.View
-import com.example.nonocross.LevelDetails
+import com.picross.nonocross.LevelDetails
 
 @SuppressLint("ViewConstructor")
 class ColNumsView(context: Context) : View(context) {

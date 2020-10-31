@@ -12,10 +12,10 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
-package com.example.nonocross.util
+package com.picross.nonocross.util
 
 import android.content.Context
-import com.example.nonocross.LevelDetails
+import com.picross.nonocross.LevelDetails
 import java.io.InputStream
 
 fun generate(context: Context) {
