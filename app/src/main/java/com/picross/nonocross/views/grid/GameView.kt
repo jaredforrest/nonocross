@@ -43,8 +43,15 @@ class GameView @JvmOverloads constructor(
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         val minPadding = this.measuredWidth / 20
 
-        val cellLength =
-            ((this.measuredWidth - (minPadding * 2)) - gridData.cols - 1 - 2 * ((gridData.cols - 1) / 5)) / (gridData.cols + (gridData.longestRowNum + 1) / 2)
+        // Given the width of this View find the max width of a Cell
+        val cellWidth =
+            ((this.measuredWidth - (minPadding * 2)) - gridData.cols - 1 - (2 * (gridData.cols - 1) / 5)) / (gridData.cols + (gridData.longestRowNum + 1) / 2)
+        // Given the width of this View find the max Height of a Cell
+        val cellHeight =
+            ((this.measuredHeight - (minPadding * 2)) - gridData.rows - 1 - (2 * (gridData.rows - 1) / 5)) / (gridData.rows + (gridData.longestColNum + 1))
+
+        val cellLength = cellWidth.coerceAtMost(cellHeight)
+
         val gridWidth =
             cellLength * gridData.cols + gridData.cols + 1 + 2 * ((gridData.cols - 1) / 5)
         val gridHeight =
@@ -106,7 +113,5 @@ class GameView @JvmOverloads constructor(
             leftPadding + rowNumsView.measuredWidth + nonocrossGridView.measuredWidth,
             topPadding + colNumsView.measuredHeight + nonocrossGridView.measuredHeight
         )
-
-
     }
 }

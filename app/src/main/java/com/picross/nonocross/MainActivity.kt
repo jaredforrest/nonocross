@@ -42,18 +42,14 @@ class MainActivity : AppCompatActivity() {
         val rowsPicker = dialogView.findViewById<NumberPicker>(R.id.rows_picker)
         val colsPicker = dialogView.findViewById<NumberPicker>(R.id.cols_picker)
         val diffPicker = dialogView.findViewById<NumberPicker>(R.id.difficulty_picker)
-        rowsPicker.maxValue = 10
+        rowsPicker.maxValue = 50
         rowsPicker.minValue = 2
         rowsPicker.value = 10
         rowsPicker.wrapSelectorWheel = false
-        rowsPicker.setOnValueChangedListener { _, _, _ -> }
         colsPicker.maxValue = 50
         colsPicker.minValue = 2
         colsPicker.value = 10
         colsPicker.wrapSelectorWheel = false
-        colsPicker.setOnValueChangedListener { _, _, _ ->
-            rowsPicker.maxValue = colsPicker.value
-        }
         diffPicker.maxValue = 10
         diffPicker.minValue = 1
         diffPicker.value = 5
