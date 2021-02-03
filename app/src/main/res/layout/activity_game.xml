@@ -28,7 +28,7 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toBottomOf="@+id/toggleCross">
 
     </com.picross.nonocross.views.grid.GameView>
 

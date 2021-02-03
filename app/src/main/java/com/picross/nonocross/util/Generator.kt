@@ -16,16 +16,18 @@ package com.picross.nonocross.util
 
 import android.content.Context
 import com.picross.nonocross.LevelDetails
+import com.picross.nonocross.views.grid.CellShading
 import java.io.InputStream
 
 fun generate(context: Context) {
-    val grid: List<List<Int>>
+    val grid: List<List<CellShading>>
 
     grid = if (LevelDetails.isRandom) {
         // Difficulty is set by changing the proportion of filled to empty cell
         // ie. difficulty=5 -> listOf(0,1,1,1,1,1)
         // difficulty=10 -> listOf(0,1)
-        val difficultyList = List(12 - LevelDetails.difficulty) { i -> if (i != 0) 1 else 0 }
+        val difficultyList =
+            List(12 - LevelDetails.difficulty) { i -> if (i != 0) CellShading.SHADED else CellShading.EMPTY }
 
         List(LevelDetails.randomGridRowsCols.first) { List(LevelDetails.randomGridRowsCols.second) { difficultyList.random() } }
     } else {
@@ -38,7 +40,7 @@ fun generate(context: Context) {
     LevelDetails.gridData = GridData(grid, rowNums, colNums)
 }
 
-fun openGridFile(context: Context, chosenLevelName: String): List<List<Int>> {
+fun openGridFile(context: Context, chosenLevelName: String): List<List<CellShading>> {
     val inputStream: InputStream = context.resources.assets.open("levels/$chosenLevelName")
     val size: Int = inputStream.available()
     val buffer = ByteArray(size)
@@ -49,14 +51,14 @@ fun openGridFile(context: Context, chosenLevelName: String): List<List<Int>> {
     val rows = text.count { it == '\n' }
     val cols = text.count { it != '\n' } / rows
 
-    return List(rows) { i -> List(cols) { j -> text[i * (cols + 1) + j].toInt() - '0'.toInt() } }
+    return List(rows) { i -> List(cols) { j -> if (text[i * (cols + 1) + j] == '1') CellShading.SHADED else CellShading.EMPTY } }
 }
 
-fun countRowNums(row: List<Int>): List<Int> {
+fun countRowNums(row: List<CellShading>): List<Int> {
     val rowNum = mutableListOf<Int>()
     var currNum = 0
     for (element in row) {
-        if (element == 1) {
+        if (element == CellShading.SHADED) {
             currNum++
         } else if (currNum != 0) {
             rowNum.add(currNum)
@@ -70,12 +72,12 @@ fun countRowNums(row: List<Int>): List<Int> {
     return rowNum
 }
 
-fun countColNums(grid: List<List<Int>>, currCol: Int): List<Int> {
+fun countColNums(grid: List<List<CellShading>>, currCol: Int): List<Int> {
     val rowNum = mutableListOf<Int>()
     var currNum = 0
     for (row in grid) {
         val element = row[currCol]
-        if (element == 1) {
+        if (element == CellShading.SHADED) {
             currNum++
         } else if (currNum != 0) {
             rowNum.add(currNum)
@@ -95,12 +97,14 @@ fun getAllLevels(context: Context): List<String> {
 
 
 data class GridData(
-    val grid: List<List<Int>>,
+    val grid: List<List<CellShading>>,
     val rowNums: List<List<Int>>,
     val colNums: List<List<Int>>
 ) {
     val rows get() = this.grid.size
     val cols get() = this.grid[0].size
+
+    /** Gets the width and height of the longest row and column */
     val longestRowNum
         get() =
             rowNums.fold(0,

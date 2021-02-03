@@ -22,5 +22,5 @@ object LevelDetails {
     var levelName = "Level 1"
     var isRandom = false
     var randomGridRowsCols = Pair(10, 10)
-}
 
+    var toggleCross = false

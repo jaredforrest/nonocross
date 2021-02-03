@@ -46,33 +46,19 @@ class GridView @JvmOverloads constructor(
         drawCells(canvas, nonocrossGrid)
     }
 
-    private val shortClickFun = { userShading: Int ->
-        when (userShading) {
-            -1, 1 -> 0
-            0 -> 1
-            else -> 0
-        }
-    }
-    private val longClickFun = { userShading: Int ->
-        when (userShading) {
-            -1 -> 0
-            0, 1 -> -1
-            else -> 0
-        }
-    }
     private var mLongPressed = Runnable {
-        clickFun = longClickFun
+        isLongPress = true
     }
     private var isFirstCell = true
     private var inCell = Pair(0, 0)
-    private var cellShade = 0
-    private var clickFun = shortClickFun
+    private var cellShade = CellShading.EMPTY
+    private var isLongPress = false
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
-                clickFun = shortClickFun
+                isLongPress = false
                 loop@ for ((i, row) in nonocrossGrid.withIndex()) {
                     for ((j, cell) in row.withIndex()) {
                         if (cell.isInside(event.x, event.y)) {
@@ -90,9 +76,9 @@ class GridView @JvmOverloads constructor(
             MotionEvent.ACTION_UP -> {
                 handler.removeCallbacks(mLongPressed)
                 if (isFirstCell) {
-                    nonocrossGrid[inCell.first][inCell.second].click(clickFun)
+                    nonocrossGrid[inCell.first][inCell.second].click(isLongPress)
                     invalidate()
-                    if(checkGridDone()) gameDoneAlert()
+                    if (checkGridDone()) gameDoneAlert()
                 }
             }
 
@@ -101,7 +87,8 @@ class GridView @JvmOverloads constructor(
                     if (isFirstCell) {
                         handler.removeCallbacks(mLongPressed)
                         isFirstCell = false
-                        cellShade = nonocrossGrid[inCell.first][inCell.second].click(clickFun)
+                        nonocrossGrid[inCell.first][inCell.second].click(isLongPress)
+                        cellShade = nonocrossGrid[inCell.first][inCell.second].userShading
                         invalidate()
                         if (checkGridDone()) gameDoneAlert()
                     }
@@ -121,7 +108,7 @@ class GridView @JvmOverloads constructor(
             MotionEvent.ACTION_CANCEL -> {
                 handler.removeCallbacks(mLongPressed)
                 isFirstCell = true
-                cellShade = 0
+                cellShade = CellShading.EMPTY
             }
         }
         return true
@@ -136,7 +123,8 @@ class GridView @JvmOverloads constructor(
                     1 + j * (cellLength + 1) + 2 * (j / 5),
                     1 + i * (cellLength + 1) + 2 * (i / 5),
                     cellLength,
-                    getPadding(i, j)
+                    getPadding(i, j),
+                    context
                 )
             }
         }
@@ -191,7 +179,7 @@ class GridView @JvmOverloads constructor(
             (context as AppCompatActivity).recreate()
         } else{
             // reset grid
-            nonocrossGrid.forEach { row -> row.forEach { it.userShading = 0 } }
+            nonocrossGrid.forEach { row -> row.forEach { it.userShading = CellShading.EMPTY } }
             invalidate()
         }
     }

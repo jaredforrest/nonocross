@@ -14,14 +14,19 @@ You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross.views.grid
 
+import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
+import androidx.core.content.res.ResourcesCompat
+import com.picross.nonocross.LevelDetails
+import com.picross.nonocross.R
 
 class Cell(
     _left: Int,
     _top: Int,
     private val cellLength: Int,
-    private val bigPadding: Int
+    private val bigPadding: Int,
+    context: Context
 ) {
 
     // Each Cell has at least 0.5px padding but some have 1.5px
@@ -33,28 +38,34 @@ class Cell(
     private var left = _left.toFloat()
     private val right = left + cellLength
     private val bottom = top + cellLength
-    var userShading = 0
 
-    private val whitePaint: Paint = Paint().apply { setARGB(255, 255, 255, 255) }
-    private val bluePaint: Paint = Paint().apply { setARGB(255, 18, 134, 255) }
-    private val redPaint: Paint = Paint().apply { setARGB(255, 239, 51, 64) }
+    //var userShading = 0
+    var userShading = CellShading.EMPTY
+
+    private val colorCrossed =
+        ResourcesCompat.getColor(context.resources, R.color.colorCrossed, null)
+    private val colorShaded = ResourcesCompat.getColor(context.resources, R.color.colorShaded, null)
+    private val colorEmpty = ResourcesCompat.getColor(context.resources, R.color.colorEmpty, null)
+
+    private val redPaint: Paint = Paint().apply { color = colorCrossed }
         .apply { strokeCap = Paint.Cap.ROUND }
         .apply { isAntiAlias = true }
 
     fun draw(canvas: Canvas) {
         when (userShading) {
-            0 -> drawCell(canvas, whitePaint)
-            1 -> drawCell(canvas, bluePaint)
-            -1 -> drawCross(canvas)
+            CellShading.EMPTY -> drawCell(canvas, colorEmpty)
+            CellShading.SHADED -> drawCell(canvas, colorShaded)
+            CellShading.CROSSED -> drawCross(canvas)
         }
     }
 
-    private fun drawCell(canvas: Canvas, paint: Paint) {
+    private fun drawCell(canvas: Canvas, cellColor: Int) {
+        val paint = Paint().apply { color = cellColor }
         canvas.drawRect(left, top, right, bottom, paint)
     }
 
     private fun drawCross(canvas: Canvas) {
-        drawCell(canvas, whitePaint)
+        drawCell(canvas, colorEmpty)
         redPaint.strokeWidth = cellLength / 15F
         canvas.drawLine(
             left + cellLength * 0.25F,
@@ -79,8 +90,23 @@ class Cell(
                 (bottom - if (bigPadding and BigPadding.BOTTOM.flag != 0) 1.5 else 0.5)
     }
 
-    fun click(lambda: (Int) -> Int): Int {
-        userShading = lambda(userShading)
-        return userShading
+    fun click(isLongClick: Boolean) {
+        userShading = if (!(isLongClick.xor(LevelDetails.toggleCross))) {
+            when (userShading) {
+                CellShading.CROSSED, CellShading.SHADED -> CellShading.EMPTY
+                CellShading.EMPTY -> CellShading.SHADED
+            }
+        } else {
+            when (userShading) {
+                CellShading.CROSSED -> CellShading.EMPTY
+                CellShading.EMPTY, CellShading.SHADED -> CellShading.CROSSED
+            }
+        }
     }
+}
+
+enum class CellShading {
+    CROSSED,
+    SHADED,
+    EMPTY
 }
