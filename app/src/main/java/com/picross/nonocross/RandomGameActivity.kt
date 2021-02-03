@@ -16,12 +16,17 @@ package com.picross.nonocross
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SwitchCompat
 
 class RandomGameActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         LevelDetails.isRandom = true
         setContentView(R.layout.activity_game)
+
+        findViewById<SwitchCompat>(R.id.toggleCross).setOnCheckedChangeListener { _, isChecked ->
+            LevelDetails.toggleCross = isChecked
+        }
     }
 
     override fun onDestroy() {

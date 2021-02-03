@@ -24,6 +24,7 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         android:id="@+id/nonocrossGameView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
@@ -31,5 +32,15 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         app:layout_constraintTop_toBottomOf="@+id/toggleCross">
 
     </com.picross.nonocross.views.grid.GameView>
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/toggleCross"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:theme="@style/My.Widget.Toggle" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
