@@ -23,6 +23,7 @@ class GameActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
 
+        LevelDetails.toggleCross = false
         findViewById<SwitchCompat>(R.id.toggleCross).setOnCheckedChangeListener { _, isChecked ->
             LevelDetails.toggleCross = isChecked
         }
