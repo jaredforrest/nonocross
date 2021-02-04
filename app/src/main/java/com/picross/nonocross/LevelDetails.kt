@@ -18,7 +18,7 @@ import com.picross.nonocross.util.GridData
 
 object LevelDetails {
     lateinit var gridData: GridData
-    var difficulty = 3
+    var difficulty = 5
     var levelName = "Level 1"
     var isRandom = false
     var randomGridRowsCols = Pair(10, 10)

@@ -157,7 +157,7 @@ class GridView @JvmOverloads constructor(
             .setTitle(R.string.finished)
             .setMessage(R.string.level_complete)
             .setPositiveButton(
-                R.string.main_menu
+                R.string.menu
             ) { _: DialogInterface, _: Int ->
                 (context as AppCompatActivity).finish()
             }
