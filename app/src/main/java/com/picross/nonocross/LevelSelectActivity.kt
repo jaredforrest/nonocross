@@ -49,6 +49,7 @@ class LevelSelectActivity : AppCompatActivity(), LevelSelectAdapter.StartGame {
     }
 
     override fun startGame(levelName: String) {
+        LevelDetails.isRandom = false
         LevelDetails.levelName = levelName
         val intent = Intent(this, GameActivity::class.java)
         startActivity(intent)

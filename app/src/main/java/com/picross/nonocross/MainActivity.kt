@@ -60,9 +60,10 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton(
                 android.R.string.ok
             ) { _, _ ->
+                LevelDetails.isRandom = true
                 LevelDetails.randomGridRowsCols = Pair(rowsPicker.value, colsPicker.value)
                 LevelDetails.difficulty = diffPicker.value
-                val intent = Intent(this, RandomGameActivity::class.java)
+                val intent = Intent(this, GameActivity::class.java)
                 startActivity(intent)
             }
             .setNegativeButton(

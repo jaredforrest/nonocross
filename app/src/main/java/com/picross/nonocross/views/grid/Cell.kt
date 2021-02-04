@@ -34,8 +34,8 @@ class Cell(
         LEFT(0x8), TOP(0x4), RIGHT(0x2), BOTTOM(0x1)
     }
 
-    private var top = _top.toFloat()
-    private var left = _left.toFloat()
+    private val top = _top.toFloat()
+    private val left = _left.toFloat()
     private val right = left + cellLength
     private val bottom = top + cellLength
 

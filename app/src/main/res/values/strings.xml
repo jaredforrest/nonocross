@@ -12,4 +12,5 @@
     <string name="rows">Rows</string>
     <string name="columns">Columns</string>
     <string name="grid_size">Grid Size</string>
+    <string name="finished">Finished</string>
 </resources>

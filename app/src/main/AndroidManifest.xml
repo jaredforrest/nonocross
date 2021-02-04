@@ -11,9 +11,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".RandomGameActivity"
-            android:screenOrientation="portrait"/>
-        <activity
             android:name=".LevelSelectActivity"
             android:screenOrientation="portrait" />
         <activity

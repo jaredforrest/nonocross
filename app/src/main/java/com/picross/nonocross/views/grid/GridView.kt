@@ -26,8 +26,8 @@ import android.view.ViewConfiguration
 import androidx.appcompat.app.AppCompatActivity
 import com.picross.nonocross.LevelDetails
 import com.picross.nonocross.R
-import com.picross.nonocross.util.countColNums
-import com.picross.nonocross.util.countRowNums
+import com.picross.nonocross.util.countCellNums
+import kotlinx.android.synthetic.main.activity_game.view.*
 
 class GridView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -131,11 +131,7 @@ class GridView @JvmOverloads constructor(
     }
 
     private fun drawCells(canvas: Canvas, nonocrossGrid: List<List<Cell>>) {
-        for (row in nonocrossGrid) {
-            for (cell in row) {
-                cell.draw(canvas)
-            }
-        }
+        nonocrossGrid.forEach { row -> row.forEach { cell -> cell.draw(canvas) } }
     }
 
     private fun getPadding(i: Int, j: Int): Int {
@@ -150,15 +146,15 @@ class GridView @JvmOverloads constructor(
     private fun checkGridDone(): Boolean {
         val userGrid =
             List(nonocrossGrid.size) { i -> List(nonocrossGrid[0].size) { j -> nonocrossGrid[i][j].userShading } }
-        val rowNums = List(gridData.rows) { i -> countRowNums(userGrid[i]) }
-        val colNums = List(gridData.cols) { i -> countColNums(userGrid, i) }
+        val rowNums = List(gridData.rows) { i -> countCellNums(userGrid[i]) }
+        val colNums = List(gridData.cols) { i -> countCellNums(userGrid.map { it[i] }) }
         return rowNums == gridData.rowNums && colNums == gridData.colNums
     }
 
     /** When the game is finished show a dialog */
     private fun gameDoneAlert() {
         AlertDialog.Builder(context)
-            .setTitle("Finished")
+            .setTitle(R.string.finished)
             .setMessage(R.string.level_complete)
             .setPositiveButton(
                 R.string.go_back
@@ -177,9 +173,13 @@ class GridView @JvmOverloads constructor(
         if(LevelDetails.isRandom){
             // restart activity to get new random grid
             (context as AppCompatActivity).recreate()
-        } else{
+        } else {
             // reset grid
-            nonocrossGrid.forEach { row -> row.forEach { it.userShading = CellShading.EMPTY } }
+            nonocrossGrid.forEach { row ->
+                row.forEach { cell ->
+                    cell.userShading = CellShading.EMPTY
+                }
+            }
             invalidate()
         }
     }
