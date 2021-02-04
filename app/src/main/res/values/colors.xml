@@ -8,4 +8,7 @@
     <color name="colorShaded">#1286FF</color>
     <color name="colorCrossed">#EF3340</color>
     <color name="colorEmpty">#FFFFFF</color>
+
+    <!-- For the row and columns -->
+    <color name="colorNumber">#000000</color>
 </resources>

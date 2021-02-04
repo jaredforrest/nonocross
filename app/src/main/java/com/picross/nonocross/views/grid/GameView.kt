@@ -17,9 +17,9 @@ package com.picross.nonocross.views.grid
 import android.content.Context
 import android.util.AttributeSet
 import android.view.ViewGroup
-import com.picross.nonocross.LevelDetails
 import com.picross.nonocross.util.GridData
 import com.picross.nonocross.util.generate
+import com.picross.nonocross.LevelDetails as LD
 
 class GameView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -30,7 +30,7 @@ class GameView @JvmOverloads constructor(
 
     init {
         generate(context)
-        gridData = LevelDetails.gridData
+        gridData = LD.gridData
         val colNumsView = ColNumsView(context)
         this.addView(colNumsView, 0)
         val rowNumsView = RowNumsView(context)
@@ -69,6 +69,7 @@ class GameView @JvmOverloads constructor(
         val leftPadding = (this.measuredWidth - rowNumWidth - gridWidth) / 2
 
         val colNumsView = getChildAt(0)
+        (colNumsView as ColNumsView).cellLength = cellLength
 
         // Get the maximum size of the child
         colNumsView.measure(
@@ -84,6 +85,8 @@ class GameView @JvmOverloads constructor(
         )
 
         val rowNumsView = getChildAt(1)
+        (rowNumsView as RowNumsView).cellLength = cellLength
+
         // Get the maximum size of the child
         rowNumsView.measure(
             MeasureSpec.makeMeasureSpec(rowNumWidth, MeasureSpec.EXACTLY),
@@ -101,6 +104,8 @@ class GameView @JvmOverloads constructor(
         // Then draw the grid
 
         val nonocrossGridView = getChildAt(2)
+        (nonocrossGridView as GridView).cellLength = cellLength
+
         // Get the maximum size of the child
         nonocrossGridView.measure(
             MeasureSpec.makeMeasureSpec(gridWidth, MeasureSpec.EXACTLY),

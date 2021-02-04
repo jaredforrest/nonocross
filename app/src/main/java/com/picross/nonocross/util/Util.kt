@@ -16,7 +16,6 @@ package com.picross.nonocross.util
 
 import android.content.Context
 import com.picross.nonocross.LevelDetails
-import com.picross.nonocross.views.grid.CellShading
 import java.io.InputStream
 
 fun generate(context: Context) {
@@ -32,11 +31,8 @@ fun generate(context: Context) {
     } else {
         openGridFile(context, LevelDetails.levelName)
     }
-    val rowNums = List(grid.size) { i -> countCellNums(grid[i]) }
 
-    val colNums = List(grid[0].size) { i -> countCellNums(grid.map { it[i] }) }
-
-    LevelDetails.gridData = GridData(grid, rowNums, colNums)
+    LevelDetails.gridData = GridData(grid)
 }
 
 fun openGridFile(context: Context, chosenLevelName: String): List<List<CellShading>> {
@@ -52,35 +48,18 @@ fun openGridFile(context: Context, chosenLevelName: String): List<List<CellShadi
     return List(rows) { i -> List(cols) { j -> if (text[i * (cols + 1) + j] == '1') CellShading.SHADED else CellShading.EMPTY } }
 }
 
-fun countCellNums(row: List<CellShading>): List<Int> {
-    val rowNum = mutableListOf<Int>()
-    var currNum = 0
-    row.forEach { cell ->
-        if (cell == CellShading.SHADED) currNum++
-        else if (currNum != 0) {
-            rowNum.add(currNum)
-            currNum = 0
-        }
-    }
-    if (currNum != 0) {
-        rowNum.add(currNum)
-    }
-
-    return rowNum
-}
-
 fun getAllLevels(context: Context): List<String> {
     return context.resources.assets.list("levels")?.toList() ?: listOf()
 }
 
 
-data class GridData(
-    val grid: List<List<CellShading>>,
-    val rowNums: List<List<Int>>,
-    val colNums: List<List<Int>>
-) {
+data class GridData(val grid: List<List<CellShading>>) {
     val rows get() = this.grid.size
     val cols get() = this.grid[0].size
+
+    // These are the numbers at the side/top of the row/column in-game
+    val rowNums get() = List(grid.size) { i -> countCellNums(grid[i]) }
+    val colNums get() = List(grid[0].size) { i -> countCellNums(grid.map { it[i] }) }
 
     /** Gets the width and height of the longest row and column */
     val longestRowNum
@@ -88,4 +67,22 @@ data class GridData(
             rowNums.fold(0,
                 { acc, i -> (i.size + if (i.count { it >= 10 } > 0) 1 else 0).coerceAtLeast(acc) })
     val longestColNum get() = colNums.fold(0, { acc, i -> i.size.coerceAtLeast(acc) })
+
+    private fun countCellNums(row: List<CellShading>): List<Int> {
+        return (row.runningFold(0) { acc, cell ->
+            if (cell == CellShading.SHADED) acc + 1
+            else 0
+        } + 0)
+            .zipWithNext { a, b -> if (b == 0) a else 0 }
+            .filterNot { it == 0 }
+    }
 }
+
+enum class CellShading {
+    CROSSED,
+    SHADED,
+    EMPTY
+}
+
+/** The cell is in the ith row and jth column like matrices */
+data class CellPosition(val i: Int, val j: Int)

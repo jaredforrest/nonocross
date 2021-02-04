@@ -44,15 +44,15 @@ class MainActivity : AppCompatActivity() {
         val diffPicker = dialogView.findViewById<NumberPicker>(R.id.difficulty_picker)
         rowsPicker.maxValue = 50
         rowsPicker.minValue = 2
-        rowsPicker.value = 10
+        rowsPicker.value = LevelDetails.randomGridRowsCols.first
         rowsPicker.wrapSelectorWheel = false
         colsPicker.maxValue = 50
         colsPicker.minValue = 2
-        colsPicker.value = 10
+        colsPicker.value = LevelDetails.randomGridRowsCols.second
         colsPicker.wrapSelectorWheel = false
         diffPicker.maxValue = 10
         diffPicker.minValue = 1
-        diffPicker.value = 5
+        diffPicker.value = LevelDetails.difficulty
         diffPicker.wrapSelectorWheel = false
         AlertDialog.Builder(this)
             .setTitle(R.string.grid_size)

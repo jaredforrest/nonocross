@@ -19,27 +19,31 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.view.View
-import com.picross.nonocross.LevelDetails
+import androidx.core.content.res.ResourcesCompat
+import com.picross.nonocross.R
+import com.picross.nonocross.LevelDetails as LD
 
 @SuppressLint("ViewConstructor")
 class ColNumsView(context: Context) : View(context) {
 
-    private val gridData = LevelDetails.gridData
-    private val blackPaint: Paint =
-        Paint().apply { setARGB(255, 0, 0, 0) }.apply { isAntiAlias = true }
-            .apply { textAlign = Paint.Align.CENTER }
+    var cellLength = 0
+    private val gridData = LD.gridData
+    private val colorNumber = ResourcesCompat.getColor(context.resources, R.color.colorNumber, null)
+    private val blackPaint = Paint()
+        .apply { color = colorNumber }
+        .apply { isAntiAlias = true }
+        .apply { textAlign = Paint.Align.CENTER }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
-        val cellLength =
-            (this.measuredWidth - gridData.cols - 1 - 2 * ((gridData.cols - 1) / 5)) / gridData.cols
+        /*val cellLength =
+            (this.measuredWidth - gridData.cols - 1 - 2 * ((gridData.cols - 1) / 5)) / gridData.cols*/
         blackPaint.apply { textSize = cellLength * 0.5F }
         var curLeft = cellLength.toFloat() * 0.5F
 
-        for ((i, col) in gridData.colNums.withIndex()){
-            var curBot = this.measuredHeight.toFloat() - cellLength.toFloat() * 0.2F  //((gridData.rows + 1) / 2 - col.size) * cellLength.toFloat() * 0.75F + cellLength.toFloat() * 0.5F
-            for (num in col.reversed()){
+        for ((i, col) in gridData.colNums.withIndex()) {
+            var curBot = this.measuredHeight.toFloat() - cellLength.toFloat() * 0.2F
+            for (num in col.reversed()) {
                 canvas.drawText(num.toString(), curLeft, curBot, blackPaint)
                 curBot -= cellLength.toFloat() * 0.75F
             }

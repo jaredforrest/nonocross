@@ -18,28 +18,33 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.view.View
+import androidx.core.content.res.ResourcesCompat
 import com.picross.nonocross.LevelDetails
+import com.picross.nonocross.R
 
 class RowNumsView(context: Context) : View(context) {
 
+    var cellLength = 0
     private val gridData = LevelDetails.gridData
-    private val blackPaint: Paint =
-        Paint().apply { setARGB(255, 0, 0, 0) }.apply { isAntiAlias = true }
-            .apply { textAlign = Paint.Align.RIGHT }
+    private val colorNumber = ResourcesCompat.getColor(context.resources, R.color.colorNumber, null)
+    private val blackPaint = Paint()
+        .apply { color = colorNumber }
+        .apply { isAntiAlias = true }
+        .apply { textAlign = Paint.Align.RIGHT }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
 
-        val cellLength =
-            (this.measuredHeight - gridData.rows - 1 - 2 * ((gridData.rows - 1) / 5)) / gridData.rows
+        /*val cellLength =
+            (this.measuredHeight - gridData.rows - 1 - 2 * ((gridData.rows - 1) / 5)) / gridData.rows*/
         blackPaint.apply { textSize = cellLength * 0.5F }
         var curBot = cellLength * 0.75F
 
-        for ((i, col) in gridData.rowNums.withIndex()){
+        for ((i, col) in gridData.rowNums.withIndex()) {
             var curLeft = this.measuredWidth.toFloat() - cellLength.toFloat() * 0.2F
-            for (num in col.reversed()){
+            for (num in col.reversed()) {
                 canvas.drawText(num.toString(), curLeft, curBot, blackPaint)
-                curLeft -= if(num < 10) cellLength * 0.5F else cellLength * 0.7F
+                curLeft -= if (num < 10) cellLength * 0.5F else cellLength * 0.7F
             }
             curBot += if ((i % gridData.cols + 1) % 5 == 0) {
                 cellLength + 3

@@ -24,16 +24,18 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
 import androidx.appcompat.app.AppCompatActivity
-import com.picross.nonocross.LevelDetails
 import com.picross.nonocross.R
-import com.picross.nonocross.util.countCellNums
-import kotlinx.android.synthetic.main.activity_game.view.*
+import com.picross.nonocross.util.CellPosition
+import com.picross.nonocross.util.CellShading
+import com.picross.nonocross.util.GridData
+import com.picross.nonocross.LevelDetails as LD
 
 class GridView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private val gridData = LevelDetails.gridData
+    private val gridData = LD.gridData
+    var cellLength = 0
 
     // Create grid of cells
     private lateinit var nonocrossGrid: List<List<Cell>>
@@ -50,7 +52,7 @@ class GridView @JvmOverloads constructor(
         isLongPress = true
     }
     private var isFirstCell = true
-    private var inCell = Pair(0, 0)
+    private var cellPos = CellPosition(0, 0)
     private var cellShade = CellShading.EMPTY
     private var isLongPress = false
 
@@ -66,7 +68,7 @@ class GridView @JvmOverloads constructor(
                                 mLongPressed,
                                 ViewConfiguration.getLongPressTimeout().toLong()
                             )
-                            inCell = Pair(i, j)
+                            cellPos = CellPosition(i, j)
                             isFirstCell = true
                             break@loop
                         }
@@ -76,27 +78,27 @@ class GridView @JvmOverloads constructor(
             MotionEvent.ACTION_UP -> {
                 handler.removeCallbacks(mLongPressed)
                 if (isFirstCell) {
-                    nonocrossGrid[inCell.first][inCell.second].click(isLongPress)
+                    nonocrossGrid[cellPos.i][cellPos.j].click(!(isLongPress.xor(LD.toggleCross)))
                     invalidate()
                     if (checkGridDone()) gameDoneAlert()
                 }
             }
 
             MotionEvent.ACTION_MOVE -> {
-                if (!nonocrossGrid[inCell.first][inCell.second].isInside(event.x, event.y)) {
+                if (!nonocrossGrid[cellPos.i][cellPos.j].isInside(event.x, event.y)) {
                     if (isFirstCell) {
                         handler.removeCallbacks(mLongPressed)
                         isFirstCell = false
-                        nonocrossGrid[inCell.first][inCell.second].click(isLongPress)
-                        cellShade = nonocrossGrid[inCell.first][inCell.second].userShading
+                        nonocrossGrid[cellPos.i][cellPos.j].click(!(isLongPress.xor(LD.toggleCross)))
+                        cellShade = nonocrossGrid[cellPos.i][cellPos.j].userShading
                         invalidate()
                         if (checkGridDone()) gameDoneAlert()
                     }
                     loop@ for ((i, row) in nonocrossGrid.withIndex()) {
                         for ((j, cell) in row.withIndex()) {
                             if (cell.isInside(event.x, event.y)) {
-                                inCell = Pair(i, j)
-                                nonocrossGrid[inCell.first][inCell.second].userShading = cellShade
+                                cellPos = CellPosition(i, j)
+                                nonocrossGrid[cellPos.i][cellPos.j].userShading = cellShade
                                 invalidate()
                                 if (checkGridDone()) gameDoneAlert()
                                 break@loop
@@ -115,8 +117,8 @@ class GridView @JvmOverloads constructor(
     }
 
     private fun initializeGrid(): List<List<Cell>> {
-        val cellLength =
-            (this.measuredWidth - gridData.cols - 1 - 2 * ((gridData.cols - 1) / 5)) / gridData.cols
+        /*val cellLength =
+            (this.measuredWidth - gridData.cols - 1 - 2 * ((gridData.cols - 1) / 5)) / gridData.cols*/
         return List(gridData.rows) { i ->
             List(gridData.cols) { j ->
                 Cell(
@@ -144,11 +146,9 @@ class GridView @JvmOverloads constructor(
     }
 
     private fun checkGridDone(): Boolean {
-        val userGrid =
-            List(nonocrossGrid.size) { i -> List(nonocrossGrid[0].size) { j -> nonocrossGrid[i][j].userShading } }
-        val rowNums = List(gridData.rows) { i -> countCellNums(userGrid[i]) }
-        val colNums = List(gridData.cols) { i -> countCellNums(userGrid.map { it[i] }) }
-        return rowNums == gridData.rowNums && colNums == gridData.colNums
+        val userGridData =
+            GridData(List(nonocrossGrid.size) { i -> List(nonocrossGrid[0].size) { j -> nonocrossGrid[i][j].userShading } })
+        return userGridData.rowNums == gridData.rowNums && userGridData.colNums == gridData.colNums
     }
 
     /** When the game is finished show a dialog */
@@ -157,7 +157,7 @@ class GridView @JvmOverloads constructor(
             .setTitle(R.string.finished)
             .setMessage(R.string.level_complete)
             .setPositiveButton(
-                R.string.go_back
+                R.string.main_menu
             ) { _: DialogInterface, _: Int ->
                 (context as AppCompatActivity).finish()
             }
@@ -170,7 +170,7 @@ class GridView @JvmOverloads constructor(
     }
 
     private fun resetGrid(){
-        if(LevelDetails.isRandom){
+        if (LD.isRandom) {
             // restart activity to get new random grid
             (context as AppCompatActivity).recreate()
         } else {

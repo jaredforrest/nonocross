@@ -24,3 +24,4 @@ object LevelDetails {
     var randomGridRowsCols = Pair(10, 10)
 
     var toggleCross = false
+}
