@@ -15,17 +15,24 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.widget.NumberPicker
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var preferences: SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        preferences = PreferenceManager.getDefaultSharedPreferences(this)
     }
 
     /** Called when the user taps the Start Level button */
@@ -36,7 +43,6 @@ class MainActivity : AppCompatActivity() {
 
     /** Called when the user taps the Random Level button */
     fun openRandomLevel(view: View) {
-
         val inflater = this.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.dialogue_random_grid, null)
         val rowsPicker = dialogView.findViewById<NumberPicker>(R.id.rows_picker)
@@ -44,15 +50,16 @@ class MainActivity : AppCompatActivity() {
         val diffPicker = dialogView.findViewById<NumberPicker>(R.id.difficulty_picker)
         rowsPicker.maxValue = 50
         rowsPicker.minValue = 2
-        rowsPicker.value = LevelDetails.randomGridRowsCols.first
+        rowsPicker.value = preferences.getInt("rows", 10)
         rowsPicker.wrapSelectorWheel = false
         colsPicker.maxValue = 50
         colsPicker.minValue = 2
-        colsPicker.value = LevelDetails.randomGridRowsCols.second
+        colsPicker.value =
+            preferences.getInt("columns", 10) //columns //LevelDetails.randomGridRowsCols.second
         colsPicker.wrapSelectorWheel = false
         diffPicker.maxValue = 10
         diffPicker.minValue = 1
-        diffPicker.value = LevelDetails.difficulty
+        diffPicker.value = preferences.getInt("difficulty", 5)
         diffPicker.wrapSelectorWheel = false
         AlertDialog.Builder(this)
             .setTitle(R.string.grid_size)
@@ -60,9 +67,13 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton(
                 android.R.string.ok
             ) { _, _ ->
+                val editor = preferences.edit()
+                editor.putInt("columns", colsPicker.value)
+                editor.putInt("rows", rowsPicker.value)
+                editor.putInt("difficulty", diffPicker.value)
+                editor.apply()
+
                 LevelDetails.isRandom = true
-                LevelDetails.randomGridRowsCols = Pair(rowsPicker.value, colsPicker.value)
-                LevelDetails.difficulty = diffPicker.value
                 val intent = Intent(this, GameActivity::class.java)
                 startActivity(intent)
             }
@@ -71,6 +82,5 @@ class MainActivity : AppCompatActivity() {
             ) { _, _ -> }
             .create()
             .show()
-
     }
 }

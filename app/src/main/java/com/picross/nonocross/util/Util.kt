@@ -15,19 +15,25 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross.util
 
 import android.content.Context
+import androidx.preference.PreferenceManager
 import com.picross.nonocross.LevelDetails
 import java.io.InputStream
 
 fun generate(context: Context) {
+
+    val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+    val columns = preferences.getInt("columns", 10)
+    val rows = preferences.getInt("rows", 10)
+    val difficulty = preferences.getInt("difficulty", 10)
 
     val grid = if (LevelDetails.isRandom) {
         // Difficulty is set by changing the proportion of filled to empty cell
         // ie. difficulty=5 -> listOf(0,1,1,1,1,1)
         // difficulty=10 -> listOf(0,1)
         val difficultyList =
-            List(12 - LevelDetails.difficulty) { i -> if (i != 0) CellShading.SHADED else CellShading.EMPTY }
+            List(12 - difficulty) { i -> if (i != 0) CellShading.SHADED else CellShading.EMPTY }
 
-        List(LevelDetails.randomGridRowsCols.first) { List(LevelDetails.randomGridRowsCols.second) { difficultyList.random() } }
+        List(rows) { List(columns) { difficultyList.random() } }
     } else {
         openGridFile(context, LevelDetails.levelName)
     }
