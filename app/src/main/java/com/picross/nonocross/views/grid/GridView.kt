@@ -28,6 +28,7 @@ import com.picross.nonocross.R
 import com.picross.nonocross.util.CellPosition
 import com.picross.nonocross.util.CellShading
 import com.picross.nonocross.util.GridData
+import com.picross.nonocross.util.UndoStack
 import com.picross.nonocross.LevelDetails as LD
 
 class GridView @JvmOverloads constructor(
@@ -39,6 +40,9 @@ class GridView @JvmOverloads constructor(
 
     // Create grid of cells
     private lateinit var nonocrossGrid: List<List<Cell>>
+
+    // Create undo stack
+    private val undoStack = UndoStack(gridData.rows, gridData.cols)
 
     override fun onDraw(canvas: Canvas) {
         if (!this::nonocrossGrid.isInitialized) {
@@ -182,6 +186,11 @@ class GridView @JvmOverloads constructor(
             }
             invalidate()
         }
+    }
+
+    fun undo() {
+        nonocrossGrid = undoStack.pop(nonocrossGrid)
+        invalidate()
     }
 
 }

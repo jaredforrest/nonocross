@@ -17,6 +17,7 @@ package com.picross.nonocross.util
 import android.content.Context
 import androidx.preference.PreferenceManager
 import com.picross.nonocross.LevelDetails
+import com.picross.nonocross.views.grid.Cell
 import java.io.InputStream
 
 fun generate(context: Context) {
@@ -82,6 +83,32 @@ data class GridData(val grid: List<List<CellShading>>) {
             .zipWithNext { a, b -> if (b == 0) a else 0 }
             .filterNot { it == 0 }
     }
+}
+
+data class UndoStack(val rows: Int, val cols: Int) {
+    private val elements: MutableList<List<List<CellShading>>> =
+        MutableList(1) { List(rows) { List(cols) { CellShading.EMPTY } } }
+
+    //private fun isEmpty() = elements.isEmpty()
+
+    //private val size get() = elements.size
+
+    fun push(item: List<List<Cell>>) =
+        elements.add(List(rows) { i -> List(cols) { j -> item[i][j].userShading } })
+
+    fun pop(grid: List<List<Cell>>): List<List<Cell>> {
+        val item = elements.last()
+        grid.forEachIndexed { i, row ->
+            row.forEachIndexed { j, cell ->
+                cell.userShading = item[i][j]
+            }
+        }
+        if (elements.size > 1) {
+            elements.removeAt(elements.size - 1)
+        }
+        return grid
+    }
+    //fun peek() : Any? = elements.lastOrNull()
 }
 
 enum class CellShading {

@@ -15,8 +15,11 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.SwitchCompat
+import com.picross.nonocross.views.grid.GameView
+import com.picross.nonocross.views.grid.GridView
 
 class GameActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,6 +30,10 @@ class GameActivity : AppCompatActivity() {
         findViewById<SwitchCompat>(R.id.toggleCross).setOnCheckedChangeListener { _, isChecked ->
             LevelDetails.toggleCross = isChecked
         }
+    }
+
+    fun onClick(view: View) {
+        (findViewById<GameView>(R.id.nonocrossGameView).getChildAt(2) as GridView).undo()
     }
 }
 
