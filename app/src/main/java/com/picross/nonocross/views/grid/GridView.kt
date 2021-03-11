@@ -52,72 +52,117 @@ class GridView @JvmOverloads constructor(
         drawCells(canvas, nonocrossGrid)
     }
 
-    private var mLongPressed = Runnable {
-        isLongPress = true
-    }
-    private var isFirstCell = true
-    private var cellPos = CellPosition(0, 0)
-    private var cellShade = CellShading.EMPTY
-    private var isLongPress = false
-
     @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
-                isLongPress = false
-                loop@ for ((i, row) in nonocrossGrid.withIndex()) {
-                    for ((j, cell) in row.withIndex()) {
-                        if (cell.isInside(event.x, event.y)) {
-                            handler.postDelayed(
-                                mLongPressed,
-                                ViewConfiguration.getLongPressTimeout().toLong()
-                            )
-                            cellPos = CellPosition(i, j)
-                            isFirstCell = true
-                            break@loop
-                        }
-                    }
-                }
+                initializeFill(event.x, event.y)
             }
             MotionEvent.ACTION_UP -> {
-                handler.removeCallbacks(mLongPressed)
-                if (isFirstCell) {
-                    nonocrossGrid[cellPos.i][cellPos.j].click(!(isLongPress.xor(LD.toggleCross)))
-                    invalidate()
-                    if (checkGridDone()) gameDoneAlert()
-                }
+                endFill()
             }
 
             MotionEvent.ACTION_MOVE -> {
                 if (!nonocrossGrid[cellPos.i][cellPos.j].isInside(event.x, event.y)) {
-                    if (isFirstCell) {
-                        handler.removeCallbacks(mLongPressed)
-                        isFirstCell = false
-                        nonocrossGrid[cellPos.i][cellPos.j].click(!(isLongPress.xor(LD.toggleCross)))
-                        cellShade = nonocrossGrid[cellPos.i][cellPos.j].userShading
-                        invalidate()
-                        if (checkGridDone()) gameDoneAlert()
-                    }
-                    loop@ for ((i, row) in nonocrossGrid.withIndex()) {
-                        for ((j, cell) in row.withIndex()) {
-                            if (cell.isInside(event.x, event.y)) {
-                                cellPos = CellPosition(i, j)
-                                nonocrossGrid[cellPos.i][cellPos.j].userShading = cellShade
-                                invalidate()
-                                if (checkGridDone()) gameDoneAlert()
-                                break@loop
-                            }
-                        }
-                    }
+                    // Only run if current cell has moved
+                    startFill(event.x, event.y)
                 }
             }
             MotionEvent.ACTION_CANCEL -> {
                 handler.removeCallbacks(mLongPressed)
-                isFirstCell = true
-                cellShade = CellShading.EMPTY
             }
         }
         return true
+    }
+
+    private var mLongPressed = Runnable {
+        isLongPress = true
+    }
+    private var isFirstCell = true
+    private var firstCellPos = CellPosition(-1, -1)
+
+    private var cellPos = CellPosition(-1, -1)
+    private var isLongPress = false
+
+    private var fillVertical = false
+    private var fillHorizontal = false
+
+    private fun initializeFill(x: Float, y: Float) {
+        run loop@{
+            nonocrossGrid.forEachIndexed { i, row ->
+                row.forEachIndexed { j, cell ->
+                    if (cell.isInside(x, y)) {
+                        handler.postDelayed(
+                            mLongPressed,
+                            ViewConfiguration.getLongPressTimeout().toLong()
+                        )
+
+                        undoStack.push(nonocrossGrid)
+
+                        firstCellPos = CellPosition(i, j)
+                        cellPos = firstCellPos
+                        isFirstCell = true
+                        fillHorizontal =
+                            true  // If user places diagonally still allow to fill cells
+                        fillVertical = false
+                        isLongPress = false
+                        return@loop
+                    }
+                }
+            }
+        }
+    }
+
+    private fun startFill(x: Float, y: Float) {
+        if (isFirstCell) {
+            handler.removeCallbacks(mLongPressed)
+            isFirstCell = false
+            nonocrossGrid[firstCellPos.i][firstCellPos.j].click(!(isLongPress.xor(LD.toggleCross)))
+            invalidate()
+            if (checkGridDone()) gameDoneAlert()
+
+            loop@ for ((i, row) in nonocrossGrid.withIndex()) {
+                for ((j, cell) in row.withIndex()) {
+                    if (cell.isInside(x, y)) {
+                        if (i == firstCellPos.i) {
+                            fillHorizontal = true
+                        } else if (j == firstCellPos.j) {
+                            fillHorizontal = false
+                            fillVertical = true
+                        }
+                        break@loop
+                    }
+                }
+            }
+        } else {
+            loop@ for ((i, row) in nonocrossGrid.withIndex()) {
+                for ((j, cell) in row.withIndex()) {
+                    if (cell.isInside(x, y)) {
+                        if (fillHorizontal) {
+                            nonocrossGrid[firstCellPos.i][j].userShading =
+                                nonocrossGrid[firstCellPos.i][firstCellPos.j].userShading
+                        }
+                        if (fillVertical) {
+                            nonocrossGrid[i][firstCellPos.j].userShading =
+                                nonocrossGrid[firstCellPos.i][firstCellPos.j].userShading
+                        }
+                        cellPos = CellPosition(i, j)
+                        invalidate()
+                        if (checkGridDone()) gameDoneAlert()
+                        break@loop
+                    }
+                }
+            }
+        }
+    }
+
+    private fun endFill() {
+        handler.removeCallbacks(mLongPressed)
+        if (isFirstCell) {
+            nonocrossGrid[firstCellPos.i][firstCellPos.j].click(!(isLongPress.xor(LD.toggleCross)))
+            invalidate()
+            if (checkGridDone()) gameDoneAlert()
+        }
     }
 
     private fun initializeGrid(): List<List<Cell>> {
