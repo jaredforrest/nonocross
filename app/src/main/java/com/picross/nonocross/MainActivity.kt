@@ -21,6 +21,7 @@ import android.view.View
 import android.widget.NumberPicker
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 
 
@@ -33,6 +34,15 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
+        val override = preferences.getBoolean("overrideSystemTheme", false)
+        val darkmode = preferences.getBoolean("darkMode", false)
+        if (override) {
+            if (darkmode) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+        }
     }
 
     fun onClick(view: View) {

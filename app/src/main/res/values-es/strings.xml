@@ -16,7 +16,11 @@
     <string name="preferences">Preferencias</string>
     <string name="vibrate_title">Vibrar</string>
     <string name="fat_finger_title">Relleno de una Sola línea</string>
-    <string name="fat_finger_summary">"Habilite si es difícil tocar cuadrados individuales. "</string>
+    <string name="fat_finger_summary">Habilite si es difícil tocar cuadrados individuales</string>
     <string name="usability_header">Funcionalidad</string>
-    <string name="vibrate_summary">Vibrar al realizar determinadas acciones.</string>
+    <string name="vibrate_summary">Vibrar al realizar determinadas acciones</string>
+    <string name="dark_mode_header">Modo Oscuro</string>
+    <string name="override_system_theme">Anular el tema de sistema</string>
+    <string name="enable_dark_mode">Habilitar el modo oscuro</string>
+    <string name="requires_restart">Requiere Reinicio</string>
 </resources>

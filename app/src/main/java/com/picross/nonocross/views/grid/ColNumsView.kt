@@ -28,7 +28,7 @@ class ColNumsView(context: Context) : View(context) {
 
     var cellLength = 0
     private val gridData = LD.gridData
-    private val colorNumber = ResourcesCompat.getColor(context.resources, R.color.colorNumber, null)
+    private val colorNumber = ResourcesCompat.getColor(context.resources, R.color.colorText, null)
     private val blackPaint = Paint()
         .apply { color = colorNumber }
         .apply { isAntiAlias = true }

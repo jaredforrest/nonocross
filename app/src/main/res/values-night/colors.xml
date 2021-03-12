@@ -7,11 +7,11 @@
     <!-- For the cells -->
     <color name="colorShaded">#1286FF</color>
     <color name="colorCrossed">#EF3340</color>
-    <color name="colorEmpty">@android:color/white</color>
+    <color name="colorEmpty">#222222</color>
 
     <!-- For the row and columns -->
-    <color name="colorText">@android:color/black</color>
+    <color name="colorText">#FFFFFF</color>
 
-    <style name="Button.Normal" parent="@style/Widget.AppCompat.Button" />
+    <style name="Button.Normal" parent="@style/Widget.AppCompat.Button.Colored" />
 
 </resources>

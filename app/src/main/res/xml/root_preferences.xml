@@ -15,4 +15,20 @@
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/dark_mode_header">
+
+        <CheckBoxPreference
+            app:defaultValue="false"
+            app:key="overrideSystemTheme"
+            app:summary="@string/requires_restart"
+            app:title="@string/override_system_theme" />
+
+        <SwitchPreferenceCompat
+            app:dependency="overrideSystemTheme"
+            app:key="darkMode"
+            app:title="@string/enable_dark_mode" />
+
+
+    </PreferenceCategory>
+
 </PreferenceScreen>

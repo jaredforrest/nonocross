@@ -35,7 +35,7 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
 
     <Button
         android:id="@+id/level_select"
-        style="@style/Widget.AppCompat.Button"
+        style="@style/Button.Normal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onClick"
@@ -48,7 +48,7 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
 
     <Button
         android:id="@+id/random_level"
-        style="@style/Widget.AppCompat.Button"
+        style="@style/Button.Normal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onClick"
@@ -62,7 +62,7 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
 
     <Button
         android:id="@+id/preferences"
-        style="@style/Widget.AppCompat.Button"
+        style="@style/Button.Normal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:onClick="onClick"
