@@ -209,6 +209,7 @@ class GridView @JvmOverloads constructor(
             .setNegativeButton(
                 R.string.reset
             ) { _: DialogInterface, _: Int ->
+                if (vibrateOn) vibrate(context)
                 resetGrid()
             }
             .show()
