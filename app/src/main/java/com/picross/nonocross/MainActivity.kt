@@ -35,14 +35,22 @@ class MainActivity : AppCompatActivity() {
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
     }
 
+    fun onClick(view: View) {
+        when (view.id) {
+            R.id.random_level -> openRandomLevel()
+            R.id.level_select -> openLevelSelect()
+            R.id.preferences -> openPreferences()
+        }
+    }
+
     /** Called when the user taps the Start Level button */
-    fun openLevelSelect(view: View) {
+    private fun openLevelSelect() {
         val intent = Intent(this, LevelSelectActivity::class.java)
         startActivity(intent)
     }
 
     /** Called when the user taps the Random Level button */
-    fun openRandomLevel(view: View) {
+    private fun openRandomLevel() {
         val inflater = this.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.dialogue_random_grid, null)
         val rowsPicker = dialogView.findViewById<NumberPicker>(R.id.rows_picker)
@@ -55,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         colsPicker.maxValue = 50
         colsPicker.minValue = 2
         colsPicker.value =
-            preferences.getInt("columns", 10) //columns //LevelDetails.randomGridRowsCols.second
+            preferences.getInt("columns", 10)
         colsPicker.wrapSelectorWheel = false
         diffPicker.maxValue = 10
         diffPicker.minValue = 1

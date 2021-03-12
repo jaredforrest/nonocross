@@ -19,7 +19,7 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import androidx.core.content.res.ResourcesCompat
 import com.picross.nonocross.R
-import com.picross.nonocross.util.CellShading
+import com.picross.nonocross.util.CellShade
 
 class Cell(
     _left: Int,
@@ -29,7 +29,7 @@ class Cell(
     context: Context
 ) {
 
-    var userShading = CellShading.EMPTY
+    var userShade = CellShade.EMPTY
 
     // Each Cell has at least 0.5px padding but some have 1.5px
     enum class BigPadding(val flag: Int) {
@@ -59,10 +59,10 @@ class Cell(
         .apply { isAntiAlias = true }
 
     fun draw(canvas: Canvas) {
-        when (userShading) {
-            CellShading.EMPTY -> drawCell(canvas, paintEmpty)
-            CellShading.SHADED -> drawCell(canvas, paintShaded)
-            CellShading.CROSSED -> drawCross(canvas)
+        when (userShade) {
+            CellShade.EMPTY -> drawCell(canvas, paintEmpty)
+            CellShade.SHADED -> drawCell(canvas, paintShaded)
+            CellShade.CROSSED -> drawCross(canvas)
         }
     }
 
@@ -94,15 +94,15 @@ class Cell(
     }
 
     fun click(invert: Boolean) {
-        userShading = if (invert) {
-            when (userShading) {
-                CellShading.CROSSED, CellShading.SHADED -> CellShading.EMPTY
-                CellShading.EMPTY -> CellShading.SHADED
+        userShade = if (invert) {
+            when (userShade) {
+                CellShade.CROSSED, CellShade.SHADED -> CellShade.EMPTY
+                CellShade.EMPTY -> CellShade.SHADED
             }
         } else {
-            when (userShading) {
-                CellShading.CROSSED -> CellShading.EMPTY
-                CellShading.EMPTY, CellShading.SHADED -> CellShading.CROSSED
+            when (userShade) {
+                CellShade.CROSSED -> CellShade.EMPTY
+                CellShade.EMPTY, CellShade.SHADED -> CellShade.CROSSED
             }
         }
     }

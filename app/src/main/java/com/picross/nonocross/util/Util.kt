@@ -15,6 +15,9 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross.util
 
 import android.content.Context
+import android.os.Build
+import android.os.VibrationEffect
+import android.os.Vibrator
 import androidx.preference.PreferenceManager
 import com.picross.nonocross.LevelDetails
 import com.picross.nonocross.views.grid.Cell
@@ -32,7 +35,7 @@ fun generate(context: Context) {
         // ie. difficulty=5 -> listOf(0,1,1,1,1,1)
         // difficulty=10 -> listOf(0,1)
         val difficultyList =
-            List(12 - difficulty) { i -> if (i != 0) CellShading.SHADED else CellShading.EMPTY }
+            List(12 - difficulty) { i -> if (i != 0) CellShade.SHADED else CellShade.EMPTY }
 
         List(rows) { List(columns) { difficultyList.random() } }
     } else {
@@ -42,7 +45,7 @@ fun generate(context: Context) {
     LevelDetails.gridData = GridData(grid)
 }
 
-fun openGridFile(context: Context, chosenLevelName: String): List<List<CellShading>> {
+fun openGridFile(context: Context, chosenLevelName: String): List<List<CellShade>> {
     val inputStream: InputStream = context.resources.assets.open("levels/$chosenLevelName")
     val buffer = ByteArray(inputStream.available())
     inputStream.read(buffer)
@@ -52,7 +55,7 @@ fun openGridFile(context: Context, chosenLevelName: String): List<List<CellShadi
     val rows = text.count { it == '\n' }
     val cols = text.count { it != '\n' } / rows
 
-    return List(rows) { i -> List(cols) { j -> if (text[i * (cols + 1) + j] == '1') CellShading.SHADED else CellShading.EMPTY } }
+    return List(rows) { i -> List(cols) { j -> if (text[i * (cols + 1) + j] == '1') CellShade.SHADED else CellShade.EMPTY } }
 }
 
 fun getAllLevels(context: Context): List<String> {
@@ -60,7 +63,7 @@ fun getAllLevels(context: Context): List<String> {
 }
 
 
-data class GridData(val grid: List<List<CellShading>>) {
+data class GridData(val grid: List<List<CellShade>>) {
     val rows get() = this.grid.size
     val cols get() = this.grid[0].size
 
@@ -75,9 +78,9 @@ data class GridData(val grid: List<List<CellShading>>) {
                 { acc, i -> (i.size + if (i.count { it >= 10 } > 0) 1 else 0).coerceAtLeast(acc) })
     val longestColNum get() = colNums.fold(0, { acc, i -> i.size.coerceAtLeast(acc) })
 
-    private fun countCellNums(row: List<CellShading>): List<Int> {
+    private fun countCellNums(row: List<CellShade>): List<Int> {
         return (row.runningFold(0) { acc, cell ->
-            if (cell == CellShading.SHADED) acc + 1
+            if (cell == CellShade.SHADED) acc + 1
             else 0
         } + 0)
             .zipWithNext { a, b -> if (b == 0) a else 0 }
@@ -86,21 +89,16 @@ data class GridData(val grid: List<List<CellShading>>) {
 }
 
 data class UndoStack(val rows: Int, val cols: Int) {
-    private val elements: MutableList<List<List<CellShading>>> =
-        MutableList(1) { List(rows) { List(cols) { CellShading.EMPTY } } }
-
-    //private fun isEmpty() = elements.isEmpty()
-
-    //private val size get() = elements.size
+    private val elements: MutableList<List<List<CellShade>>> =
+        MutableList(1) { List(rows) { List(cols) { CellShade.EMPTY } } }
 
     fun push(item: List<List<Cell>>) =
-        elements.add(List(rows) { i -> List(cols) { j -> item[i][j].userShading } })
+        elements.add(List(rows) { i -> List(cols) { j -> item[i][j].userShade } })
 
     fun pop(grid: List<List<Cell>>): List<List<Cell>> {
-        val item = elements.last()
         grid.forEachIndexed { i, row ->
             row.forEachIndexed { j, cell ->
-                cell.userShading = item[i][j]
+                cell.userShade = elements.last()[i][j]
             }
         }
         if (elements.size > 1) {
@@ -108,10 +106,9 @@ data class UndoStack(val rows: Int, val cols: Int) {
         }
         return grid
     }
-    //fun peek() : Any? = elements.lastOrNull()
 }
 
-enum class CellShading {
+enum class CellShade {
     CROSSED,
     SHADED,
     EMPTY
@@ -119,3 +116,19 @@ enum class CellShading {
 
 /** The cell is in the ith row and jth column like matrices */
 data class CellPosition(val i: Int, val j: Int)
+
+fun vibrate(context: Context) {
+    when {
+        Build.VERSION.SDK_INT >= 26 -> {
+            (context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator).vibrate(
+                VibrationEffect.createOneShot(
+                    50,
+                    VibrationEffect.DEFAULT_AMPLITUDE
+                )
+            )
+        }
+        else -> {
+            (context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator).vibrate(50)
+        }
+    }
+}

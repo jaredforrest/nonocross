@@ -14,21 +14,19 @@ You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross.views.grid
 
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.content.SharedPreferences
 import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
 import androidx.appcompat.app.AppCompatActivity
+import androidx.preference.PreferenceManager
 import com.picross.nonocross.R
-import com.picross.nonocross.util.CellPosition
-import com.picross.nonocross.util.CellShading
-import com.picross.nonocross.util.GridData
-import com.picross.nonocross.util.UndoStack
+import com.picross.nonocross.util.*
 import com.picross.nonocross.LevelDetails as LD
 
 class GridView @JvmOverloads constructor(
@@ -38,21 +36,26 @@ class GridView @JvmOverloads constructor(
     private val gridData = LD.gridData
     var cellLength = 0
 
+    // Get Preferences
+    private val sharedPreferences: SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(context)
+    private val fatFingerMode = sharedPreferences.getBoolean("fatFinger", true)
+    private val vibrateOn = sharedPreferences.getBoolean("vibrate", false)
+
     // Create grid of cells
-    private lateinit var nonocrossGrid: List<List<Cell>>
+    private lateinit var nonoGrid: List<List<Cell>>
 
     // Create undo stack
     private val undoStack = UndoStack(gridData.rows, gridData.cols)
 
     override fun onDraw(canvas: Canvas) {
-        if (!this::nonocrossGrid.isInitialized) {
-            nonocrossGrid = initializeGrid()
+        if (!this::nonoGrid.isInitialized) {
+            nonoGrid = initializeGrid()
         }
         super.onDraw(canvas)
-        drawCells(canvas, nonocrossGrid)
+        drawCells(canvas, nonoGrid)
     }
 
-    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> {
@@ -63,8 +66,8 @@ class GridView @JvmOverloads constructor(
             }
 
             MotionEvent.ACTION_MOVE -> {
-                if (!nonocrossGrid[cellPos.i][cellPos.j].isInside(event.x, event.y)) {
-                    // Only run if current cell has moved
+                // Only run if current cell has moved
+                if (!nonoGrid[cellPos.i][cellPos.j].isInside(event.x, event.y)) {
                     startFill(event.x, event.y)
                 }
             }
@@ -75,82 +78,62 @@ class GridView @JvmOverloads constructor(
         return true
     }
 
-    private var mLongPressed = Runnable {
-        isLongPress = true
-    }
     private var isFirstCell = true
-    private var firstCellPos = CellPosition(-1, -1)
+
+    /** first cell position */
+    private var fCP = CellPosition(-1, -1)
 
     private var cellPos = CellPosition(-1, -1)
     private var isLongPress = false
 
-    private var fillVertical = false
-    private var fillHorizontal = false
+    /** fill horizontally, if false fill vertically */
+    private var fillHori = true
+
+    private var mLongPressed = Runnable {
+        nonoGrid[fCP.i][fCP.j].click(LD.toggleCross)
+        invalidate()
+        isLongPress = true
+        if (vibrateOn) vibrate(context)
+    }
 
     private fun initializeFill(x: Float, y: Float) {
-        run loop@{
-            nonocrossGrid.forEachIndexed { i, row ->
-                row.forEachIndexed { j, cell ->
-                    if (cell.isInside(x, y)) {
-                        handler.postDelayed(
-                            mLongPressed,
-                            ViewConfiguration.getLongPressTimeout().toLong()
-                        )
+        nonoGrid.getCellAt(x, y) { i, j ->
+            handler.postDelayed(
+                mLongPressed,
+                ViewConfiguration.getLongPressTimeout().toLong()
+            )
+            undoStack.push(nonoGrid)
 
-                        undoStack.push(nonocrossGrid)
-
-                        firstCellPos = CellPosition(i, j)
-                        cellPos = firstCellPos
-                        isFirstCell = true
-                        fillHorizontal =
-                            true  // If user places diagonally still allow to fill cells
-                        fillVertical = false
-                        isLongPress = false
-                        return@loop
-                    }
-                }
-            }
+            cellPos = CellPosition(i, j)
+            fCP = cellPos
+            isFirstCell = true
+            isLongPress = false
         }
     }
 
     private fun startFill(x: Float, y: Float) {
         if (isFirstCell) {
-            handler.removeCallbacks(mLongPressed)
             isFirstCell = false
-            nonocrossGrid[firstCellPos.i][firstCellPos.j].click(!(isLongPress.xor(LD.toggleCross)))
+            handler.removeCallbacks(mLongPressed)
+            if (!isLongPress) nonoGrid[fCP.i][fCP.j].click(!LD.toggleCross)
             invalidate()
             if (checkGridDone()) gameDoneAlert()
 
-            loop@ for ((i, row) in nonocrossGrid.withIndex()) {
-                for ((j, cell) in row.withIndex()) {
-                    if (cell.isInside(x, y)) {
-                        if (i == firstCellPos.i) {
-                            fillHorizontal = true
-                        } else if (j == firstCellPos.j) {
-                            fillHorizontal = false
-                            fillVertical = true
-                        }
-                        break@loop
-                    }
-                }
-            }
+            nonoGrid.getCellAt(x, y) { i, _ -> fillHori = (i == fCP.i) }
         } else {
-            loop@ for ((i, row) in nonocrossGrid.withIndex()) {
-                for ((j, cell) in row.withIndex()) {
-                    if (cell.isInside(x, y)) {
-                        if (fillHorizontal) {
-                            nonocrossGrid[firstCellPos.i][j].userShading =
-                                nonocrossGrid[firstCellPos.i][firstCellPos.j].userShading
-                        }
-                        if (fillVertical) {
-                            nonocrossGrid[i][firstCellPos.j].userShading =
-                                nonocrossGrid[firstCellPos.i][firstCellPos.j].userShading
-                        }
-                        cellPos = CellPosition(i, j)
-                        invalidate()
-                        if (checkGridDone()) gameDoneAlert()
-                        break@loop
+            nonoGrid.getCellAt(x, y) { i, j ->
+                if (fatFingerMode) {
+                    if (fillHori) {
+                        nonoGrid[fCP.i][j].userShade = nonoGrid[fCP.i][fCP.j].userShade
+                    } else {
+                        nonoGrid[i][fCP.j].userShade = nonoGrid[fCP.i][fCP.j].userShade
                     }
+                    cellPos = CellPosition(i, j)
+                    invalidate()
+                    if (checkGridDone()) gameDoneAlert()
+                } else {
+                    nonoGrid[i][j].userShade = nonoGrid[fCP.i][fCP.j].userShade
+                    invalidate()
                 }
             }
         }
@@ -158,16 +141,29 @@ class GridView @JvmOverloads constructor(
 
     private fun endFill() {
         handler.removeCallbacks(mLongPressed)
-        if (isFirstCell) {
-            nonocrossGrid[firstCellPos.i][firstCellPos.j].click(!(isLongPress.xor(LD.toggleCross)))
+        if (isFirstCell and !isLongPress) {
+            nonoGrid[fCP.i][fCP.j].click(!LD.toggleCross)
+
             invalidate()
             if (checkGridDone()) gameDoneAlert()
         }
     }
 
+
+    private fun List<List<Cell>>.getCellAt(x: Float, y: Float, action: (Int, Int) -> Unit) {
+        run loop@{
+            this.forEachIndexed { i, row ->
+                row.forEachIndexed { j, cell ->
+                    if (cell.isInside(x, y)) {
+                        action(i, j)
+                        return@loop
+                    }
+                }
+            }
+        }
+    }
+
     private fun initializeGrid(): List<List<Cell>> {
-        /*val cellLength =
-            (this.measuredWidth - gridData.cols - 1 - 2 * ((gridData.cols - 1) / 5)) / gridData.cols*/
         return List(gridData.rows) { i ->
             List(gridData.cols) { j ->
                 Cell(
@@ -196,7 +192,7 @@ class GridView @JvmOverloads constructor(
 
     private fun checkGridDone(): Boolean {
         val userGridData =
-            GridData(List(nonocrossGrid.size) { i -> List(nonocrossGrid[0].size) { j -> nonocrossGrid[i][j].userShading } })
+            GridData(List(nonoGrid.size) { i -> List(nonoGrid[0].size) { j -> nonoGrid[i][j].userShade } })
         return userGridData.rowNums == gridData.rowNums && userGridData.colNums == gridData.colNums
     }
 
@@ -224,17 +220,22 @@ class GridView @JvmOverloads constructor(
             (context as AppCompatActivity).recreate()
         } else {
             // reset grid
-            nonocrossGrid.forEach { row ->
-                row.forEach { cell ->
-                    cell.userShading = CellShading.EMPTY
-                }
-            }
-            invalidate()
+            clear()
         }
     }
 
     fun undo() {
-        nonocrossGrid = undoStack.pop(nonocrossGrid)
+        nonoGrid = undoStack.pop(nonoGrid)
+        invalidate()
+    }
+
+    fun clear() {
+        undoStack.push(nonoGrid)
+        nonoGrid.forEach { row ->
+            row.forEach { cell ->
+                cell.userShade = CellShade.EMPTY
+            }
+        }
         invalidate()
     }
 

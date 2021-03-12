@@ -12,4 +12,13 @@
     <string name="columns">Columns</string>
     <string name="grid_size">Grid Size</string>
     <string name="finished">Finished</string>
+
+    <!-- Preferences -->
+    <string name="preferences">Preferences</string>
+    <string name="usability_header">Usability</string>
+    <string name="vibrate_title">Vibrate</string>
+    <string name="fat_finger_title">Single Line Fill Mode</string>
+    <string name="fat_finger_summary">Enable if it is difficult to touch individual squares.</string>
+    <string name="vibrate_summary">Vibrate when performing certain actions.</string>
+
 </resources>

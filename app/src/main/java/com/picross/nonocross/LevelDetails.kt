@@ -18,7 +18,7 @@ import com.picross.nonocross.util.GridData
 
 object LevelDetails {
     lateinit var gridData: GridData
-    lateinit var levelName: String
+    var levelName = "Level 1"
     var isRandom = false
 
     var toggleCross = false
