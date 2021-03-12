@@ -1,0 +1,18 @@
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory app:title="@string/usability_header">
+
+        <SwitchPreferenceCompat
+            app:key="vibrate"
+            app:summary="@string/vibrate_summary"
+            app:title="@string/vibrate_title" />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="fatFinger"
+            app:summary="@string/fat_finger_summary"
+            app:title="@string/fat_finger_title" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

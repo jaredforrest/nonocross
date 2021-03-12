@@ -91,4 +91,9 @@ class MainActivity : AppCompatActivity() {
             .create()
             .show()
     }
+
+    private fun openPreferences() {
+        val intent = Intent(this, SettingsActivity::class.java)
+        startActivity(intent)
+    }
 }
