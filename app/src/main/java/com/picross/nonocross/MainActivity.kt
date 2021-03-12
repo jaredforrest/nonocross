@@ -35,9 +35,9 @@ class MainActivity : AppCompatActivity() {
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
         val override = preferences.getBoolean("overrideSystemTheme", false)
-        val darkmode = preferences.getBoolean("darkMode", false)
+        val darkMode = preferences.getBoolean("darkMode", false)
         if (override) {
-            if (darkmode) {
+            if (darkMode) {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
             } else {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
