@@ -27,8 +27,13 @@ class ColNumsView(context: Context) : View(context) {
     var cellLength = 0
     private val gridData = LD.gridData
     private val colorNumber = ResourcesCompat.getColor(context.resources, R.color.colorText, null)
+    private val colorBlue = ResourcesCompat.getColor(context.resources, R.color.colorShaded, null)
     private val blackPaint = Paint()
         .apply { color = colorNumber }
+        .apply { isAntiAlias = true }
+        .apply { textAlign = Paint.Align.CENTER }
+    private val bluePaint = Paint()
+        .apply { color = colorBlue }
         .apply { isAntiAlias = true }
         .apply { textAlign = Paint.Align.CENTER }
 
@@ -37,6 +42,7 @@ class ColNumsView(context: Context) : View(context) {
         /*val cellLength =
             (this.measuredWidth - gridData.cols - 1 - 2 * ((gridData.cols - 1) / 5)) / gridData.cols*/
         blackPaint.apply { textSize = cellLength * 0.5F }
+        bluePaint.apply { textSize = cellLength * 0.5F }
         var curLeft = cellLength.toFloat() * 0.5F
 
         for ((i, col) in gridData.colNums.withIndex()) {
