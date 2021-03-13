@@ -64,6 +64,9 @@ fun getAllLevels(context: Context): List<String> {
 
 
 data class GridData(val grid: List<List<CellShade>>) {
+
+    fun isEmpty() = grid.isEmpty()
+
     val rows get() = this.grid.size
     val cols get() = this.grid[0].size
 
@@ -92,19 +95,20 @@ data class UndoStack(val rows: Int, val cols: Int) {
     private val elements: MutableList<List<List<CellShade>>> =
         MutableList(1) { List(rows) { List(cols) { CellShade.EMPTY } } }
 
-    fun push(item: List<List<Cell>>) =
-        elements.add(List(rows) { i -> List(cols) { j -> item[i][j].userShade } })
+    fun push(item: UserGrid) =
+        elements.add(item.data.grid)
 
-    fun pop(grid: List<List<Cell>>): List<List<Cell>> {
-        grid.forEachIndexed { i, row ->
-            row.forEachIndexed { j, cell ->
+    fun pop(userGrid: UserGrid): UserGrid {
+        val newUserGrid = UserGrid(userGrid.grid.mapIndexed { i, row ->
+            row.mapIndexed { j, cell ->
                 cell.userShade = elements.last()[i][j]
+                cell
             }
-        }
+        })
         if (elements.size > 1) {
             elements.removeAt(elements.size - 1)
         }
-        return grid
+        return newUserGrid
     }
 }
 

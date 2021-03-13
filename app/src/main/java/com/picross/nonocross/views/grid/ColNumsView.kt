@@ -25,7 +25,6 @@ import com.picross.nonocross.LevelDetails as LD
 class ColNumsView(context: Context) : View(context) {
 
     var cellLength = 0
-    private val gridData = LD.gridData
     private val colorNumber = ResourcesCompat.getColor(context.resources, R.color.colorText, null)
     private val colorBlue = ResourcesCompat.getColor(context.resources, R.color.colorShaded, null)
     private val blackPaint = Paint()
@@ -45,16 +44,23 @@ class ColNumsView(context: Context) : View(context) {
         bluePaint.apply { textSize = cellLength * 0.5F }
         var curLeft = cellLength.toFloat() * 0.5F
 
-        for ((i, col) in gridData.colNums.withIndex()) {
-            var curBot = this.measuredHeight.toFloat() - cellLength.toFloat() * 0.2F
-            for (num in col.reversed()) {
-                canvas.drawText(num.toString(), curLeft, curBot, blackPaint)
-                curBot -= cellLength.toFloat() * 0.75F
-            }
-            curLeft += if ((i % gridData.cols + 1) % 5 == 0) {
-                cellLength + 3
-            } else {
-                cellLength + 1
+        if (!LD.gridData.isEmpty()) {
+            LD.gridData.colNums.forEachIndexed { i, col ->
+                var curBot = this.measuredHeight.toFloat() - cellLength.toFloat() * 0.2F
+                col.reversed().forEachIndexed { j, num ->
+                    val paint = if (LD.isReady() &&
+                        LD.userGrid.data.colNums.getOrElse(i) { List(1) { 0 } }.reversed()
+                            .getOrElse(j) { 0 } == num
+                    ) bluePaint
+                    else blackPaint
+                    canvas.drawText(num.toString(), curLeft, curBot, paint)
+                    curBot -= cellLength.toFloat() * 0.75F
+                }
+                curLeft += if ((i % LD.gridData.cols + 1) % 5 == 0) {
+                    cellLength + 3
+                } else {
+                    cellLength + 1
+                }
             }
         }
 

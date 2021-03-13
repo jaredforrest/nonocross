@@ -16,6 +16,7 @@ package com.picross.nonocross.views.grid
 
 import android.content.Context
 import android.util.AttributeSet
+import android.view.MotionEvent
 import android.view.ViewGroup
 import com.picross.nonocross.util.GridData
 import com.picross.nonocross.util.generate
@@ -118,5 +119,14 @@ class GameView @JvmOverloads constructor(
             leftPadding + rowNumsView.measuredWidth + nonocrossGridView.measuredWidth,
             topPadding + colNumsView.measuredHeight + nonocrossGridView.measuredHeight
         )
+    }
+
+    override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
+        super.onInterceptTouchEvent(event)
+        if ((event.actionMasked == MotionEvent.ACTION_UP)) {
+            getChildAt(0).invalidate()
+            getChildAt(1).invalidate()
+        }
+        return false
     }
 }

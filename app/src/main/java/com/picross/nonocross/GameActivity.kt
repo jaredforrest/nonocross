@@ -39,8 +39,16 @@ class GameActivity : AppCompatActivity() {
 
     fun onClick(view: View) {
         when (view.id) {
-            R.id.undo -> (findViewById<GameView>(R.id.nonocrossGameView).getChildAt(2) as GridView).undo()
-            R.id.clear -> (findViewById<GameView>(R.id.nonocrossGameView).getChildAt(2) as GridView).clear()
+            R.id.undo -> {
+                (findViewById<GameView>(R.id.nonocrossGameView).getChildAt(2) as GridView).undo()
+                findViewById<GameView>(R.id.nonocrossGameView).getChildAt(0).invalidate()
+                findViewById<GameView>(R.id.nonocrossGameView).getChildAt(1).invalidate()
+            }
+            R.id.clear -> {
+                (findViewById<GameView>(R.id.nonocrossGameView).getChildAt(2) as GridView).clear()
+                findViewById<GameView>(R.id.nonocrossGameView).getChildAt(0).invalidate()
+                findViewById<GameView>(R.id.nonocrossGameView).getChildAt(1).invalidate()
+            }
         }
     }
 }

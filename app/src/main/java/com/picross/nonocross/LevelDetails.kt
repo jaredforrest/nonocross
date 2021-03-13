@@ -14,12 +14,21 @@ You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross
 
+import com.picross.nonocross.util.CellShade
 import com.picross.nonocross.util.GridData
+import com.picross.nonocross.views.grid.UserGrid
 
 object LevelDetails {
-    lateinit var gridData: GridData
+    var gridData = GridData(List(0) { List(0) { CellShade.EMPTY } })
+    lateinit var userGrid: UserGrid
+
+
     var levelName = "Level 1"
     var isRandom = false
 
     var toggleCross = false
+
+    fun isReady(): Boolean {
+        return ::userGrid.isInitialized
+    }
 }

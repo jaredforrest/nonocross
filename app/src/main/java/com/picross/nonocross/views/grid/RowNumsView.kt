@@ -19,8 +19,8 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
-import com.picross.nonocross.LevelDetails
 import com.picross.nonocross.R
+import com.picross.nonocross.LevelDetails as LD
 
 class RowNumsView(context: Context) : View(context) {
 
@@ -46,16 +46,23 @@ class RowNumsView(context: Context) : View(context) {
         bluePaint.apply { textSize = cellLength * 0.5F }
         var curBot = cellLength * 0.75F
 
-        for ((i, col) in gridData.rowNums.withIndex()) {
-            var curLeft = this.measuredWidth.toFloat() - cellLength.toFloat() * 0.2F
-            for (num in col.reversed()) {
-                canvas.drawText(num.toString(), curLeft, curBot, blackPaint)
-                curLeft -= if (num < 10) cellLength * 0.5F else cellLength * 0.7F
-            }
-            curBot += if ((i % gridData.cols + 1) % 5 == 0) {
-                cellLength + 3
-            } else {
-                cellLength + 1
+        if (!LD.gridData.isEmpty()) {
+            LD.gridData.rowNums.forEachIndexed { i, col ->
+                var curLeft = this.measuredWidth.toFloat() - cellLength.toFloat() * 0.2F
+                col.reversed().forEachIndexed { j, num ->
+                    val paint = if (LD.isReady() &&
+                        LD.userGrid.data.rowNums.getOrElse(i) { List(1) { 0 } }.reversed()
+                            .getOrElse(j) { 0 } == num
+                    ) bluePaint
+                    else blackPaint
+                    canvas.drawText(num.toString(), curLeft, curBot, paint)
+                    curLeft -= if (num < 10) cellLength * 0.5F else cellLength * 0.7F
+                }
+                curBot += if ((i % LD.gridData.cols + 1) % 5 == 0) {
+                    cellLength + 3
+                } else {
+                    cellLength + 1
+                }
             }
         }
 

@@ -25,15 +25,17 @@ import android.view.View
 import android.view.ViewConfiguration
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
+import com.picross.nonocross.LevelDetails.gridData
 import com.picross.nonocross.R
 import com.picross.nonocross.util.*
 import com.picross.nonocross.LevelDetails as LD
+import com.picross.nonocross.LevelDetails.userGrid as nonoGrid
 
 class GridView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private val gridData = LD.gridData
+    private var firstDraw = true
     var cellLength = 0
 
     // Get Preferences
@@ -42,15 +44,13 @@ class GridView @JvmOverloads constructor(
     private val fatFingerMode = sharedPreferences.getBoolean("fatFinger", true)
     private val vibrateOn = sharedPreferences.getBoolean("vibrate", false)
 
-    // Create grid of cells
-    private lateinit var nonoGrid: List<List<Cell>>
-
     // Create undo stack
     private val undoStack = UndoStack(gridData.rows, gridData.cols)
 
     override fun onDraw(canvas: Canvas) {
-        if (!this::nonoGrid.isInitialized) {
+        if (firstDraw) {
             nonoGrid = initializeGrid()
+            firstDraw = false
         }
         super.onDraw(canvas)
         drawCells(canvas, nonoGrid)
@@ -150,9 +150,9 @@ class GridView @JvmOverloads constructor(
     }
 
 
-    private fun List<List<Cell>>.getCellAt(x: Float, y: Float, action: (Int, Int) -> Unit) {
+    private fun UserGrid.getCellAt(x: Float, y: Float, action: (Int, Int) -> Unit) {
         run loop@{
-            this.forEachIndexed { i, row ->
+            this.grid.forEachIndexed { i, row ->
                 row.forEachIndexed { j, cell ->
                     if (cell.isInside(x, y)) {
                         action(i, j)
@@ -163,8 +163,8 @@ class GridView @JvmOverloads constructor(
         }
     }
 
-    private fun initializeGrid(): List<List<Cell>> {
-        return List(gridData.rows) { i ->
+    private fun initializeGrid(): UserGrid {
+        return UserGrid(List(gridData.rows) { i ->
             List(gridData.cols) { j ->
                 Cell(
                     1 + j * (cellLength + 1) + 2 * (j / 5),
@@ -175,10 +175,11 @@ class GridView @JvmOverloads constructor(
                 )
             }
         }
+        )
     }
 
-    private fun drawCells(canvas: Canvas, nonocrossGrid: List<List<Cell>>) {
-        nonocrossGrid.forEach { row -> row.forEach { cell -> cell.draw(canvas) } }
+    private fun drawCells(canvas: Canvas, nonoGrid: UserGrid) {
+        nonoGrid.grid.forEach { row -> row.forEach { cell -> cell.draw(canvas) } }
     }
 
     private fun getPadding(i: Int, j: Int): Int {
@@ -191,9 +192,7 @@ class GridView @JvmOverloads constructor(
     }
 
     private fun checkGridDone(): Boolean {
-        val userGridData =
-            GridData(List(nonoGrid.size) { i -> List(nonoGrid[0].size) { j -> nonoGrid[i][j].userShade } })
-        return userGridData.rowNums == gridData.rowNums && userGridData.colNums == gridData.colNums
+        return nonoGrid.data.rowNums == gridData.rowNums && nonoGrid.data.colNums == gridData.colNums
     }
 
     /** When the game is finished show a dialog */
@@ -232,11 +231,7 @@ class GridView @JvmOverloads constructor(
 
     fun clear() {
         undoStack.push(nonoGrid)
-        nonoGrid.forEach { row ->
-            row.forEach { cell ->
-                cell.userShade = CellShade.EMPTY
-            }
-        }
+        nonoGrid.clear()
         invalidate()
     }
 
