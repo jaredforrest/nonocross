@@ -47,7 +47,7 @@ class RowNumsView(context: Context) : View(context) {
                 var curLeft = this.measuredWidth.toFloat() - cellLength.toFloat() * 0.2F
                 col.reversed().forEachIndexed { j, num ->
                     val paint = if (LD.isReady() &&
-                        LD.userGrid.data.rowNums.getOrElse(i) { List(1) { 0 } }.reversed()
+                        LD.userGrid.rowNums.getOrElse(i) { List(1) { 0 } }.reversed()
                             .getOrElse(j) { 0 } == num
                     ) bluePaint
                     else blackPaint

@@ -96,14 +96,12 @@ data class UndoStack(val rows: Int, val cols: Int) {
         MutableList(1) { List(rows) { List(cols) { CellShade.EMPTY } } }
 
     fun push(item: UserGrid) =
-        elements.add(item.data.grid)
+        elements.add(item.data)
 
     fun pop(userGrid: UserGrid): UserGrid {
-        val newUserGrid = UserGrid(userGrid.grid.mapIndexed { i, row ->
-            row.mapIndexed { j, cell ->
-                cell.userShade = elements.last()[i][j]
-                cell
-            }
+        val newUserGrid = UserGrid(userGrid.rows, userGrid.grid.mapIndexed { i, cell ->
+            cell.userShade = elements.last()[i]
+            cell
         })
         if (elements.size > 1) {
             elements.removeAt(elements.size - 1)

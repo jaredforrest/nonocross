@@ -28,7 +28,6 @@ import androidx.preference.PreferenceManager
 import com.picross.nonocross.LevelDetails.gridData
 import com.picross.nonocross.R
 import com.picross.nonocross.util.CellShade
-import com.picross.nonocross.util.GridData
 import com.picross.nonocross.util.UndoStack
 import com.picross.nonocross.util.vibrate
 import com.picross.nonocross.LevelDetails as LD
@@ -121,17 +120,15 @@ class GridView @JvmOverloads constructor(
             handler.removeCallbacks(mLongPressed)
             if (!isLongPress) fC.click(!LD.toggleCross)
             invalidate()
-            if (checkGridDone()) gameDoneAlert()
 
             nonoGrid.getCellAt(x, y) { cell -> fillHori = (cell.row == fC.row) }
         }
         nonoGrid.getCellAt(x, y) { cell ->
             if (!fatFingerMode) {
                 cell.userShade = fC.userShade
-                if (checkGridDone()) gameDoneAlert()
             } else {
-                if (fillHori) nonoGrid[fC.row][cell.col].userShade = fC.userShade
-                else nonoGrid[cell.row][fC.col].userShade = fC.userShade
+                if (fillHori) nonoGrid[fC.row, cell.col].userShade = fC.userShade
+                else nonoGrid[cell.row, fC.col].userShade = fC.userShade
             }
             invalidate()
             aC = cell
@@ -150,30 +147,27 @@ class GridView @JvmOverloads constructor(
 
 
     private fun UserGrid.getCellAt(x: Float, y: Float, action: (Cell) -> Unit) {
-        val cell = this.grid.flatten()
-            .find { cell -> cell.isInside(x, y) }
+        val cell = this.grid.find { cell -> cell.isInside(x, y) }
         if (cell != null) {
             action(cell)
         }
     }
 
     private fun initializeGrid(): UserGrid {
-        return UserGrid(List(gridData.rows) { i ->
-            List(gridData.cols) { j ->
-                Cell(
-                    i,
-                    j,
-                    cellLength,
-                    getPadding(i, j),
-                    context
-                )
-            }
+        return UserGrid(gridData.rows, List(gridData.rows * gridData.cols) { i ->
+            Cell(
+                i / gridData.cols,
+                i % gridData.cols,
+                cellLength,
+                getPadding(i / gridData.cols, i % gridData.cols),
+                context
+            )
         }
         )
     }
 
     private fun drawCells(canvas: Canvas, nonoGrid: UserGrid) {
-        nonoGrid.grid.forEach { row -> row.forEach { cell -> cell.draw(canvas) } }
+        nonoGrid.grid.forEach { cell -> cell.draw(canvas) }
     }
 
     private fun getPadding(i: Int, j: Int): Int {
@@ -186,7 +180,7 @@ class GridView @JvmOverloads constructor(
     }
 
     private fun checkGridDone(): Boolean {
-        return nonoGrid.data.rowNums == gridData.rowNums && nonoGrid.data.colNums == gridData.colNums
+        return nonoGrid.rowNums == gridData.rowNums && nonoGrid.colNums == gridData.colNums
     }
 
     /** When the game is finished show a dialog */
@@ -229,19 +223,40 @@ class GridView @JvmOverloads constructor(
 
 }
 
-data class UserGrid(var grid: List<List<Cell>>) {
+data class UserGrid(val rows: Int, var grid: List<Cell>) {
 
     fun clear() {
-        grid = grid.map { row ->
-            row.map { cell ->
-                cell.userShade = CellShade.EMPTY
-                cell
-            }
+        grid = grid.map { cell ->
+            cell.userShade = CellShade.EMPTY
+            cell
         }
     }
 
-    val data get() = GridData(grid.map { row -> row.map { cell -> cell.userShade } })
+    private val size = grid.size
+    private val cols = size / rows
 
-    operator fun get(i: Int) = grid[i]
+    //private val twoDGrid get() = List(rows) { i -> List(cols) { j -> grid[ i * cols + j]} }
 
+    //val data get() = GridData(twoDGrid.map { row -> row.map { cell -> cell.userShade } })
+
+    val data get() = grid.map { cell -> cell.userShade }
+
+    operator fun get(i: Int, j: Int) = grid[i * cols + j]
+
+
+    val rowNums
+        get() = List(rows) { i ->
+            countCellNums(
+                grid.subList(i * cols, i * cols + cols).map { it.userShade })
+        }
+    val colNums get() = List(cols) { i -> countCellNums(List(rows) { j -> grid[j * cols + i].userShade }) }
+
+    private fun countCellNums(row: List<CellShade>): List<Int> {
+        return (row.runningFold(0) { acc, cell ->
+            if (cell == CellShade.SHADED) acc + 1
+            else 0
+        } + 0)
+            .zipWithNext { a, b -> if (b == 0) a else 0 }
+            .filterNot { it == 0 }
+    }
 }
