@@ -27,7 +27,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import com.picross.nonocross.LevelDetails.gridData
 import com.picross.nonocross.R
-import com.picross.nonocross.util.*
+import com.picross.nonocross.util.CellShade
+import com.picross.nonocross.util.GridData
+import com.picross.nonocross.util.UndoStack
+import com.picross.nonocross.util.vibrate
 import com.picross.nonocross.LevelDetails as LD
 import com.picross.nonocross.LevelDetails.userGrid as nonoGrid
 
@@ -121,22 +124,17 @@ class GridView @JvmOverloads constructor(
             if (checkGridDone()) gameDoneAlert()
 
             nonoGrid.getCellAt(x, y) { cell -> fillHori = (cell.row == fC.row) }
-        } else {
-            nonoGrid.getCellAt(x, y) { cell ->
-                if (fatFingerMode) {
-                    if (fillHori) {
-                        nonoGrid[fC.row][cell.col].userShade = fC.userShade
-                    } else {
-                        nonoGrid[cell.row][fC.col].userShade = fC.userShade
-                    }
-                    aC = cell
-                    invalidate()
-                    if (checkGridDone()) gameDoneAlert()
-                } else {
-                    cell.userShade = fC.userShade
-                    invalidate()
-                }
+        }
+        nonoGrid.getCellAt(x, y) { cell ->
+            if (!fatFingerMode) {
+                cell.userShade = fC.userShade
+                if (checkGridDone()) gameDoneAlert()
+            } else {
+                if (fillHori) nonoGrid[fC.row][cell.col].userShade = fC.userShade
+                else nonoGrid[cell.row][fC.col].userShade = fC.userShade
             }
+            invalidate()
+            aC = cell
         }
     }
 
@@ -152,15 +150,10 @@ class GridView @JvmOverloads constructor(
 
 
     private fun UserGrid.getCellAt(x: Float, y: Float, action: (Cell) -> Unit) {
-        run loop@{
-            this.grid.forEach { row ->
-                row.forEach { cell ->
-                    if (cell.isInside(x, y)) {
-                        action(cell)
-                        return@loop
-                    }
-                }
-            }
+        val cell = this.grid.flatten()
+            .find { cell -> cell.isInside(x, y) }
+        if (cell != null) {
+            action(cell)
         }
     }
 

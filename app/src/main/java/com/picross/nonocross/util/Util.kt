@@ -118,9 +118,6 @@ enum class CellShade {
     EMPTY
 }
 
-/** The cell is in the ith row and jth column like matrices */
-data class CellPosition(val i: Int, val j: Int)
-
 fun vibrate(context: Context) {
     when {
         Build.VERSION.SDK_INT >= 26 -> {
