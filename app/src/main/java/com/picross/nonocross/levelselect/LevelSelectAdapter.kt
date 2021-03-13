@@ -62,7 +62,7 @@ class LevelSelectAdapter(
         val level = openGridFile(context, levels[position])
         holder.itemView.findViewById<TextView>(R.id.level_name).text = levels[position]
         holder.itemView.findViewById<TextView>(R.id.gridData).text = context.getString(
-            R.string.width_x_height,
+            R.string.height_x_width,
             level.rows,
             level.cols
         )
