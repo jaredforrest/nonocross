@@ -19,9 +19,9 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.preference.PreferenceManager
-import com.picross.nonocross.LevelDetails
-import com.picross.nonocross.views.grid.Cell
+import com.picross.nonocross.views.grid.UserGrid
 import java.io.InputStream
+import com.picross.nonocross.LevelDetails as LD
 
 fun generate(context: Context) {
 
@@ -30,7 +30,7 @@ fun generate(context: Context) {
     val rows = preferences.getInt("rows", 10)
     val difficulty = preferences.getInt("difficulty", 10)
 
-    val grid = if (LevelDetails.isRandom) {
+    val grid = if (LD.isRandom) {
         // Difficulty is set by changing the proportion of filled to empty cell
         // ie. difficulty=5 -> listOf(0,1,1,1,1,1)
         // difficulty=10 -> listOf(0,1)
@@ -39,10 +39,10 @@ fun generate(context: Context) {
 
         List(rows) { List(columns) { difficultyList.random() } }
     } else {
-        openGridFile(context, LevelDetails.levelName)
+        openGridFile(context, LD.levelName)
     }
 
-    LevelDetails.gridData = GridData(grid)
+    LD.gridData = GridData(grid)
 }
 
 fun openGridFile(context: Context, chosenLevelName: String): List<List<CellShade>> {

@@ -24,7 +24,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.preference.PreferenceManager
 
-
 class MainActivity : AppCompatActivity() {
 
     private lateinit var preferences: SharedPreferences

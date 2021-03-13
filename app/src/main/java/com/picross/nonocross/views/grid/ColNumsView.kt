@@ -14,7 +14,6 @@ You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross.views.grid
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
@@ -23,7 +22,6 @@ import androidx.core.content.res.ResourcesCompat
 import com.picross.nonocross.R
 import com.picross.nonocross.LevelDetails as LD
 
-@SuppressLint("ViewConstructor")
 class ColNumsView(context: Context) : View(context) {
 
     var cellLength = 0
