@@ -145,8 +145,8 @@ class GridView @JvmOverloads constructor(
             nonoGrid[fCP.i][fCP.j].click(!LD.toggleCross)
 
             invalidate()
-            if (checkGridDone()) gameDoneAlert()
         }
+        if (checkGridDone()) gameDoneAlert()
     }
 
 
