@@ -63,8 +63,8 @@ class LevelSelectAdapter(
         holder.itemView.findViewById<TextView>(R.id.level_name).text = levels[position]
         holder.itemView.findViewById<TextView>(R.id.gridData).text = context.getString(
             R.string.width_x_height,
-            level.size,
-            level[0].size
+            level.rows,
+            level.cols
         )
         holder.itemView.findViewById<Button>(R.id.level_select).setOnClickListener { startGame.startGame(
             levels[position]

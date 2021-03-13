@@ -19,7 +19,7 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.preference.PreferenceManager
-import com.picross.nonocross.views.grid.UserGrid
+import com.picross.nonocross.views.grid.Cell
 import java.io.InputStream
 import com.picross.nonocross.LevelDetails as LD
 
@@ -30,56 +30,48 @@ fun generate(context: Context) {
     val rows = preferences.getInt("rows", 10)
     val difficulty = preferences.getInt("difficulty", 10)
 
-    val grid = if (LD.isRandom) {
+    LD.gridData = if (LD.isRandom) {
         // Difficulty is set by changing the proportion of filled to empty cell
         // ie. difficulty=5 -> listOf(0,1,1,1,1,1)
         // difficulty=10 -> listOf(0,1)
         val difficultyList =
             List(12 - difficulty) { i -> if (i != 0) CellShade.SHADED else CellShade.EMPTY }
 
-        List(rows) { List(columns) { difficultyList.random() } }
+        GridData(rows, List(rows * columns) { difficultyList.random() })
     } else {
         openGridFile(context, LD.levelName)
     }
-
-    LD.gridData = GridData(grid)
 }
 
-fun openGridFile(context: Context, chosenLevelName: String): List<List<CellShade>> {
+fun openGridFile(context: Context, chosenLevelName: String): GridData {
     val inputStream: InputStream = context.resources.assets.open("levels/$chosenLevelName")
     val buffer = ByteArray(inputStream.available())
     inputStream.read(buffer)
-    val text = String(buffer)
+    val rows = String(buffer).takeWhile { it != ' ' }
+        .toInt()
+    val text = String(buffer).dropWhile { it != ' ' }.drop(1)
 
-    // Count height of column (number of rows) and width of row (number of columns)
-    val rows = text.count { it == '\n' }
-    val cols = text.count { it != '\n' } / rows
-
-    return List(rows) { i -> List(cols) { j -> if (text[i * (cols + 1) + j] == '1') CellShade.SHADED else CellShade.EMPTY } }
+    return GridData(rows, text.map { if (it == '1') CellShade.SHADED else CellShade.EMPTY })
 }
 
 fun getAllLevels(context: Context): List<String> {
     return context.resources.assets.list("levels")?.toList() ?: listOf()
 }
 
+data class GridData(val rows: Int, val grid: List<CellShade>) {
 
-data class GridData(val grid: List<List<CellShade>>) {
-
-    fun isEmpty() = grid.isEmpty()
-
-    val rows get() = this.grid.size
-    val cols get() = this.grid[0].size
+    private val size = grid.size
+    val cols = if (rows == 0) 0 else size / rows
 
     // These are the numbers at the side/top of the row/column in-game
-    val rowNums get() = List(grid.size) { i -> countCellNums(grid[i]) }
-    val colNums get() = List(grid[0].size) { i -> countCellNums(grid.map { it[i] }) }
+    val rowNums = List(rows) { i -> countCellNums(row(i)) }
+    val colNums = List(cols) { i -> countCellNums(col(i)) }
 
     /** Gets the width and height of the longest row and column */
-    val longestRowNum
-        get() =
-            rowNums.fold(0,
-                { acc, i -> (i.size + if (i.count { it >= 10 } > 0) 1 else 0).coerceAtLeast(acc) })
-    val longestColNum get() = colNums.fold(0, { acc, i -> i.size.coerceAtLeast(acc) })
+    val longestRowNum =
+        rowNums.fold(0,
+            { acc, i -> (i.size + if (i.count { it >= 10 } > 0) 1 else 0).coerceAtLeast(acc) })
+    val longestColNum = colNums.fold(0, { acc, i -> i.size.coerceAtLeast(acc) })
 
     private fun countCellNums(row: List<CellShade>): List<Int> {
         return (row.runningFold(0) { acc, cell ->
@@ -89,11 +81,39 @@ data class GridData(val grid: List<List<CellShade>>) {
             .zipWithNext { a, b -> if (b == 0) a else 0 }
             .filterNot { it == 0 }
     }
+
+    fun isEmpty() = grid.isEmpty()
+
+    private fun row(index: Int) = grid.subList(index * cols, index * cols + cols)
+    private fun col(index: Int) = List(rows) { j -> grid[j * cols + index] }
 }
 
-data class UndoStack(val rows: Int, val cols: Int) {
+data class UserGrid(val rows: Int, var grid: List<Cell>) {
+
+    operator fun get(i: Int, j: Int) = grid[i * cols + j]
+
+    fun clear() {
+        grid = grid.map { cell ->
+            cell.userShade = CellShade.EMPTY
+            cell
+        }
+    }
+
+    private val size = grid.size
+    private val cols = size / rows
+
+    val data get() = grid.map { cell -> cell.userShade }
+
+    val rowNums get() = GridData(rows, data).rowNums
+    val colNums get() = GridData(rows, data).colNums
+
+    //private fun row(index: Int) =  data.subList(index * cols, index * cols + cols)
+    //private fun col(index: Int) =  List(rows) { j -> data[j * cols + index] }
+}
+
+data class UndoStack(val gridSize: Int) {
     private val elements: MutableList<List<CellShade>> =
-        MutableList(1) { List(rows * cols) { CellShade.EMPTY } }
+        MutableList(1) { List(gridSize) { CellShade.EMPTY } }
 
     fun push(item: UserGrid) =
         elements.add(item.data)

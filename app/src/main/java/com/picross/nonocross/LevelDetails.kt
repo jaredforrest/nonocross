@@ -16,10 +16,10 @@ package com.picross.nonocross
 
 import com.picross.nonocross.util.CellShade
 import com.picross.nonocross.util.GridData
-import com.picross.nonocross.views.grid.UserGrid
+import com.picross.nonocross.util.UserGrid
 
 object LevelDetails {
-    var gridData = GridData(List(0) { List(0) { CellShade.EMPTY } })
+    var gridData = GridData(0, List(0) { CellShade.EMPTY })
     lateinit var userGrid: UserGrid
 
 

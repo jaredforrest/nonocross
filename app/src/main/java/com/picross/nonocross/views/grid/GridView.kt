@@ -27,8 +27,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import com.picross.nonocross.LevelDetails.gridData
 import com.picross.nonocross.R
-import com.picross.nonocross.util.CellShade
 import com.picross.nonocross.util.UndoStack
+import com.picross.nonocross.util.UserGrid
 import com.picross.nonocross.util.vibrate
 import com.picross.nonocross.LevelDetails as LD
 import com.picross.nonocross.LevelDetails.userGrid as nonoGrid
@@ -47,7 +47,7 @@ class GridView @JvmOverloads constructor(
     private val vibrateOn = sharedPreferences.getBoolean("vibrate", false)
 
     // Create undo stack
-    private val undoStack = UndoStack(gridData.rows, gridData.cols)
+    private val undoStack = UndoStack(gridData.rows * gridData.cols)
 
     override fun onDraw(canvas: Canvas) {
         if (firstDraw) {
@@ -221,42 +221,4 @@ class GridView @JvmOverloads constructor(
         invalidate()
     }
 
-}
-
-data class UserGrid(val rows: Int, var grid: List<Cell>) {
-
-    fun clear() {
-        grid = grid.map { cell ->
-            cell.userShade = CellShade.EMPTY
-            cell
-        }
-    }
-
-    private val size = grid.size
-    private val cols = size / rows
-
-    //private val twoDGrid get() = List(rows) { i -> List(cols) { j -> grid[ i * cols + j]} }
-
-    //val data get() = GridData(twoDGrid.map { row -> row.map { cell -> cell.userShade } })
-
-    val data get() = grid.map { cell -> cell.userShade }
-
-    operator fun get(i: Int, j: Int) = grid[i * cols + j]
-
-
-    val rowNums
-        get() = List(rows) { i ->
-            countCellNums(
-                grid.subList(i * cols, i * cols + cols).map { it.userShade })
-        }
-    val colNums get() = List(cols) { i -> countCellNums(List(rows) { j -> grid[j * cols + i].userShade }) }
-
-    private fun countCellNums(row: List<CellShade>): List<Int> {
-        return (row.runningFold(0) { acc, cell ->
-            if (cell == CellShade.SHADED) acc + 1
-            else 0
-        } + 0)
-            .zipWithNext { a, b -> if (b == 0) a else 0 }
-            .filterNot { it == 0 }
-    }
 }

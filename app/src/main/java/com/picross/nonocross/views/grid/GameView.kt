@@ -18,20 +18,15 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ViewGroup
-import com.picross.nonocross.util.GridData
+import com.picross.nonocross.LevelDetails.gridData
 import com.picross.nonocross.util.generate
-import com.picross.nonocross.LevelDetails as LD
 
 class GameView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : ViewGroup(context, attrs, defStyleAttr) {
 
-
-    private var gridData: GridData
-
     init {
         generate(context)
-        gridData = LD.gridData
         val colNumsView = ColNumsView(context)
         this.addView(colNumsView, 0)
         val rowNumsView = RowNumsView(context)
