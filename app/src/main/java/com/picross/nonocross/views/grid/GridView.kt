@@ -67,7 +67,7 @@ class GridView @JvmOverloads constructor(
 
             MotionEvent.ACTION_MOVE -> {
                 // Only run if current cell has moved
-                if (!nonoGrid[cellPos.i][cellPos.j].isInside(event.x, event.y)) {
+                if (!aC.isInside(event.x, event.y)) {
                     startFill(event.x, event.y)
                 }
             }
@@ -80,32 +80,33 @@ class GridView @JvmOverloads constructor(
 
     private var isFirstCell = true
 
-    /** first cell position */
-    private var fCP = CellPosition(-1, -1)
+    /** First cell */
+    private lateinit var fC: Cell
 
-    private var cellPos = CellPosition(-1, -1)
+    /** Active cell */
+    private lateinit var aC: Cell
     private var isLongPress = false
 
     /** fill horizontally, if false fill vertically */
     private var fillHori = true
 
     private var mLongPressed = Runnable {
-        nonoGrid[fCP.i][fCP.j].click(LD.toggleCross)
+        fC.click(LD.toggleCross)
         invalidate()
         isLongPress = true
         if (vibrateOn) vibrate(context)
     }
 
     private fun initializeFill(x: Float, y: Float) {
-        nonoGrid.getCellAt(x, y) { i, j ->
+        nonoGrid.getCellAt(x, y) { cell ->
             handler.postDelayed(
                 mLongPressed,
                 ViewConfiguration.getLongPressTimeout().toLong()
             )
             undoStack.push(nonoGrid)
 
-            cellPos = CellPosition(i, j)
-            fCP = cellPos
+            aC = cell
+            fC = cell
             isFirstCell = true
             isLongPress = false
         }
@@ -115,24 +116,24 @@ class GridView @JvmOverloads constructor(
         if (isFirstCell) {
             isFirstCell = false
             handler.removeCallbacks(mLongPressed)
-            if (!isLongPress) nonoGrid[fCP.i][fCP.j].click(!LD.toggleCross)
+            if (!isLongPress) fC.click(!LD.toggleCross)
             invalidate()
             if (checkGridDone()) gameDoneAlert()
 
-            nonoGrid.getCellAt(x, y) { i, _ -> fillHori = (i == fCP.i) }
+            nonoGrid.getCellAt(x, y) { cell -> fillHori = (cell.row == fC.row) }
         } else {
-            nonoGrid.getCellAt(x, y) { i, j ->
+            nonoGrid.getCellAt(x, y) { cell ->
                 if (fatFingerMode) {
                     if (fillHori) {
-                        nonoGrid[fCP.i][j].userShade = nonoGrid[fCP.i][fCP.j].userShade
+                        nonoGrid[fC.row][cell.col].userShade = fC.userShade
                     } else {
-                        nonoGrid[i][fCP.j].userShade = nonoGrid[fCP.i][fCP.j].userShade
+                        nonoGrid[cell.row][fC.col].userShade = fC.userShade
                     }
-                    cellPos = CellPosition(i, j)
+                    aC = cell
                     invalidate()
                     if (checkGridDone()) gameDoneAlert()
                 } else {
-                    nonoGrid[i][j].userShade = nonoGrid[fCP.i][fCP.j].userShade
+                    cell.userShade = fC.userShade
                     invalidate()
                 }
             }
@@ -142,7 +143,7 @@ class GridView @JvmOverloads constructor(
     private fun endFill() {
         handler.removeCallbacks(mLongPressed)
         if (isFirstCell and !isLongPress) {
-            nonoGrid[fCP.i][fCP.j].click(!LD.toggleCross)
+            fC.click(!LD.toggleCross)
 
             invalidate()
         }
@@ -150,12 +151,12 @@ class GridView @JvmOverloads constructor(
     }
 
 
-    private fun UserGrid.getCellAt(x: Float, y: Float, action: (Int, Int) -> Unit) {
+    private fun UserGrid.getCellAt(x: Float, y: Float, action: (Cell) -> Unit) {
         run loop@{
-            this.grid.forEachIndexed { i, row ->
-                row.forEachIndexed { j, cell ->
+            this.grid.forEach { row ->
+                row.forEach { cell ->
                     if (cell.isInside(x, y)) {
-                        action(i, j)
+                        action(cell)
                         return@loop
                     }
                 }
@@ -167,8 +168,8 @@ class GridView @JvmOverloads constructor(
         return UserGrid(List(gridData.rows) { i ->
             List(gridData.cols) { j ->
                 Cell(
-                    1 + j * (cellLength + 1) + 2 * (j / 5),
-                    1 + i * (cellLength + 1) + 2 * (i / 5),
+                    i,
+                    j,
                     cellLength,
                     getPadding(i, j),
                     context

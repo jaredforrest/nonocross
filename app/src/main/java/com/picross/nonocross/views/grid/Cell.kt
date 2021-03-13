@@ -22,8 +22,8 @@ import com.picross.nonocross.R
 import com.picross.nonocross.util.CellShade
 
 class Cell(
-    _left: Int,
-    _top: Int,
+    val row: Int,
+    val col: Int,
     private val cellLength: Int,
     bigPadding: Int,
     context: Context
@@ -36,8 +36,8 @@ class Cell(
         LEFT(0x8), TOP(0x4), RIGHT(0x2), BOTTOM(0x1)
     }
 
-    private val top = _top.toFloat()
-    private val left = _left.toFloat()
+    private val top = 1 + row.toFloat() * (cellLength + 1) + 2 * (row.toFloat() / 5)
+    private val left = 1 + col.toFloat() * (cellLength + 1) + 2 * (col.toFloat() / 5)
     private val right = left + cellLength
     private val bottom = top + cellLength
 
