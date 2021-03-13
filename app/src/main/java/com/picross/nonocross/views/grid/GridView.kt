@@ -214,14 +214,12 @@ class GridView @JvmOverloads constructor(
             .show()
     }
 
-    private fun resetGrid(){
-        if (LD.isRandom) {
-            // restart activity to get new random grid
-            (context as AppCompatActivity).recreate()
-        } else {
-            // reset grid
-            clear()
-        }
+    private fun resetGrid() {
+        clear()
+        //if (LD.isRandom) {
+        // restart activity to get new random grid
+        (context as AppCompatActivity).recreate()
+        //}
     }
 
     fun undo() {
@@ -234,5 +232,22 @@ class GridView @JvmOverloads constructor(
         nonoGrid.clear()
         invalidate()
     }
+
+}
+
+data class UserGrid(var grid: List<List<Cell>>) {
+
+    fun clear() {
+        grid = grid.map { row ->
+            row.map { cell ->
+                cell.userShade = CellShade.EMPTY
+                cell
+            }
+        }
+    }
+
+    val data get() = GridData(grid.map { row -> row.map { cell -> cell.userShade } })
+
+    operator fun get(i: Int) = grid[i]
 
 }
