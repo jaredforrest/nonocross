@@ -92,8 +92,8 @@ data class GridData(val grid: List<List<CellShade>>) {
 }
 
 data class UndoStack(val rows: Int, val cols: Int) {
-    private val elements: MutableList<List<List<CellShade>>> =
-        MutableList(1) { List(rows) { List(cols) { CellShade.EMPTY } } }
+    private val elements: MutableList<List<CellShade>> =
+        MutableList(1) { List(rows * cols) { CellShade.EMPTY } }
 
     fun push(item: UserGrid) =
         elements.add(item.data)
