@@ -25,7 +25,6 @@ import com.picross.nonocross.LevelDetails as LD
 class RowNumsView(context: Context) : View(context) {
 
     var cellLength = 0
-    private val gridData = LevelDetails.gridData
     private val colorNumber = ResourcesCompat.getColor(context.resources, R.color.colorText, null)
     private val colorBlue = ResourcesCompat.getColor(context.resources, R.color.colorShaded, null)
     private val blackPaint = Paint()
@@ -39,9 +38,6 @@ class RowNumsView(context: Context) : View(context) {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
-        /*val cellLength =
-            (this.measuredHeight - gridData.rows - 1 - 2 * ((gridData.rows - 1) / 5)) / gridData.rows*/
         blackPaint.apply { textSize = cellLength * 0.5F }
         bluePaint.apply { textSize = cellLength * 0.5F }
         var curBot = cellLength * 0.75F

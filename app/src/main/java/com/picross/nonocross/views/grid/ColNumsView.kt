@@ -38,8 +38,6 @@ class ColNumsView(context: Context) : View(context) {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        /*val cellLength =
-            (this.measuredWidth - gridData.cols - 1 - 2 * ((gridData.cols - 1) / 5)) / gridData.cols*/
         blackPaint.apply { textSize = cellLength * 0.5F }
         bluePaint.apply { textSize = cellLength * 0.5F }
         var curLeft = cellLength.toFloat() * 0.5F
