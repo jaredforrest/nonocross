@@ -95,7 +95,7 @@ class GridView @JvmOverloads constructor(
                 mLongPressed,
                 ViewConfiguration.getLongPressTimeout().toLong()
             )
-            undoStack.push(nonoGrid)
+            undoStack.push(nonoGrid.data)
 
             aC = cell
             fC = cell
@@ -180,12 +180,12 @@ class GridView @JvmOverloads constructor(
     }
 
     fun undo() {
-        nonoGrid = undoStack.pop(nonoGrid)
+        nonoGrid.data = undoStack.pop()
         invalidate()
     }
 
     fun clear() {
-        undoStack.push(nonoGrid)
+        undoStack.push(nonoGrid.data)
         nonoGrid.clear()
         invalidate()
     }

@@ -89,41 +89,36 @@ data class UserGrid(val rows: Int, var grid: List<Cell>) {
 
     operator fun get(i: Int, j: Int) = grid[i * cols + j]
 
-    fun clear() {
-        grid = grid.map { cell ->
-            cell.userShade = CellShade.EMPTY
-            cell
-        }
-    }
+    fun clear() = copyCellShades(List(size) { CellShade.EMPTY })
 
     private val size = grid.size
     private val cols = size / rows
 
-    val data get() = grid.map { cell -> cell.userShade }
+    var data
+        get() = grid.map { cell -> cell.userShade }
+        set(element) = copyCellShades(element)
 
     val rowNums get() = GridData(rows, data).rowNums
     val colNums get() = GridData(rows, data).colNums
 
-    //private fun row(index: Int) =  data.subList(index * cols, index * cols + cols)
-    //private fun col(index: Int) =  List(rows) { j -> data[j * cols + index] }
+    private fun copyCellShades(element: List<CellShade>) {
+        grid = grid.mapIndexed { i, cell ->
+            cell.userShade = element[i]
+            cell
+        }
+    }
 }
 
 data class UndoStack(val gridSize: Int) {
     private val elements: MutableList<List<CellShade>> =
         MutableList(1) { List(gridSize) { CellShade.EMPTY } }
 
-    fun push(item: UserGrid) =
-        elements.add(item.data)
+    fun push(item: List<CellShade>) = elements.add(item)
 
-    fun pop(userGrid: UserGrid): UserGrid {
-        val newUserGrid = UserGrid(userGrid.rows, userGrid.grid.mapIndexed { i, cell ->
-            cell.userShade = elements.last()[i]
-            cell
-        })
-        if (elements.size > 1) {
-            elements.removeAt(elements.size - 1)
-        }
-        return newUserGrid
+    fun pop(): List<CellShade> {
+        val newGrid = elements.last()
+        if (elements.size > 1) elements.removeLast()
+        return newGrid
     }
 }
 
