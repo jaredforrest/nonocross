@@ -24,26 +24,19 @@ class Cell(
     val row: Int,
     val col: Int,
     private val cellLength: Int,
-    bigPadding: Int,
     context: Context
 ) {
-
     var userShade = CellShade.EMPTY
-
-    // Each Cell has at least 0.5px padding but some have 1.5px
-    enum class BigPadding(val flag: Int) {
-        LEFT(0x8), TOP(0x4), RIGHT(0x2), BOTTOM(0x1)
-    }
 
     private val top = 1 + row.toFloat() * (cellLength + 1) + 2 * (row.toFloat() / 5)
     private val left = 1 + col.toFloat() * (cellLength + 1) + 2 * (col.toFloat() / 5)
     private val right = left + cellLength
     private val bottom = top + cellLength
 
-    private val topBound = top - if (bigPadding and BigPadding.TOP.flag != 0) 1.5 else 0.5
-    private val leftBound = left - if (bigPadding and BigPadding.LEFT.flag != 0) 1.5 else 0.5
-    private val rightBound = right + if (bigPadding and BigPadding.RIGHT.flag != 0) 1.5 else 0.5
-    private val bottomBound = bottom - if (bigPadding and BigPadding.BOTTOM.flag != 0) 1.5 else 0.5
+    private val topBound = top - if (col % 5 == 4) 1.5 else 0.5
+    private val leftBound = left - if (row % 5 == 4 && col != 0) 1.5 else 0.5
+    private val rightBound = right + if (row % 5 == 4) 1.5 else 0.5
+    private val bottomBound = bottom - if (col % 5 == 4 && col != 0) 1.5 else 0.5
 
     private val colorCross = ResourcesCompat.getColor(context.resources, R.color.colorCross, null)
     private val colorShade = ResourcesCompat.getColor(context.resources, R.color.colorShade, null)

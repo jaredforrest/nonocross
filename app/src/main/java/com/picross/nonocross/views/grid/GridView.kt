@@ -46,7 +46,7 @@ class GridView @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        drawCells(canvas, nonoGrid)
+        nonoGrid.grid.forEach { it.draw(canvas) }
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -58,6 +58,17 @@ class GridView @JvmOverloads constructor(
         }
         return true
     }
+
+    var cellLength = 0
+
+    // Get Preferences
+    private val sharedPreferences: SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(context)
+    private val fatFingerMode = sharedPreferences.getBoolean("fatFinger", true)
+    private val vibrateOn = sharedPreferences.getBoolean("vibrate", false)
+
+    // Create undo stack
+    private val undoStack = UndoStack(gridData.rows * gridData.cols)
 
     private var isFirstCell = true
     private var isLongPress = false
@@ -138,19 +149,6 @@ class GridView @JvmOverloads constructor(
         return UserGrid(gridData.rows, List(gridData.rows * gridData.cols) { index ->
             Cell(index / gridData.cols, index % gridData.cols, cellLength, context)
         })
-    }
-
-    private fun drawCells(canvas: Canvas, nonoGrid: UserGrid) {
-        nonoGrid.grid.forEach { cell -> cell.draw(canvas) }
-    }
-
-    private fun getPadding(i: Int, j: Int): Int {
-        var x = 0
-        if (i % 5 == 4) x += Cell.BigPadding.RIGHT.flag
-        if (j % 5 == 4) x += Cell.BigPadding.TOP.flag
-        if (i % 5 == 4 && j != 0) x += Cell.BigPadding.LEFT.flag
-        if (j % 5 == 4 && j != 0) x += Cell.BigPadding.BOTTOM.flag
-        return x
     }
 
     private fun checkGridDone(): Boolean {
