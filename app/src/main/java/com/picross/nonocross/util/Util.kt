@@ -20,6 +20,7 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.preference.PreferenceManager
 import com.picross.nonocross.views.grid.Cell
+import com.picross.nonocross.views.grid.Cell.CellShade
 import java.io.InputStream
 import com.picross.nonocross.LevelDetails as LD
 
@@ -35,7 +36,7 @@ fun generate(context: Context) {
         // ie. difficulty=5 -> listOf(0,1,1,1,1,1)
         // difficulty=10 -> listOf(0,1)
         val difficultyList =
-            List(12 - difficulty) { i -> if (i != 0) CellShade.SHADED else CellShade.EMPTY }
+            List(12 - difficulty) { i -> if (i != 0) CellShade.SHADE else CellShade.EMPTY }
 
         GridData(rows, List(rows * columns) { difficultyList.random() })
     } else {
@@ -51,7 +52,7 @@ fun openGridFile(context: Context, chosenLevelName: String): GridData {
         .toInt()
     val text = String(buffer).dropWhile { it != ' ' }.drop(1)
 
-    return GridData(rows, text.map { if (it == '1') CellShade.SHADED else CellShade.EMPTY })
+    return GridData(rows, text.map { if (it == '1') CellShade.SHADE else CellShade.EMPTY })
 }
 
 data class GridData(val rows: Int, val grid: List<CellShade>) {
@@ -71,7 +72,7 @@ data class GridData(val rows: Int, val grid: List<CellShade>) {
 
     private fun countCellNums(row: List<CellShade>): List<Int> {
         return (row.runningFold(0) { acc, cell ->
-            if (cell == CellShade.SHADED) acc + 1
+            if (cell == CellShade.SHADE) acc + 1
             else 0
         } + 0)
             .zipWithNext { a, b -> if (b == 0) a else 0 }

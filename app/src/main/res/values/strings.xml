@@ -24,5 +24,6 @@
     <string name="override_system_theme">Override System Theme</string>
     <string name="enable_dark_mode">Enable Dark Mode</string>
     <string name="requires_restart">Requires Restart</string>
+    <string name="show_blue_hints">Show Blue Hints</string>
 
 </resources>

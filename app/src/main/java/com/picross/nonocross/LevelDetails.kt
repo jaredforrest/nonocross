@@ -14,7 +14,6 @@ You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross
 
-import com.picross.nonocross.util.CellShade
 import com.picross.nonocross.util.GridData
 import com.picross.nonocross.util.UserGrid
 import com.picross.nonocross.views.grid.Cell.CellShade

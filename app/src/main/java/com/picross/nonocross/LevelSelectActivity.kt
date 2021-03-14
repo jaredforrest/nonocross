@@ -20,7 +20,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.picross.nonocross.levelselect.LevelSelectAdapter
-import com.picross.nonocross.util.getAllLevels
 
 class LevelSelectActivity : AppCompatActivity(), LevelSelectAdapter.StartGame {
     private lateinit var recyclerView: RecyclerView

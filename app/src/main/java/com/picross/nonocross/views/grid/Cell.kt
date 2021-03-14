@@ -19,7 +19,6 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import androidx.core.content.res.ResourcesCompat
 import com.picross.nonocross.R
-import com.picross.nonocross.util.CellShade
 
 class Cell(
     val row: Int,
@@ -46,33 +45,27 @@ class Cell(
     private val rightBound = right + if (bigPadding and BigPadding.RIGHT.flag != 0) 1.5 else 0.5
     private val bottomBound = bottom - if (bigPadding and BigPadding.BOTTOM.flag != 0) 1.5 else 0.5
 
-    private val colorCrossed =
-        ResourcesCompat.getColor(context.resources, R.color.colorCrossed, null)
-    private val colorShaded = ResourcesCompat.getColor(context.resources, R.color.colorShaded, null)
+    private val colorCross = ResourcesCompat.getColor(context.resources, R.color.colorCross, null)
+    private val colorShade = ResourcesCompat.getColor(context.resources, R.color.colorShade, null)
     private val colorEmpty = ResourcesCompat.getColor(context.resources, R.color.colorEmpty, null)
 
     private val paintEmpty = Paint().apply { color = colorEmpty }
-    private val paintShaded = Paint().apply { color = colorShaded }
-    private val paintCrossed = Paint()
-        .apply { color = colorCrossed }
+    private val paintShade = Paint().apply { color = colorShade }
+    private val paintCross = Paint().apply { color = colorCross }
         .apply { strokeCap = Paint.Cap.ROUND }
         .apply { isAntiAlias = true }
 
     fun draw(canvas: Canvas) {
         when (userShade) {
-            CellShade.EMPTY -> drawCell(canvas, paintEmpty)
-            CellShade.SHADED -> drawCell(canvas, paintShaded)
-            CellShade.CROSSED -> drawCross(canvas)
+            CellShade.EMPTY -> canvas.drawRect(left, top, right, bottom, paintEmpty)
+            CellShade.SHADE -> canvas.drawRect(left, top, right, bottom, paintShade)
+            CellShade.CROSS -> drawCross(canvas)
         }
     }
 
-    private fun drawCell(canvas: Canvas, paint: Paint) {
-        canvas.drawRect(left, top, right, bottom, paint)
-    }
-
     private fun drawCross(canvas: Canvas) {
-        paintCrossed.apply { strokeWidth = cellLength / 15F }
-        drawCell(canvas, paintEmpty)
+        paintCross.apply { strokeWidth = cellLength / 15F }
+        canvas.drawRect(left, top, right, bottom, paintEmpty)
         canvas.drawLine(
             left + cellLength * 0.25F,
             top + cellLength * 0.25F,
@@ -85,7 +78,7 @@ class Cell(
             top + cellLength * 0.75F,
             left + cellLength * 0.75F,
             top + cellLength * 0.25F,
-            paintCrossed
+            paintCross
         )
     }
 
@@ -96,13 +89,13 @@ class Cell(
     fun click(invert: Boolean) {
         userShade = if (invert) {
             when (userShade) {
-                CellShade.CROSSED, CellShade.SHADED -> CellShade.EMPTY
-                CellShade.EMPTY -> CellShade.SHADED
+                CellShade.CROSS, CellShade.SHADE -> CellShade.EMPTY
+                CellShade.EMPTY -> CellShade.SHADE
             }
         } else {
             when (userShade) {
-                CellShade.CROSSED -> CellShade.EMPTY
-                CellShade.EMPTY, CellShade.SHADED -> CellShade.CROSSED
+                CellShade.CROSS -> CellShade.EMPTY
+                CellShade.EMPTY, CellShade.SHADE -> CellShade.CROSS
             }
         }
     }

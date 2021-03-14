@@ -23,4 +23,5 @@
     <string name="override_system_theme">Anular el Tema del Sistema</string>
     <string name="enable_dark_mode">Habilitar el Tema Oscuro</string>
     <string name="requires_restart">Requiere Reinicio</string>
+    <string name="show_blue_hints">Mostrar Indicios Azul</string>
 </resources>

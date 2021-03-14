@@ -28,6 +28,10 @@
             app:key="darkMode"
             app:title="@string/enable_dark_mode" />
 
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="showBlueHints"
+            app:title="@string/show_blue_hints" />
 
     </PreferenceCategory>
 
