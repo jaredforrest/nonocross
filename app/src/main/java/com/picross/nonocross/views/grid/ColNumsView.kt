@@ -15,14 +15,20 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross.views.grid
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.view.View
 import androidx.core.content.res.ResourcesCompat
+import androidx.preference.PreferenceManager
 import com.picross.nonocross.R
 import com.picross.nonocross.LevelDetails as LD
 
 class ColNumsView(context: Context) : View(context) {
+
+    private val preferences: SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(context)
+    private val blueHints = preferences.getBoolean("showBlueHints", true)
 
     var cellLength = 0
     private val colorNumber = ResourcesCompat.getColor(context.resources, R.color.colorText, null)
@@ -52,7 +58,7 @@ class ColNumsView(context: Context) : View(context) {
             LD.gridData.colNums.forEachIndexed { i, col ->
                 var curBot = this.measuredHeight.toFloat() - cellLength.toFloat() * 0.2F
                 col.reversed().forEachIndexed { j, num ->
-                    val paint = if (LD.isReady() &&
+                    val paint = if (blueHints && LD.isReady() &&
                         LD.userGrid.colNums.getOrElse(i) { List(1) { 0 } }.reversed()
                             .getOrElse(j) { 0 } == num
                     ) bluePaint
