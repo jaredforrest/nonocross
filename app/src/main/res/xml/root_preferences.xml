@@ -15,7 +15,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/dark_mode_header">
+    <PreferenceCategory app:title="@string/appearance_header">
 
         <CheckBoxPreference
             app:defaultValue="false"

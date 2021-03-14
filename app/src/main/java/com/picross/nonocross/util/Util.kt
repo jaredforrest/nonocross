@@ -54,10 +54,6 @@ fun openGridFile(context: Context, chosenLevelName: String): GridData {
     return GridData(rows, text.map { if (it == '1') CellShade.SHADED else CellShade.EMPTY })
 }
 
-fun getAllLevels(context: Context): List<String> {
-    return context.resources.assets.list("levels")?.toList() ?: listOf()
-}
-
 data class GridData(val rows: Int, val grid: List<CellShade>) {
 
     private val size = grid.size
@@ -128,12 +124,6 @@ data class UndoStack(val gridSize: Int) {
         }
         return newUserGrid
     }
-}
-
-enum class CellShade {
-    CROSSED,
-    SHADED,
-    EMPTY
 }
 
 fun vibrate(context: Context) {

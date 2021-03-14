@@ -37,59 +37,38 @@ class GridView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private var firstDraw = true
-    var cellLength = 0
-
-    // Get Preferences
-    private val sharedPreferences: SharedPreferences =
-        PreferenceManager.getDefaultSharedPreferences(context)
-    private val fatFingerMode = sharedPreferences.getBoolean("fatFinger", true)
-    private val vibrateOn = sharedPreferences.getBoolean("vibrate", false)
-
-    // Create undo stack
-    private val undoStack = UndoStack(gridData.rows * gridData.cols)
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        nonoGrid = initializeGrid()
+        fC = nonoGrid[0, 0]
+        aC = nonoGrid[0, 0]
+    }
 
     override fun onDraw(canvas: Canvas) {
-        if (firstDraw) {
-            nonoGrid = initializeGrid()
-            firstDraw = false
-        }
         super.onDraw(canvas)
         drawCells(canvas, nonoGrid)
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
-            MotionEvent.ACTION_DOWN -> {
-                initializeFill(event.x, event.y)
-            }
-            MotionEvent.ACTION_UP -> {
-                endFill()
-            }
-
-            MotionEvent.ACTION_MOVE -> {
-                // Only run if current cell has moved
-                if (!aC.isInside(event.x, event.y)) {
-                    startFill(event.x, event.y)
-                }
-            }
-            MotionEvent.ACTION_CANCEL -> {
-                handler.removeCallbacks(mLongPressed)
-            }
+            MotionEvent.ACTION_DOWN -> initializeFill(event.x, event.y)
+            MotionEvent.ACTION_UP -> endFill()
+            MotionEvent.ACTION_MOVE -> startFill(event.x, event.y)
+            MotionEvent.ACTION_CANCEL -> handler.removeCallbacks(mLongPressed)
         }
         return true
     }
 
     private var isFirstCell = true
+    private var isLongPress = false
 
     /** First cell */
     private lateinit var fC: Cell
 
     /** Active cell */
     private lateinit var aC: Cell
-    private var isLongPress = false
 
-    /** fill horizontally, if false fill vertically */
+    /** If true fill horizontally, false fill vertically */
     private var fillHori = true
 
     private var mLongPressed = Runnable {
@@ -115,23 +94,26 @@ class GridView @JvmOverloads constructor(
     }
 
     private fun startFill(x: Float, y: Float) {
-        if (isFirstCell) {
-            isFirstCell = false
-            handler.removeCallbacks(mLongPressed)
-            if (!isLongPress) fC.click(!LD.toggleCross)
-            invalidate()
+        // Only run if current cell has moved
+        if (!aC.isInside(x, y)) {
+            if (isFirstCell) {
+                isFirstCell = false
+                handler.removeCallbacks(mLongPressed)
+                if (!isLongPress) fC.click(!LD.toggleCross)
+                invalidate()
 
-            nonoGrid.getCellAt(x, y) { cell -> fillHori = (cell.row == fC.row) }
-        }
-        nonoGrid.getCellAt(x, y) { cell ->
-            if (!fatFingerMode) {
-                cell.userShade = fC.userShade
-            } else {
-                if (fillHori) nonoGrid[fC.row, cell.col].userShade = fC.userShade
-                else nonoGrid[cell.row, fC.col].userShade = fC.userShade
+                nonoGrid.getCellAt(x, y) { cell -> fillHori = (cell.row == fC.row) }
             }
-            invalidate()
-            aC = cell
+            nonoGrid.getCellAt(x, y) { cell ->
+                if (!fatFingerMode) {
+                    cell.userShade = fC.userShade
+                } else {
+                    if (fillHori) nonoGrid[fC.row, cell.col].userShade = fC.userShade
+                    else nonoGrid[cell.row, fC.col].userShade = fC.userShade
+                }
+                invalidate()
+                aC = cell
+            }
         }
     }
 
@@ -139,7 +121,6 @@ class GridView @JvmOverloads constructor(
         handler.removeCallbacks(mLongPressed)
         if (isFirstCell and !isLongPress) {
             fC.click(!LD.toggleCross)
-
             invalidate()
         }
         if (checkGridDone()) gameDoneAlert()
@@ -154,16 +135,9 @@ class GridView @JvmOverloads constructor(
     }
 
     private fun initializeGrid(): UserGrid {
-        return UserGrid(gridData.rows, List(gridData.rows * gridData.cols) { i ->
-            Cell(
-                i / gridData.cols,
-                i % gridData.cols,
-                cellLength,
-                getPadding(i / gridData.cols, i % gridData.cols),
-                context
-            )
-        }
-        )
+        return UserGrid(gridData.rows, List(gridData.rows * gridData.cols) { index ->
+            Cell(index / gridData.cols, index % gridData.cols, cellLength, context)
+        })
     }
 
     private fun drawCells(canvas: Canvas, nonoGrid: UserGrid) {
@@ -204,10 +178,7 @@ class GridView @JvmOverloads constructor(
 
     private fun resetGrid() {
         clear()
-        //if (LD.isRandom) {
-        // restart activity to get new random grid
         (context as AppCompatActivity).recreate()
-        //}
     }
 
     fun undo() {

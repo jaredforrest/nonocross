@@ -17,6 +17,7 @@ package com.picross.nonocross
 import com.picross.nonocross.util.CellShade
 import com.picross.nonocross.util.GridData
 import com.picross.nonocross.util.UserGrid
+import com.picross.nonocross.views.grid.Cell.CellShade
 
 object LevelDetails {
     var gridData = GridData(0, List(0) { CellShade.EMPTY })

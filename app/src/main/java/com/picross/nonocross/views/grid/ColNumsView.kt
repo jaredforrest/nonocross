@@ -26,7 +26,7 @@ class ColNumsView(context: Context) : View(context) {
 
     var cellLength = 0
     private val colorNumber = ResourcesCompat.getColor(context.resources, R.color.colorText, null)
-    private val colorBlue = ResourcesCompat.getColor(context.resources, R.color.colorShaded, null)
+    private val colorBlue = ResourcesCompat.getColor(context.resources, R.color.colorShade, null)
     private val blackPaint = Paint()
         .apply { color = colorNumber }
         .apply { isAntiAlias = true }
@@ -36,13 +36,19 @@ class ColNumsView(context: Context) : View(context) {
         .apply { isAntiAlias = true }
         .apply { textAlign = Paint.Align.CENTER }
 
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        if (changed) {
+            blackPaint.apply { textSize = cellLength * 0.5F }
+            bluePaint.apply { textSize = cellLength * 0.5F }
+        }
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        blackPaint.apply { textSize = cellLength * 0.5F }
-        bluePaint.apply { textSize = cellLength * 0.5F }
-        var curLeft = cellLength.toFloat() * 0.5F
-
         if (!LD.gridData.isEmpty()) {
+            var curLeft = cellLength.toFloat() * 0.5F
+
             LD.gridData.colNums.forEachIndexed { i, col ->
                 var curBot = this.measuredHeight.toFloat() - cellLength.toFloat() * 0.2F
                 col.reversed().forEachIndexed { j, num ->
@@ -51,7 +57,9 @@ class ColNumsView(context: Context) : View(context) {
                             .getOrElse(j) { 0 } == num
                     ) bluePaint
                     else blackPaint
+
                     canvas.drawText(num.toString(), curLeft, curBot, paint)
+
                     curBot -= cellLength.toFloat() * 0.75F
                 }
                 curLeft += if ((i % LD.gridData.cols + 1) % 5 == 0) {

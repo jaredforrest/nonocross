@@ -56,3 +56,7 @@ class LevelSelectActivity : AppCompatActivity(), LevelSelectAdapter.StartGame {
     }
 
 }
+
+fun getAllLevels(context: Context): List<String> {
+    return context.resources.assets.list("levels")?.toList() ?: listOf()
+}

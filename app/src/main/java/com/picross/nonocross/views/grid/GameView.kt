@@ -37,83 +37,85 @@ class GameView @JvmOverloads constructor(
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        val minPadding = this.measuredWidth / 20
+        if (changed) {
+            val minPadding = this.measuredWidth / 20
 
-        // Given the width of this View find the max width of a Cell
-        val cellWidth =
-            ((this.measuredWidth - (minPadding * 2)) - gridData.cols - 1 - (2 * (gridData.cols - 1) / 5)) / (gridData.cols + (gridData.longestRowNum + 1) / 2)
-        // Given the width of this View find the max Height of a Cell
-        val cellHeight =
-            ((this.measuredHeight - (minPadding * 2)) - gridData.rows - 1 - (2 * (gridData.rows - 1) / 5)) / (gridData.rows + (gridData.longestColNum + 1))
+            // Given the width of this View find the max width of a Cell
+            val cellWidth =
+                ((this.measuredWidth - (minPadding * 2)) - gridData.cols - 1 - (2 * (gridData.cols - 1) / 5)) / (gridData.cols + (gridData.longestRowNum + 1) / 2)
+            // Given the width of this View find the max Height of a Cell
+            val cellHeight =
+                ((this.measuredHeight - (minPadding * 2)) - gridData.rows - 1 - (2 * (gridData.rows - 1) / 5)) / (gridData.rows + (gridData.longestColNum + 1))
 
-        val cellLength = cellWidth.coerceAtMost(cellHeight)
+            val cellLength = cellWidth.coerceAtMost(cellHeight)
 
-        val gridWidth =
-            cellLength * gridData.cols + gridData.cols + 1 + 2 * ((gridData.cols - 1) / 5)
-        val gridHeight =
-            cellLength * gridData.rows + gridData.rows + 1 + 2 * ((gridData.rows - 1) / 5)
+            val gridWidth =
+                cellLength * gridData.cols + gridData.cols + 1 + 2 * ((gridData.cols - 1) / 5)
+            val gridHeight =
+                cellLength * gridData.rows + gridData.rows + 1 + 2 * ((gridData.rows - 1) / 5)
 
-        // First draw the column numbers
+            // First draw the column numbers
 
-        // Finds longest column * half of cell length
-        val colNumHeight = gridData.longestColNum * (cellLength * 0.75F).toInt()
+            // Finds longest column * half of cell length
+            val colNumHeight = gridData.longestColNum * (cellLength * 0.75F).toInt()
 
-        // (Finds longest row + 1) * half of cell length
-        val rowNumWidth = gridData.longestRowNum * (cellLength * 0.5F).toInt()
+            // (Finds longest row + 1) * half of cell length
+            val rowNumWidth = gridData.longestRowNum * (cellLength * 0.5F).toInt()
 
-        val topPadding = (this.measuredHeight - colNumHeight - gridHeight) / 3
-        val leftPadding = (this.measuredWidth - rowNumWidth - gridWidth) / 2
+            val topPadding = (this.measuredHeight - colNumHeight - gridHeight) / 3
+            val leftPadding = (this.measuredWidth - rowNumWidth - gridWidth) / 2
 
-        val colNumsView = getChildAt(0)
-        (colNumsView as ColNumsView).cellLength = cellLength
+            val colNumsView = getChildAt(0)
+            (colNumsView as ColNumsView).cellLength = cellLength
 
-        // Get the maximum size of the child
-        colNumsView.measure(
-            MeasureSpec.makeMeasureSpec(gridWidth, MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(colNumHeight, MeasureSpec.EXACTLY)
-        )
-        // Create the layout
-        colNumsView.layout(
-            leftPadding + rowNumWidth,
-            topPadding,
-            leftPadding + rowNumWidth + colNumsView.measuredWidth,
-            topPadding + colNumsView.measuredHeight
-        )
+            // Get the maximum size of the child
+            colNumsView.measure(
+                MeasureSpec.makeMeasureSpec(gridWidth, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(colNumHeight, MeasureSpec.EXACTLY)
+            )
+            // Create the layout
+            colNumsView.layout(
+                leftPadding + rowNumWidth,
+                topPadding,
+                leftPadding + rowNumWidth + colNumsView.measuredWidth,
+                topPadding + colNumsView.measuredHeight
+            )
 
-        val rowNumsView = getChildAt(1)
-        (rowNumsView as RowNumsView).cellLength = cellLength
+            val rowNumsView = getChildAt(1)
+            (rowNumsView as RowNumsView).cellLength = cellLength
 
-        // Get the maximum size of the child
-        rowNumsView.measure(
-            MeasureSpec.makeMeasureSpec(rowNumWidth, MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(gridHeight, MeasureSpec.EXACTLY)
-        )
+            // Get the maximum size of the child
+            rowNumsView.measure(
+                MeasureSpec.makeMeasureSpec(rowNumWidth, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(gridHeight, MeasureSpec.EXACTLY)
+            )
 
-        // Create the layout
-        rowNumsView.layout(
-            leftPadding,
-            topPadding + colNumsView.measuredHeight,
-            leftPadding + rowNumsView.measuredWidth,
-            topPadding + colNumsView.measuredHeight + rowNumsView.measuredHeight
-        )
+            // Create the layout
+            rowNumsView.layout(
+                leftPadding,
+                topPadding + colNumsView.measuredHeight,
+                leftPadding + rowNumsView.measuredWidth,
+                topPadding + colNumsView.measuredHeight + rowNumsView.measuredHeight
+            )
 
-        // Then draw the grid
+            // Then draw the grid
 
-        val nonocrossGridView = getChildAt(2)
-        (nonocrossGridView as GridView).cellLength = cellLength
+            val nonocrossGridView = getChildAt(2)
+            (nonocrossGridView as GridView).cellLength = cellLength
 
-        // Get the maximum size of the child
-        nonocrossGridView.measure(
-            MeasureSpec.makeMeasureSpec(gridWidth, MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(gridHeight, MeasureSpec.EXACTLY)
-        )
-        // Create the layout
-        nonocrossGridView.layout(
-            leftPadding + rowNumsView.measuredWidth,
-            topPadding + colNumsView.measuredHeight,
-            leftPadding + rowNumsView.measuredWidth + nonocrossGridView.measuredWidth,
-            topPadding + colNumsView.measuredHeight + nonocrossGridView.measuredHeight
-        )
+            // Get the maximum size of the child
+            nonocrossGridView.measure(
+                MeasureSpec.makeMeasureSpec(gridWidth, MeasureSpec.EXACTLY),
+                MeasureSpec.makeMeasureSpec(gridHeight, MeasureSpec.EXACTLY)
+            )
+            // Create the layout
+            nonocrossGridView.layout(
+                leftPadding + rowNumsView.measuredWidth,
+                topPadding + colNumsView.measuredHeight,
+                leftPadding + rowNumsView.measuredWidth + nonocrossGridView.measuredWidth,
+                topPadding + colNumsView.measuredHeight + nonocrossGridView.measuredHeight
+            )
+        }
     }
 
     override fun onInterceptTouchEvent(event: MotionEvent): Boolean {

@@ -5,8 +5,8 @@
     <color name="colorAccent">#1C73E8</color>
 
     <!-- For the cells -->
-    <color name="colorShaded">#1286FF</color>
-    <color name="colorCrossed">#EF3340</color>
+    <color name="colorShade">#1286FF</color>
+    <color name="colorCross">#EF3340</color>
     <color name="colorEmpty">#222222</color>
 
     <!-- For the row and columns -->

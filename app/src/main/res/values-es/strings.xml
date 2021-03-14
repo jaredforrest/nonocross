@@ -19,8 +19,8 @@
     <string name="fat_finger_summary">Habilite si es difícil tocar cuadrados individuales</string>
     <string name="usability_header">Funcionalidad</string>
     <string name="vibrate_summary">Vibrar al realizar determinadas acciones</string>
-    <string name="dark_mode_header">Modo Oscuro</string>
-    <string name="override_system_theme">Anular el tema de sistema</string>
-    <string name="enable_dark_mode">Habilitar el modo oscuro</string>
+    <string name="appearance_header">Apariencia</string>
+    <string name="override_system_theme">Anular el Tema del Sistema</string>
+    <string name="enable_dark_mode">Habilitar el Tema Oscuro</string>
     <string name="requires_restart">Requiere Reinicio</string>
 </resources>

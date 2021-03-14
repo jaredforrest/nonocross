@@ -106,4 +106,10 @@ class Cell(
             }
         }
     }
+
+    enum class CellShade {
+        CROSS,
+        SHADE,
+        EMPTY
+    }
 }
