@@ -71,7 +71,7 @@ class Cell(
             top + cellLength * 0.25F,
             left + cellLength * 0.75F,
             top + cellLength * 0.75F,
-            paintCrossed
+            paintCross
         )
         canvas.drawLine(
             left + cellLength * 0.25F,
