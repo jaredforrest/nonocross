@@ -85,6 +85,7 @@ data class GridData(val rows: Int, val grid: List<CellShade>) {
     private fun col(index: Int) = List(rows) { j -> grid[j * cols + index] }
 }
 
+/** UserGrid is a 1D list encoding a 2D array (the grid) */
 data class UserGrid(val rows: Int, var grid: List<Cell>) {
 
     operator fun get(i: Int, j: Int) = grid[i * cols + j]
@@ -100,6 +101,24 @@ data class UserGrid(val rows: Int, var grid: List<Cell>) {
 
     val rowNums get() = GridData(rows, data).rowNums
     val colNums get() = GridData(rows, data).colNums
+
+    fun copyRowInRange(row: Int, initCol: Int, currCol: Int, cellShade: CellShade) {
+        val startCol = initCol.coerceAtMost(currCol)
+        val endCol = initCol.coerceAtLeast(currCol)
+        grid.forEachIndexed { i, cell ->
+            cell.userShade =
+                if (i in (startCol + row * cols..endCol + row * cols)) cellShade else cell.userShade
+        }
+    }
+
+    fun copyColInRange(col: Int, initRow: Int, currRow: Int, cellShade: CellShade) {
+        val startRow = initRow.coerceAtMost(currRow)
+        val endRow = initRow.coerceAtLeast(currRow)
+        grid.forEachIndexed { i, cell ->
+            cell.userShade =
+                if (i in (col + startRow * cols..col + endRow * cols step cols)) cellShade else cell.userShade
+        }
+    }
 
     private fun copyCellShades(element: List<CellShade>) {
         grid = grid.mapIndexed { i, cell ->

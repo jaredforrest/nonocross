@@ -28,8 +28,8 @@ class Cell(
 ) {
     var userShade = CellShade.EMPTY
 
-    private val top = 1 + row.toFloat() * (cellLength + 1) + 2 * (row.toFloat() / 5)
-    private val left = 1 + col.toFloat() * (cellLength + 1) + 2 * (col.toFloat() / 5)
+    private val top = (1 + row * (cellLength + 1) + 2 * (row / 5)).toFloat()
+    private val left = (1 + col * (cellLength + 1) + 2 * (col / 5)).toFloat()
     private val right = left + cellLength
     private val bottom = top + cellLength
 

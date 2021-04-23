@@ -119,8 +119,18 @@ class GridView @JvmOverloads constructor(
                 if (!fatFingerMode) {
                     cell.userShade = fC.userShade
                 } else {
-                    if (fillHori) nonoGrid[fC.row, cell.col].userShade = fC.userShade
-                    else nonoGrid[cell.row, fC.col].userShade = fC.userShade
+                    if (fillHori) nonoGrid.copyRowInRange(
+                        fC.row,
+                        fC.col,
+                        cell.col,
+                        fC.userShade
+                    )//*/nonoGrid[fC.row, cell.col].userShade = fC.userShade
+                    else nonoGrid.copyColInRange(
+                        fC.col,
+                        fC.row,
+                        cell.row,
+                        fC.userShade
+                    )//nonoGrid[cell.row, fC.col].userShade = fC.userShade
                 }
                 invalidate()
                 aC = cell
