@@ -33,10 +33,8 @@ fun generate(context: Context) {
 
     LD.gridData = if (LD.isRandom) {
         // Difficulty is set by changing the proportion of filled to empty cell
-        // ie. difficulty=5 -> listOf(0,1,1,1,1,1)
-        // difficulty=10 -> listOf(0,1)
         val difficultyList =
-            List(12 - difficulty) { i -> if (i != 0) CellShade.SHADE else CellShade.EMPTY }
+            List(100) { i -> if (i > (100 - 5 * difficulty)) CellShade.SHADE else CellShade.EMPTY }
 
         GridData(rows, List(rows * columns) { difficultyList.random() })
     } else {
