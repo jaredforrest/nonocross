@@ -32,10 +32,12 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
+    /*
     override fun onStop() {
         (findViewById<GameView>(R.id.nonocrossGameView).getChildAt(2) as GridView).clear()
         super.onStop()
     }
+    */
 
     fun onClick(view: View) {
         when (view.id) {
