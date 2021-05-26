@@ -124,6 +124,20 @@ data class UserGrid(val rows: Int, var grid: List<Cell>) {
             cell
         }
     }
+
+    fun crossRow(row: Int) {
+        grid.forEachIndexed { i, cell ->
+            if (i in (row * cols until (row + 1) * cols) && cell.userShade == CellShade.EMPTY)
+                cell.userShade = CellShade.CROSS
+        }
+    }
+
+    fun crossCol(col: Int) {
+        grid.forEachIndexed { i, cell ->
+            if (i in (col..size step cols) && cell.userShade == CellShade.EMPTY)
+                cell.userShade = CellShade.CROSS
+        }
+    }
 }
 
 data class UndoStack(val gridSize: Int) {

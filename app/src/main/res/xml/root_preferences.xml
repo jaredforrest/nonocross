@@ -13,6 +13,12 @@
             app:summary="@string/fat_finger_summary"
             app:title="@string/fat_finger_title" />
 
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:key="autoCross"
+            app:summary="@string/auto_cross_summary"
+            app:title="@string/auto_cross_title" />
+
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/appearance_header">
