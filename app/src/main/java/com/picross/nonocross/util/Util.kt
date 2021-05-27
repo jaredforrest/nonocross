@@ -100,6 +100,7 @@ data class UserGrid(val rows: Int, var grid: List<Cell>) {
     val rowNums get() = GridData(rows, data).rowNums
     val colNums get() = GridData(rows, data).colNums
 
+    /** Fills a the cells in a Row from initCol to currCol (both inclusive) */
     fun copyRowInRange(row: Int, initCol: Int, currCol: Int, cellShade: CellShade) {
         val startCol = initCol.coerceAtMost(currCol)
         val endCol = initCol.coerceAtLeast(currCol)
@@ -109,6 +110,7 @@ data class UserGrid(val rows: Int, var grid: List<Cell>) {
         }
     }
 
+    /** Fills a the cells in a column from initRow to currRow (both inclusive) */
     fun copyColInRange(col: Int, initRow: Int, currRow: Int, cellShade: CellShade) {
         val startRow = initRow.coerceAtMost(currRow)
         val endRow = initRow.coerceAtLeast(currRow)
@@ -125,19 +127,10 @@ data class UserGrid(val rows: Int, var grid: List<Cell>) {
         }
     }
 
-    fun crossRow(row: Int) {
-        grid.forEachIndexed { i, cell ->
-            if (i in (row * cols until (row + 1) * cols) && cell.userShade == CellShade.EMPTY)
-                cell.userShade = CellShade.CROSS
-        }
-    }
-
-    fun crossCol(col: Int) {
-        grid.forEachIndexed { i, cell ->
-            if (i in (col..size step cols) && cell.userShade == CellShade.EMPTY)
-                cell.userShade = CellShade.CROSS
-        }
-    }
+    fun crossRow(row: Int) = copyRowInRange(row, 0, cols - 1, CellShade.CROSS)
+    fun crossCol(row: Int) = copyColInRange(row, 0, rows - 1, CellShade.CROSS)
+    fun fillRow(row: Int) = copyRowInRange(row, 0, cols - 1, CellShade.SHADE)
+    fun fillCol(row: Int) = copyColInRange(row, 0, rows - 1, CellShade.SHADE)
 }
 
 data class UndoStack(val gridSize: Int) {

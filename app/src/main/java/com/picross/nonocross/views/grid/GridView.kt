@@ -161,22 +161,22 @@ class GridView @JvmOverloads constructor(
     }
 
     private fun initializeGrid(): UserGrid {
-        return UserGrid(gridData.rows, List(gridData.rows * gridData.cols) { index ->
+        val grid = UserGrid(gridData.rows, List(gridData.rows * gridData.cols) { index ->
             Cell(index / gridData.cols, index % gridData.cols, cellLength, context)
         })
+        return if (autoCross) autoFill(grid) else grid
     }
 
-    private fun autoMarkCross() {
-        for (i in 0 until gridData.rows) {
-            if (nonoGrid.rowNums[i] == gridData.rowNums[i]) {
-                nonoGrid.crossRow(i);
-            }
+    private fun autoFill(grid: UserGrid): UserGrid {
+        gridData.rowNums.forEachIndexed { i, rowNum ->
+            if (rowNum == emptyList<Int>()) grid.crossRow(i)
+            else if (rowNum == listOf(gridData.cols)) grid.fillRow(i)
         }
-        for (i in 0 until gridData.cols) {
-            if (nonoGrid.colNums[i] == gridData.colNums[i]) {
-                nonoGrid.crossCol(i);
-            }
+        gridData.colNums.forEachIndexed { i, colNum ->
+            if (colNum == emptyList<Int>()) grid.crossCol(i)
+            else if (colNum == listOf(gridData.rows)) grid.fillCol(i)
         }
+        return grid
     }
 
     private fun checkGridDone(): Boolean {
