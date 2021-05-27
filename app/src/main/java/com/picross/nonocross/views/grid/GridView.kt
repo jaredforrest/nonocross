@@ -65,6 +65,7 @@ class GridView @JvmOverloads constructor(
     private val sharedPreferences: SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(context)
     private val fatFingerMode = sharedPreferences.getBoolean("fatFinger", true)
+    private val autoCross = sharedPreferences.getBoolean("autoCross", false)
     private val vibrateOn = sharedPreferences.getBoolean("vibrate", false)
 
     // Create undo stack
@@ -144,6 +145,10 @@ class GridView @JvmOverloads constructor(
             fC.click(!LD.toggleCross)
             invalidate()
         }
+        if (autoCross) {
+            autoMarkCross()
+            invalidate()
+        }
         if (checkGridDone()) gameDoneAlert()
     }
 
@@ -159,6 +164,19 @@ class GridView @JvmOverloads constructor(
         return UserGrid(gridData.rows, List(gridData.rows * gridData.cols) { index ->
             Cell(index / gridData.cols, index % gridData.cols, cellLength, context)
         })
+    }
+
+    private fun autoMarkCross() {
+        for (i in 0 until gridData.rows) {
+            if (nonoGrid.rowNums[i] == gridData.rowNums[i]) {
+                nonoGrid.crossRow(i);
+            }
+        }
+        for (i in 0 until gridData.cols) {
+            if (nonoGrid.colNums[i] == gridData.colNums[i]) {
+                nonoGrid.crossCol(i);
+            }
+        }
     }
 
     private fun checkGridDone(): Boolean {
