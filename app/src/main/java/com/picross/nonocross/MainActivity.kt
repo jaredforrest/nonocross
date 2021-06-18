@@ -18,10 +18,12 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
+import android.widget.EditText
 import android.widget.NumberPicker
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.preference.PreferenceManager
 
 class MainActivity : AppCompatActivity() {
@@ -66,6 +68,8 @@ class MainActivity : AppCompatActivity() {
         val rowsPicker = dialogView.findViewById<NumberPicker>(R.id.rows_picker)
         val colsPicker = dialogView.findViewById<NumberPicker>(R.id.cols_picker)
         val diffPicker = dialogView.findViewById<NumberPicker>(R.id.difficulty_picker)
+        val seedSelectEnable = dialogView.findViewById<AppCompatCheckBox>(R.id.seed_select_enable)
+        val seedSelect = dialogView.findViewById<EditText>(R.id.seed_select)
         rowsPicker.maxValue = 50
         rowsPicker.minValue = 2
         rowsPicker.value = preferences.getInt("rows", 10)
@@ -79,6 +83,9 @@ class MainActivity : AppCompatActivity() {
         diffPicker.minValue = 1
         diffPicker.value = preferences.getInt("difficulty", 5)
         diffPicker.wrapSelectorWheel = false
+        seedSelectEnable.setOnCheckedChangeListener { _, bool ->
+            seedSelect.visibility = if (bool) View.VISIBLE else View.GONE
+        }
         AlertDialog.Builder(this)
             .setTitle(R.string.grid_size)
             .setView(dialogView)
@@ -89,6 +96,11 @@ class MainActivity : AppCompatActivity() {
                 editor.putInt("columns", colsPicker.value)
                 editor.putInt("rows", rowsPicker.value)
                 editor.putInt("difficulty", diffPicker.value)
+                editor.putBoolean("level seed enable", seedSelectEnable.isChecked)
+                if (seedSelectEnable.isChecked) editor.putLong(
+                    "level seed",
+                    seedSelect.text.toString().toLongOrNull() ?: 0
+                )
                 editor.apply()
 
                 LevelDetails.isRandom = true

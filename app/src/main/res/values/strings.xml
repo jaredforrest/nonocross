@@ -19,13 +19,15 @@
     <string name="vibrate_title">Vibrate</string>
     <string name="fat_finger_title">Single Line Fill Mode</string>
     <string name="fat_finger_summary">Enable if it is difficult to touch individual squares</string>
-    <string name="auto_cross_title">Auto cross lines</string>
-    <string name="auto_cross_summary">Cross out fully completed lines</string>
+    <string name="auto_cross_title">Auto Fill</string>
+    <string name="auto_cross_summary">Automatically fill lines with only one shade</string>
     <string name="vibrate_summary">Vibrate when performing certain actions</string>
     <string name="appearance_header">Appearance</string>
     <string name="override_system_theme">Override System Theme</string>
     <string name="enable_dark_mode">Enable Dark Mode</string>
     <string name="requires_restart">Requires Restart</string>
     <string name="show_blue_hints">Show Blue Hints</string>
+    <string name="select_seed">Custom Seed</string>
+    <string name="enter_seed">Enter seed</string>
 
 </resources>

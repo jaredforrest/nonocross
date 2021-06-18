@@ -22,6 +22,7 @@ import androidx.preference.PreferenceManager
 import com.picross.nonocross.views.grid.Cell
 import com.picross.nonocross.views.grid.Cell.CellShade
 import java.io.InputStream
+import kotlin.random.Random
 import com.picross.nonocross.LevelDetails as LD
 
 fun generate(context: Context) {
@@ -30,13 +31,24 @@ fun generate(context: Context) {
     val columns = preferences.getInt("columns", 10)
     val rows = preferences.getInt("rows", 10)
     val difficulty = preferences.getInt("difficulty", 10)
+    val seed = if (preferences.getBoolean("level seed enable", false)) preferences.getLong(
+        "level seed",
+        System.currentTimeMillis()
+    ) else System.currentTimeMillis()
 
     LD.gridData = if (LD.isRandom) {
         // Difficulty is set by changing the proportion of filled to empty cell
-        val difficultyList =
-            List(100) { i -> if (i > (100 - 5 * difficulty)) CellShade.SHADE else CellShade.EMPTY }
+        val random = Random(seed)
 
-        GridData(rows, List(rows * columns) { difficultyList.random() })
+        GridData(
+            rows,
+            List(rows * columns) {
+                if (random.nextInt(
+                        0,
+                        100
+                    ) > 3 * difficulty + 46
+                ) CellShade.SHADE else CellShade.EMPTY
+            })
     } else {
         openGridFile(context, LD.levelName)
     }

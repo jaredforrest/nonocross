@@ -24,4 +24,8 @@
     <string name="enable_dark_mode">Habilitar el Tema Oscuro</string>
     <string name="requires_restart">Requiere Reinicio</string>
     <string name="show_blue_hints">Mostrar Indicios Azul</string>
+    <string name="auto_cross_summary">Llenar líneas con un tono solo</string>
+    <string name="select_seed">Semilla Personilazada</string>
+    <string name="enter_seed">Introducir la semilla</string>
+    <string name="auto_cross_title">Rellenon Automático</string>
 </resources>
