@@ -59,7 +59,7 @@ class ColNumsView(context: Context) : View(context) {
                 var curBot = this.measuredHeight.toFloat() - cellLength.toFloat() * 0.2F
                 col.reversed().forEachIndexed { j, num ->
                     val paint = if (blueHints && LD.isReady() &&
-                        LD.userGrid.colNums.getOrElse(i) { List(1) { 0 } }.reversed()
+                        LD.userGrid.colNums.getOrElse(i) { listOf(0) }.reversed()
                             .getOrElse(j) { 0 } == num
                     ) bluePaint
                     else blackPaint

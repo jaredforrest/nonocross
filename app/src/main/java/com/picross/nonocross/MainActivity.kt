@@ -42,14 +42,15 @@ class MainActivity : AppCompatActivity() {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
         }
-    }
 
-    fun onClick(view: View) {
-        when (view.id) {
-            R.id.random_level -> openRandomLevel()
-            R.id.level_select -> openLevelSelect()
-            R.id.preferences -> openPreferences()
-        }
+        val randomLevel: View = findViewById(R.id.random_level)
+        val levelSelect: View = findViewById(R.id.level_select)
+        val preferences: View = findViewById(R.id.preferences)
+
+        randomLevel.setOnClickListener { openRandomLevel() }
+        levelSelect.setOnClickListener { openLevelSelect() }
+        preferences.setOnClickListener { openPreferences() }
+
     }
 
     /** Called when the user taps the Start Level button */

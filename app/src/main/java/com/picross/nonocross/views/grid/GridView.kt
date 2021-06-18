@@ -52,8 +52,8 @@ class GridView @JvmOverloads constructor(
     override fun onTouchEvent(event: MotionEvent): Boolean {
         when (event.actionMasked) {
             MotionEvent.ACTION_DOWN -> initializeFill(event.x, event.y)
-            MotionEvent.ACTION_UP -> endFill()
             MotionEvent.ACTION_MOVE -> startFill(event.x, event.y)
+            MotionEvent.ACTION_UP -> endFill()
             MotionEvent.ACTION_CANCEL -> handler.removeCallbacks(mLongPressed)
         }
         return true
@@ -125,13 +125,13 @@ class GridView @JvmOverloads constructor(
                         fC.col,
                         cell.col,
                         fC.userShade
-                    )//*/nonoGrid[fC.row, cell.col].userShade = fC.userShade
+                    )
                     else nonoGrid.copyColInRange(
                         fC.col,
                         fC.row,
                         cell.row,
                         fC.userShade
-                    )//nonoGrid[cell.row, fC.col].userShade = fC.userShade
+                    )
                 }
                 invalidate()
                 aC = cell
@@ -143,10 +143,6 @@ class GridView @JvmOverloads constructor(
         handler.removeCallbacks(mLongPressed)
         if (isFirstCell and !isLongPress) {
             fC.click(!LD.toggleCross)
-            invalidate()
-        }
-        if (autoCross) {
-            autoMarkCross()
             invalidate()
         }
         if (checkGridDone()) gameDoneAlert()

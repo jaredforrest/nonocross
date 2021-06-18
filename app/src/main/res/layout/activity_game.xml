@@ -40,16 +40,12 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
     <TextView
         android:id="@+id/undo"
         android:layout_width="51dp"
         android:layout_height="32dp"
         android:layout_marginBottom="8dp"
-        android:clickable="true"
         android:drawablePadding="5sp"
-        android:focusable="true"
-        android:onClick="onClick"
         android:text=""
         android:textSize="55sp"
         app:drawableTopCompat="@drawable/ic_baseline_undo_32"
@@ -63,10 +59,7 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         android:layout_width="51dp"
         android:layout_height="32dp"
         android:layout_marginBottom="8dp"
-        android:clickable="true"
         android:drawablePadding="5sp"
-        android:focusable="true"
-        android:onClick="onClick"
         android:text=""
         android:textSize="55sp"
         app:drawableTopCompat="@drawable/ic_baseline_delete_32"

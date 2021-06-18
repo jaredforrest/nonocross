@@ -30,6 +30,21 @@ class GameActivity : AppCompatActivity() {
         findViewById<SwitchCompat>(R.id.toggleCross).setOnCheckedChangeListener { _, isChecked ->
             LevelDetails.toggleCross = isChecked
         }
+
+        val undo: View = findViewById(R.id.undo)
+        val clear: View = findViewById(R.id.clear)
+
+        undo.setOnClickListener {
+            (findViewById<GameView>(R.id.nonocrossGameView).getChildAt(2) as GridView).undo()
+            findViewById<GameView>(R.id.nonocrossGameView).getChildAt(0).invalidate()
+            findViewById<GameView>(R.id.nonocrossGameView).getChildAt(1).invalidate()
+        }
+        clear.setOnClickListener {
+            (findViewById<GameView>(R.id.nonocrossGameView).getChildAt(2) as GridView).clear()
+            findViewById<GameView>(R.id.nonocrossGameView).getChildAt(0).invalidate()
+            findViewById<GameView>(R.id.nonocrossGameView).getChildAt(1).invalidate()
+        }
+
     }
 
     /*
@@ -38,20 +53,5 @@ class GameActivity : AppCompatActivity() {
         super.onStop()
     }
     */
-
-    fun onClick(view: View) {
-        when (view.id) {
-            R.id.undo -> {
-                (findViewById<GameView>(R.id.nonocrossGameView).getChildAt(2) as GridView).undo()
-                findViewById<GameView>(R.id.nonocrossGameView).getChildAt(0).invalidate()
-                findViewById<GameView>(R.id.nonocrossGameView).getChildAt(1).invalidate()
-            }
-            R.id.clear -> {
-                (findViewById<GameView>(R.id.nonocrossGameView).getChildAt(2) as GridView).clear()
-                findViewById<GameView>(R.id.nonocrossGameView).getChildAt(0).invalidate()
-                findViewById<GameView>(R.id.nonocrossGameView).getChildAt(1).invalidate()
-            }
-        }
-    }
 }
 
