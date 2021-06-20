@@ -27,7 +27,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import com.picross.nonocross.LevelDetails.gridData
 import com.picross.nonocross.R
-import com.picross.nonocross.util.UndoStack
 import com.picross.nonocross.util.UserGrid
 import com.picross.nonocross.util.vibrate
 import com.picross.nonocross.LevelDetails as LD
@@ -39,7 +38,7 @@ class GridView @JvmOverloads constructor(
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        nonoGrid = initializeGrid()
+        nonoGrid = UserGrid(gridData, cellLength, context)
         fC = nonoGrid[0, 0]
         aC = nonoGrid[0, 0]
     }
@@ -65,11 +64,7 @@ class GridView @JvmOverloads constructor(
     private val sharedPreferences: SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(context)
     private val fatFingerMode = sharedPreferences.getBoolean("fatFinger", true)
-    private val autoCross = sharedPreferences.getBoolean("autoCross", false)
     private val vibrateOn = sharedPreferences.getBoolean("vibrate", false)
-
-    // Create undo stack
-    private val undoStack = UndoStack(gridData.rows * gridData.cols)
 
     private var isFirstCell = true
     private var isLongPress = false
@@ -96,7 +91,7 @@ class GridView @JvmOverloads constructor(
                 mLongPressed,
                 ViewConfiguration.getLongPressTimeout().toLong()
             )
-            undoStack.push(nonoGrid.data)
+            nonoGrid.undoAddStack()
 
             aC = cell
             fC = cell
@@ -116,25 +111,25 @@ class GridView @JvmOverloads constructor(
 
                 nonoGrid.getCellAt(x, y) { cell -> fillHori = (cell.row == fC.row) }
             }
-            nonoGrid.getCellAt(x, y) { cell ->
+            nonoGrid.getCellAt(x, y) { currCell ->
                 if (!fatFingerMode) {
-                    cell.userShade = fC.userShade
+                    currCell.userShade = fC.userShade
                 } else {
                     if (fillHori) nonoGrid.copyRowInRange(
                         fC.row,
                         fC.col,
-                        cell.col,
+                        currCell.col,
                         fC.userShade
                     )
                     else nonoGrid.copyColInRange(
                         fC.col,
                         fC.row,
-                        cell.row,
+                        currCell.row,
                         fC.userShade
                     )
                 }
                 invalidate()
-                aC = cell
+                aC = currCell
             }
         }
     }
@@ -145,38 +140,7 @@ class GridView @JvmOverloads constructor(
             fC.click(!LD.toggleCross)
             invalidate()
         }
-        if (checkGridDone()) gameDoneAlert()
-    }
-
-
-    private fun UserGrid.getCellAt(x: Float, y: Float, action: (Cell) -> Unit) {
-        val cell = this.grid.find { cell -> cell.isInside(x, y) }
-        if (cell != null) {
-            action(cell)
-        }
-    }
-
-    private fun initializeGrid(): UserGrid {
-        val grid = UserGrid(gridData.rows, List(gridData.rows * gridData.cols) { index ->
-            Cell(index / gridData.cols, index % gridData.cols, cellLength, context)
-        })
-        return if (autoCross) autoFill(grid) else grid
-    }
-
-    private fun autoFill(grid: UserGrid): UserGrid {
-        gridData.rowNums.forEachIndexed { i, rowNum ->
-            if (rowNum == emptyList<Int>()) grid.crossRow(i)
-            else if (rowNum == listOf(gridData.cols)) grid.fillRow(i)
-        }
-        gridData.colNums.forEachIndexed { i, colNum ->
-            if (colNum == emptyList<Int>()) grid.crossCol(i)
-            else if (colNum == listOf(gridData.rows)) grid.fillCol(i)
-        }
-        return grid
-    }
-
-    private fun checkGridDone(): Boolean {
-        return nonoGrid.rowNums == gridData.rowNums && nonoGrid.colNums == gridData.colNums
+        if (nonoGrid.checkDone()) gameDoneAlert()
     }
 
     /** When the game is finished show a dialog */
@@ -204,12 +168,12 @@ class GridView @JvmOverloads constructor(
     }
 
     fun undo() {
-        nonoGrid.data = undoStack.pop()
+        nonoGrid.undo()
         invalidate()
     }
 
     fun clear() {
-        undoStack.push(nonoGrid.data)
+        nonoGrid.undoAddStack()
         nonoGrid.clear()
         invalidate()
     }

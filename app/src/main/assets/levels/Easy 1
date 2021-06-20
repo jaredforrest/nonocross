@@ -1,1 +1,14 @@
-1 11101
+width 5
+height 1
+
+rows
+3,1
+
+columns
+1
+1
+1
+0
+1
+
+goal "11101"

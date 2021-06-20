@@ -14,12 +14,11 @@ You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross
 
-import com.picross.nonocross.util.GridData
+import com.picross.nonocross.util.GridData2
 import com.picross.nonocross.util.UserGrid
-import com.picross.nonocross.views.grid.Cell.CellShade
 
 object LevelDetails {
-    var gridData = GridData(0, List(0) { CellShade.EMPTY })
+    var gridData = GridData2(0, 0, listOf(), listOf())//0, List(0) { CellShade.EMPTY })
     lateinit var userGrid: UserGrid
 
 

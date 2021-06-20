@@ -68,7 +68,7 @@ class RowNumsView(context: Context) : View(context) {
 
                     curLeft -= if (num < 10) cellLength * 0.5F else cellLength * 0.7F
                 }
-                curBot += if ((i % LD.gridData.cols + 1) % 5 == 0) {
+                curBot += if ((i % LD.gridData.width + 1) % 5 == 0) {
                     cellLength + 3
                 } else {
                     cellLength + 1

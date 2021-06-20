@@ -19,7 +19,6 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.preference.PreferenceManager
-import com.picross.nonocross.views.grid.Cell
 import com.picross.nonocross.views.grid.Cell.CellShade
 import java.io.InputStream
 import kotlin.random.Random
@@ -48,114 +47,22 @@ fun generate(context: Context) {
                         100
                     ) > 3 * difficulty + 46
                 ) CellShade.SHADE else CellShade.EMPTY
-            })
+            }).toGridData2()
     } else {
         openGridFile(context, LD.levelName)
     }
 }
 
-fun openGridFile(context: Context, chosenLevelName: String): GridData {
+fun openGridFile(context: Context, chosenLevelName: String): GridData2 {
     val inputStream: InputStream = context.resources.assets.open("levels/$chosenLevelName")
     val buffer = ByteArray(inputStream.available())
     inputStream.read(buffer)
-    val rows = String(buffer).takeWhile { it != ' ' }
-        .toInt()
-    val text = String(buffer).dropWhile { it != ' ' }.drop(1)
+    //val rows = String(buffer).takeWhile { it != ' ' }
+    //    .toInt()
+    val text = String(buffer)//.dropWhile { it != ' ' }.drop(1)
+    //Log.d("text", text)
 
-    return GridData(rows, text.map { if (it == '1') CellShade.SHADE else CellShade.EMPTY })
-}
-
-data class GridData(val rows: Int, val grid: List<CellShade>) {
-
-    private val size = grid.size
-    val cols = if (rows == 0) 0 else size / rows
-
-    // These are the numbers at the side/top of the row/column in-game
-    val rowNums = List(rows) { i -> countCellNums(row(i)) }
-    val colNums = List(cols) { i -> countCellNums(col(i)) }
-
-    /** Gets the width and height of the longest row and column */
-    val longestRowNum =
-        rowNums.fold(0,
-            { acc, i -> (i.size + if (i.count { it >= 10 } > 0) 1 else 0).coerceAtLeast(acc) })
-    val longestColNum = colNums.fold(0, { acc, i -> i.size.coerceAtLeast(acc) })
-
-    private fun countCellNums(row: List<CellShade>): List<Int> {
-        return (row.runningFold(0) { acc, cell ->
-            if (cell == CellShade.SHADE) acc + 1
-            else 0
-        } + 0)
-            .zipWithNext { a, b -> if (b == 0) a else 0 }
-            .filterNot { it == 0 }
-    }
-
-    fun isEmpty() = grid.isEmpty()
-
-    private fun row(index: Int) = grid.subList(index * cols, index * cols + cols)
-    private fun col(index: Int) = List(rows) { j -> grid[j * cols + index] }
-}
-
-/** UserGrid is a 1D list encoding a 2D array (the grid) */
-data class UserGrid(val rows: Int, var grid: List<Cell>) {
-
-    operator fun get(i: Int, j: Int) = grid[i * cols + j]
-
-    fun clear() = copyCellShades(List(size) { CellShade.EMPTY })
-
-    private val size = grid.size
-    private val cols = size / rows
-
-    var data
-        get() = grid.map { cell -> cell.userShade }
-        set(element) = copyCellShades(element)
-
-    val rowNums get() = GridData(rows, data).rowNums
-    val colNums get() = GridData(rows, data).colNums
-
-    /** Fills a the cells in a Row from initCol to currCol (both inclusive) */
-    fun copyRowInRange(row: Int, initCol: Int, currCol: Int, cellShade: CellShade) {
-        val startCol = initCol.coerceAtMost(currCol)
-        val endCol = initCol.coerceAtLeast(currCol)
-        grid.forEachIndexed { i, cell ->
-            cell.userShade =
-                if (i in (startCol + row * cols..endCol + row * cols)) cellShade else cell.userShade
-        }
-    }
-
-    /** Fills a the cells in a column from initRow to currRow (both inclusive) */
-    fun copyColInRange(col: Int, initRow: Int, currRow: Int, cellShade: CellShade) {
-        val startRow = initRow.coerceAtMost(currRow)
-        val endRow = initRow.coerceAtLeast(currRow)
-        grid.forEachIndexed { i, cell ->
-            cell.userShade =
-                if (i in (col + startRow * cols..col + endRow * cols step cols)) cellShade else cell.userShade
-        }
-    }
-
-    private fun copyCellShades(element: List<CellShade>) {
-        grid = grid.mapIndexed { i, cell ->
-            cell.userShade = element[i]
-            cell
-        }
-    }
-
-    fun crossRow(row: Int) = copyRowInRange(row, 0, cols - 1, CellShade.CROSS)
-    fun crossCol(row: Int) = copyColInRange(row, 0, rows - 1, CellShade.CROSS)
-    fun fillRow(row: Int) = copyRowInRange(row, 0, cols - 1, CellShade.SHADE)
-    fun fillCol(row: Int) = copyColInRange(row, 0, rows - 1, CellShade.SHADE)
-}
-
-data class UndoStack(val gridSize: Int) {
-    private val elements: MutableList<List<CellShade>> =
-        MutableList(1) { List(gridSize) { CellShade.EMPTY } }
-
-    fun push(item: List<CellShade>) = elements.add(item)
-
-    fun pop(): List<CellShade> {
-        val newGrid = elements.last()
-        if (elements.size > 1) elements.removeLast()
-        return newGrid
-    }
+    return parseNonFile(text)//(rows, text.map { if (it == '1') CellShade.SHADE else CellShade.EMPTY })
 }
 
 fun vibrate(context: Context) {

@@ -68,7 +68,7 @@ class ColNumsView(context: Context) : View(context) {
 
                     curBot -= cellLength.toFloat() * 0.75F
                 }
-                curLeft += if ((i % LD.gridData.cols + 1) % 5 == 0) {
+                curLeft += if ((i % LD.gridData.width + 1) % 5 == 0) {
                     cellLength + 3
                 } else {
                     cellLength + 1

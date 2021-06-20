@@ -42,17 +42,17 @@ class GameView @JvmOverloads constructor(
 
             // Given the width of this View find the max width of a Cell
             val cellWidth =
-                ((this.measuredWidth - (minPadding * 2)) - gridData.cols - 1 - (2 * (gridData.cols - 1) / 5)) / (gridData.cols + (gridData.longestRowNum + 1) / 2)
+                ((this.measuredWidth - (minPadding * 2)) - gridData.width - 1 - (2 * (gridData.width - 1) / 5)) / (gridData.width + (gridData.longestRowNum + 1) / 2)
             // Given the width of this View find the max Height of a Cell
             val cellHeight =
-                ((this.measuredHeight - (minPadding * 2)) - gridData.rows - 1 - (2 * (gridData.rows - 1) / 5)) / (gridData.rows + (gridData.longestColNum + 1))
+                ((this.measuredHeight - (minPadding * 2)) - gridData.height - 1 - (2 * (gridData.height - 1) / 5)) / (gridData.height + (gridData.longestColNum + 1))
 
             val cellLength = cellWidth.coerceAtMost(cellHeight)
 
             val gridWidth =
-                cellLength * gridData.cols + gridData.cols + 1 + 2 * ((gridData.cols - 1) / 5)
+                cellLength * gridData.width + gridData.width + 1 + 2 * ((gridData.width - 1) / 5)
             val gridHeight =
-                cellLength * gridData.rows + gridData.rows + 1 + 2 * ((gridData.rows - 1) / 5)
+                cellLength * gridData.height + gridData.height + 1 + 2 * ((gridData.height - 1) / 5)
 
             // First draw the column numbers
 
