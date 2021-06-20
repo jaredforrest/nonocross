@@ -57,12 +57,9 @@ fun openGridFile(context: Context, chosenLevelName: String): GridData2 {
     val inputStream: InputStream = context.resources.assets.open("levels/$chosenLevelName")
     val buffer = ByteArray(inputStream.available())
     inputStream.read(buffer)
-    //val rows = String(buffer).takeWhile { it != ' ' }
-    //    .toInt()
-    val text = String(buffer)//.dropWhile { it != ' ' }.drop(1)
-    //Log.d("text", text)
+    val text = String(buffer)
 
-    return parseNonFile(text)//(rows, text.map { if (it == '1') CellShade.SHADE else CellShade.EMPTY })
+    return parseNonFile(text)
 }
 
 fun vibrate(context: Context) {

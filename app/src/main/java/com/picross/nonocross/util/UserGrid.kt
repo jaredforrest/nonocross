@@ -4,7 +4,7 @@ import android.content.Context
 import com.picross.nonocross.views.grid.Cell
 
 /** UserGrid is a 1D list encoding a 2D array (the grid) */
-data class UserGrid(val gridData: GridData2, val cellLength: Int, val context: Context) {
+class UserGrid(private val gridData: GridData2, private val cellLength: Int, context: Context) {
 
     private val rows = gridData.height
 
