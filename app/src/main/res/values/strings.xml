@@ -12,6 +12,8 @@
     <string name="columns">Columns</string>
     <string name="grid_size">Grid Size</string>
     <string name="finished">Finished</string>
+    <string name="long_seed">Seed: %1$d</string>
+    <string name="seed_copied">Copied to the clipboard</string>
 
     <!-- Preferences -->
     <string name="preferences">Preferences</string>
@@ -29,5 +31,6 @@
     <string name="show_blue_hints">Show Blue Hints</string>
     <string name="select_seed">Custom Seed</string>
     <string name="enter_seed">Enter seed</string>
+    <string name="menu_copy">Copy</string>
 
 </resources>

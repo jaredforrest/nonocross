@@ -28,7 +28,7 @@ class ColNumsView(context: Context) : View(context) {
 
     private val preferences: SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(context)
-    private val blueHints = preferences.getBoolean("showBlueHints", true)
+    private val blueHints = preferences.getBoolean("showBlueHints", false)
 
     var cellLength = 0
     private val colorNumber = ResourcesCompat.getColor(context.resources, R.color.colorText, null)

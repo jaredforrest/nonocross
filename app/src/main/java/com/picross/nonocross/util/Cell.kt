@@ -12,23 +12,28 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
-package com.picross.nonocross
+package com.picross.nonocross.util
 
-import com.picross.nonocross.util.GridData2
-import com.picross.nonocross.util.UserGrid
+class Cell {
+    var userShade = CellShade.EMPTY
 
-object LevelDetails {
-    var gridData = GridData2(0, 0, listOf(), listOf())
-    lateinit var userGrid: UserGrid
+    fun click(invert: Boolean) {
+        userShade = if (invert) {
+            when (userShade) {
+                CellShade.CROSS, CellShade.SHADE -> CellShade.EMPTY
+                CellShade.EMPTY -> CellShade.SHADE
+            }
+        } else {
+            when (userShade) {
+                CellShade.CROSS -> CellShade.EMPTY
+                CellShade.EMPTY, CellShade.SHADE -> CellShade.CROSS
+            }
+        }
+    }
 
-
-    var levelName = "Level 1"
-    var isRandom = false
-    var randomSeed = 0L
-
-    var toggleCross = false
-
-    fun isReady(): Boolean {
-        return ::userGrid.isInitialized
+    enum class CellShade {
+        CROSS,
+        SHADE,
+        EMPTY
     }
 }

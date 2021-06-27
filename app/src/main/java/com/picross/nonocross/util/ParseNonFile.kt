@@ -1,5 +1,7 @@
 package com.picross.nonocross.util
 
+import kotlinx.collections.immutable.*
+
 /** Takes a .non file (represented as a list of strings by each new line) and outputs the grid */
 fun parseNonFile(lines: String): GridData2 {
 
@@ -24,29 +26,35 @@ fun parseNonFile(lines: String): GridData2 {
         }
     }
 
-    fun parseNum(rowNum: String): List<Int> {
-        return if (rowNum == "0") listOf()
-        else rowNum.split(',').map { it.toInt() }
+    fun parseNum(rowNum: String): ImmutableList<Int> {
+        return if (rowNum == "0") persistentListOf()
+        else {
+            val plist = persistentListOf<Int>()
+            val builder = plist.builder()
+            builder.addAll(rowNum.split(',').map { it.toInt() })
+            builder.build()
+            rowNum.split(',').map { it.toInt() }.toPersistentList()
+        }
     }
 
     tailrec fun parseNums(
         lines: String,
         size: Int,
-        acc: List<List<Int>> = listOf()
-    ): Pair<String, List<List<Int>>> {
+        acc: ImmutableList<ImmutableList<Int>> = persistentListOf()
+    ): Pair<String, ImmutableList<ImmutableList<Int>>> {
         return if (size == 0) Pair(lines, acc)
         else parseNums(
             lines.substringAfter('\n'),
             size - 1,
-            acc + listOf(parseNum(lines.substringBefore('\n')))
+            (acc as PersistentList) + persistentListOf(parseNum(lines.substringBefore('\n')))
         )
     }
 
     fun parseLine2(
         lines: String,
         widthHeight: Pair<Int, Int>,
-        data: Pair<List<List<Int>>, List<List<Int>>>
-    ): Triple<String, List<List<Int>>, List<List<Int>>> {
+        data: Pair<ImmutableList<ImmutableList<Int>>, ImmutableList<ImmutableList<Int>>>
+    ): Triple<String, ImmutableList<ImmutableList<Int>>, ImmutableList<ImmutableList<Int>>> {
         return when (lines.substringBefore('\n')) {
             "rows" -> {
                 val output = parseNums(lines.substringAfter('\n'), widthHeight.second)
@@ -63,11 +71,11 @@ fun parseNonFile(lines: String): GridData2 {
     tailrec fun rowColAcc(
         lines: String,
         widthHeight: Pair<Int, Int>,
-        data: Pair<List<List<Int>>, List<List<Int>>> = Pair(
-            listOf(),
-            listOf()
+        data: Pair<ImmutableList<ImmutableList<Int>>, ImmutableList<ImmutableList<Int>>> = Pair(
+            persistentListOf(),
+            persistentListOf()
         )
-    ): Triple<String, Pair<Int, Int>, Pair<List<List<Int>>, List<List<Int>>>> {
+    ): Triple<String, Pair<Int, Int>, Pair<ImmutableList<ImmutableList<Int>>, ImmutableList<ImmutableList<Int>>>> {
         return if (lines == "" || (data.first.isNotEmpty() && data.second.isNotEmpty())) Triple(
             lines,
             widthHeight,
@@ -81,13 +89,13 @@ fun parseNonFile(lines: String): GridData2 {
 
     val (lines2, widthHeight) = heightWidthAcc(lines)
     //if(widthHeight.first == 0 || widthHeight.second == 0) exitProcess(1)
-    val (_, widthHeight2, rowNumscolNums) = rowColAcc(lines2, widthHeight)
+    val (_, widthHeight2, rowNumsColNums) = rowColAcc(lines2, widthHeight)
 
     return GridData2(
         widthHeight2.first,
         widthHeight2.second,
-        rowNumscolNums.first,
-        rowNumscolNums.second
+        rowNumsColNums.first,
+        rowNumsColNums.second
     )
 
 

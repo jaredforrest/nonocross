@@ -28,4 +28,7 @@
     <string name="select_seed">Semilla Personilazada</string>
     <string name="enter_seed">Introducir la semilla</string>
     <string name="auto_cross_title">Rellenon Automático</string>
+    <string name="long_seed">Semilla: %1$d</string>
+    <string name="menu_copy">Copiar</string>
+    <string name="seed_copied">Copiado en el portapapeles</string>
 </resources>

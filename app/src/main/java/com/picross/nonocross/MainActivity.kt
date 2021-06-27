@@ -25,6 +25,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.widget.AppCompatCheckBox
 import androidx.preference.PreferenceManager
+import com.picross.nonocross.util.generate
 
 class MainActivity : AppCompatActivity() {
 
@@ -105,6 +106,7 @@ class MainActivity : AppCompatActivity() {
 
                 LevelDetails.isRandom = true
                 val intent = Intent(this, GameActivity::class.java)
+                generate(this)
                 startActivity(intent)
             }
             .setNegativeButton(

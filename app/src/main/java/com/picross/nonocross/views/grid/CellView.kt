@@ -19,15 +19,15 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import androidx.core.content.res.ResourcesCompat
 import com.picross.nonocross.R
+import com.picross.nonocross.util.Cell
 
-class Cell(
+class CellView(
+    val cell: Cell,
     val row: Int,
     val col: Int,
     private val cellLength: Int,
     context: Context
 ) {
-    var userShade = CellShade.EMPTY
-
     private val top = (1 + row * (cellLength + 1) + 2 * (row / 5)).toFloat()
     private val left = (1 + col * (cellLength + 1) + 2 * (col / 5)).toFloat()
     private val right = left + cellLength
@@ -49,10 +49,10 @@ class Cell(
         .apply { isAntiAlias = true }
 
     fun draw(canvas: Canvas) {
-        when (userShade) {
-            CellShade.EMPTY -> canvas.drawRect(left, top, right, bottom, paintEmpty)
-            CellShade.SHADE -> canvas.drawRect(left, top, right, bottom, paintShade)
-            CellShade.CROSS -> drawCross(canvas)
+        when (cell.userShade) {
+            Cell.CellShade.EMPTY -> canvas.drawRect(left, top, right, bottom, paintEmpty)
+            Cell.CellShade.SHADE -> canvas.drawRect(left, top, right, bottom, paintShade)
+            Cell.CellShade.CROSS -> drawCross(canvas)
         }
     }
 
@@ -77,25 +77,5 @@ class Cell(
 
     fun isInside(x: Float, y: Float): Boolean {
         return x in leftBound..rightBound && y in topBound..bottomBound
-    }
-
-    fun click(invert: Boolean) {
-        userShade = if (invert) {
-            when (userShade) {
-                CellShade.CROSS, CellShade.SHADE -> CellShade.EMPTY
-                CellShade.EMPTY -> CellShade.SHADE
-            }
-        } else {
-            when (userShade) {
-                CellShade.CROSS -> CellShade.EMPTY
-                CellShade.EMPTY, CellShade.SHADE -> CellShade.CROSS
-            }
-        }
-    }
-
-    enum class CellShade {
-        CROSS,
-        SHADE,
-        EMPTY
     }
 }

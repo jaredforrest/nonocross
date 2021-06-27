@@ -25,12 +25,11 @@ import android.view.View
 import android.view.ViewConfiguration
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
-import com.picross.nonocross.LevelDetails.gridData
 import com.picross.nonocross.R
-import com.picross.nonocross.util.UserGrid
+import com.picross.nonocross.util.UserGridView
+import com.picross.nonocross.util.generate
 import com.picross.nonocross.util.vibrate
 import com.picross.nonocross.LevelDetails as LD
-import com.picross.nonocross.LevelDetails.userGrid as nonoGrid
 
 class GridView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
@@ -38,14 +37,13 @@ class GridView @JvmOverloads constructor(
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        nonoGrid = UserGrid(gridData, cellLength, context)
         fC = nonoGrid[0, 0]
         aC = nonoGrid[0, 0]
     }
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        nonoGrid.grid.forEach { it.draw(canvas) }
+        nonoGrid.gridView.forEach { it.draw(canvas) }
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
@@ -59,6 +57,7 @@ class GridView @JvmOverloads constructor(
     }
 
     var cellLength = 0
+    private val nonoGrid by lazy { UserGridView(LD.userGrid, cellLength, context) }
 
     // Get Preferences
     private val sharedPreferences: SharedPreferences =
@@ -70,16 +69,16 @@ class GridView @JvmOverloads constructor(
     private var isLongPress = false
 
     /** First cell */
-    private lateinit var fC: Cell
+    private lateinit var fC: CellView
 
     /** Active cell */
-    private lateinit var aC: Cell
+    private lateinit var aC: CellView
 
     /** If true fill horizontally, false fill vertically */
     private var fillHori = true
 
     private var mLongPressed = Runnable {
-        fC.click(LD.toggleCross)
+        fC.cell.click(LD.toggleCross)
         invalidate()
         isLongPress = true
         if (vibrateOn) vibrate(context)
@@ -91,7 +90,7 @@ class GridView @JvmOverloads constructor(
                 mLongPressed,
                 ViewConfiguration.getLongPressTimeout().toLong()
             )
-            nonoGrid.undoAddStack()
+            nonoGrid.userGrid.undoAddStack()
 
             aC = cell
             fC = cell
@@ -106,26 +105,26 @@ class GridView @JvmOverloads constructor(
             if (isFirstCell) {
                 isFirstCell = false
                 handler.removeCallbacks(mLongPressed)
-                if (!isLongPress) fC.click(!LD.toggleCross)
+                if (!isLongPress) fC.cell.click(!LD.toggleCross)
                 invalidate()
 
                 nonoGrid.getCellAt(x, y) { cell -> fillHori = (cell.row == fC.row) }
             }
             nonoGrid.getCellAt(x, y) { currCell ->
                 if (!fatFingerMode) {
-                    currCell.userShade = fC.userShade
+                    currCell.cell.userShade = fC.cell.userShade
                 } else {
-                    if (fillHori) nonoGrid.copyRowInRange(
+                    if (fillHori) nonoGrid.userGrid.copyRowInRange(
                         fC.row,
                         fC.col,
                         currCell.col,
-                        fC.userShade
+                        fC.cell.userShade
                     )
-                    else nonoGrid.copyColInRange(
+                    else nonoGrid.userGrid.copyColInRange(
                         fC.col,
                         fC.row,
                         currCell.row,
-                        fC.userShade
+                        fC.cell.userShade
                     )
                 }
                 invalidate()
@@ -137,10 +136,10 @@ class GridView @JvmOverloads constructor(
     private fun endFill() {
         handler.removeCallbacks(mLongPressed)
         if (isFirstCell and !isLongPress) {
-            fC.click(!LD.toggleCross)
+            fC.cell.click(!LD.toggleCross)
             invalidate()
         }
-        if (nonoGrid.checkDone()) gameDoneAlert()
+        if (nonoGrid.userGrid.checkDone()) gameDoneAlert()
     }
 
     /** When the game is finished show a dialog */
@@ -163,18 +162,19 @@ class GridView @JvmOverloads constructor(
     }
 
     private fun resetGrid() {
+        if (LD.isRandom) generate(context)
         clear()
         (context as AppCompatActivity).recreate()
     }
 
     fun undo() {
-        nonoGrid.undo()
+        nonoGrid.userGrid.undo()
         invalidate()
     }
 
     fun clear() {
-        nonoGrid.undoAddStack()
-        nonoGrid.clear()
+        nonoGrid.userGrid.undoAddStack()
+        nonoGrid.userGrid.clear()
         invalidate()
     }
 

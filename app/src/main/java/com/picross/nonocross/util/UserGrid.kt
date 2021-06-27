@@ -1,30 +1,53 @@
 package com.picross.nonocross.util
 
 import android.content.Context
-import com.picross.nonocross.views.grid.Cell
+import com.picross.nonocross.views.grid.CellView
+
+class UserGridView(val userGrid: UserGrid, cellLength: Int, context: Context) {
+
+    operator fun get(i: Int, j: Int) = gridView[i * userGrid.width + j]
+
+    val gridView = userGrid.grid.mapIndexed { index, cell ->
+        CellView(
+            cell,
+            index / userGrid.width,
+            index % userGrid.width,
+            cellLength,
+            context
+        )
+    }
+
+    fun getCellAt(x: Float, y: Float, action: (CellView) -> Unit) {
+        val cellView = this.gridView.find { cellView -> cellView.isInside(x, y) }
+        if (cellView != null) {
+            action(cellView)
+        }
+    }
+
+}
 
 /** UserGrid is a 1D list encoding a 2D array (the grid) */
-class UserGrid(private val gridData: GridData2, private val cellLength: Int, context: Context) {
+data class UserGrid(private val gridData: GridData2) {
 
-    private val rows = gridData.height
+    private val height = gridData.height
 
-    var grid = List(gridData.height * gridData.width) { index ->
-        Cell(index / gridData.width, index % gridData.width, cellLength, context)
+    var grid = List(gridData.height * gridData.width) {
+        Cell()
     }
 
     private val size = grid.size
-    private val cols = size / rows
+    val width = size / height
 
     init {
         autoFill()
     }
 
-    operator fun get(i: Int, j: Int) = grid[i * cols + j]
+    operator fun get(i: Int, j: Int) = grid[i * width + j]
 
     private val data get() = grid.map { cell -> cell.userShade }
 
-    val rowNums get() = GridData(rows, data).rowNums
-    val colNums get() = GridData(rows, data).colNums
+    val rowNums get() = GridData(height, data).rowNums
+    val colNums get() = GridData(height, data).colNums
 
     fun checkDone(): Boolean {
         return rowNums == gridData.rowNums && colNums == gridData.colNums
@@ -46,18 +69,11 @@ class UserGrid(private val gridData: GridData2, private val cellLength: Int, con
         undoStack.add(data)
     }
 
-    fun getCellAt(x: Float, y: Float, action: (Cell) -> Unit) {
-        val cell = this.grid.find { cell -> cell.isInside(x, y) }
-        if (cell != null) {
-            action(cell)
-        }
-    }
-
     private fun fillRow(row: Int, cellShade: Cell.CellShade) =
-        copyRowInRange(row, 0, cols - 1, cellShade)
+        copyRowInRange(row, 0, width - 1, cellShade)
 
     private fun fillCol(row: Int, cellShade: Cell.CellShade) =
-        copyColInRange(row, 0, rows - 1, cellShade)
+        copyColInRange(row, 0, height - 1, cellShade)
 
     /** Fills a the cells in a Row from initCol to currCol (both inclusive) */
     fun copyRowInRange(row: Int, initCol: Int, currCol: Int, cellShade: Cell.CellShade) {
@@ -65,7 +81,7 @@ class UserGrid(private val gridData: GridData2, private val cellLength: Int, con
         val endCol = initCol.coerceAtLeast(currCol)
         grid.forEachIndexed { i, cell ->
             cell.userShade =
-                if (i in (startCol + row * cols..endCol + row * cols)) cellShade else cell.userShade
+                if (i in (startCol + row * width..endCol + row * width)) cellShade else cell.userShade
         }
     }
 
@@ -75,7 +91,7 @@ class UserGrid(private val gridData: GridData2, private val cellLength: Int, con
         val endRow = initRow.coerceAtLeast(currRow)
         grid.forEachIndexed { i, cell ->
             cell.userShade =
-                if (i in (col + startRow * cols..col + endRow * cols step cols)) cellShade else cell.userShade
+                if (i in (col + startRow * width..col + endRow * width step width)) cellShade else cell.userShade
         }
     }
 
@@ -88,11 +104,11 @@ class UserGrid(private val gridData: GridData2, private val cellLength: Int, con
     private fun autoFill() {
         gridData.rowNums.forEachIndexed { i, rowNum ->
             if (rowNum == emptyList<Int>()) fillRow(i, Cell.CellShade.CROSS)
-            else if (rowNum == listOf(cols)) fillRow(i, Cell.CellShade.SHADE)
+            else if (rowNum == listOf(width)) fillRow(i, Cell.CellShade.SHADE)
         }
         gridData.colNums.forEachIndexed { i, colNum ->
             if (colNum == emptyList<Int>()) fillCol(i, Cell.CellShade.CROSS)
-            else if (colNum == listOf(rows)) fillCol(i, Cell.CellShade.SHADE)
+            else if (colNum == listOf(height)) fillCol(i, Cell.CellShade.SHADE)
         }
     }
 }

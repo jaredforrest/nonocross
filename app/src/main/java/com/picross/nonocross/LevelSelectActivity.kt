@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.picross.nonocross.levelselect.LevelSelectAdapter
+import com.picross.nonocross.util.generate
 
 class LevelSelectActivity : AppCompatActivity(), LevelSelectAdapter.StartGame {
     private lateinit var recyclerView: RecyclerView
@@ -51,6 +52,7 @@ class LevelSelectActivity : AppCompatActivity(), LevelSelectAdapter.StartGame {
     override fun startGame(levelName: String) {
         LevelDetails.isRandom = false
         LevelDetails.levelName = levelName
+        generate(this)
         val intent = Intent(this, GameActivity::class.java)
         startActivity(intent)
     }

@@ -19,7 +19,7 @@ import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.preference.PreferenceManager
-import com.picross.nonocross.views.grid.Cell.CellShade
+import com.picross.nonocross.util.Cell.CellShade
 import java.io.InputStream
 import kotlin.random.Random
 import com.picross.nonocross.LevelDetails as LD
@@ -30,14 +30,14 @@ fun generate(context: Context) {
     val columns = preferences.getInt("columns", 10)
     val rows = preferences.getInt("rows", 10)
     val difficulty = preferences.getInt("difficulty", 10)
-    val seed = if (preferences.getBoolean("level seed enable", false)) preferences.getLong(
+    LD.randomSeed = if (preferences.getBoolean("level seed enable", false)) preferences.getLong(
         "level seed",
         System.currentTimeMillis()
     ) else System.currentTimeMillis()
 
     LD.gridData = if (LD.isRandom) {
         // Difficulty is set by changing the proportion of filled to empty cell
-        val random = Random(seed)
+        val random = Random(LD.randomSeed)
 
         GridData(
             rows,
@@ -51,6 +51,7 @@ fun generate(context: Context) {
     } else {
         openGridFile(context, LD.levelName)
     }
+    LD.userGrid = UserGrid(LD.gridData)
 }
 
 fun openGridFile(context: Context, chosenLevelName: String): GridData2 {
