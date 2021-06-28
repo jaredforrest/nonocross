@@ -49,16 +49,24 @@ class MainActivity : AppCompatActivity() {
         val randomLevel: View = findViewById(R.id.random_level)
         val levelSelect: View = findViewById(R.id.level_select)
         val preferences: View = findViewById(R.id.preferences)
+        val customLevelSelect: View = findViewById(R.id.custom_level)
 
         randomLevel.setOnClickListener { openRandomLevel() }
         levelSelect.setOnClickListener { openLevelSelect() }
         preferences.setOnClickListener { openPreferences() }
+        customLevelSelect.setOnClickListener { openCustomLevelSelect() }
 
     }
 
     /** Called when the user taps the Start Level button */
     private fun openLevelSelect() {
         val intent = Intent(this, LevelSelectActivity::class.java)
+        startActivity(intent)
+    }
+
+    /** Called when the user taps the Custom Level button */
+    private fun openCustomLevelSelect() {
+        val intent = Intent(this, CustomLevelSelectActivity::class.java)
         startActivity(intent)
     }
 

@@ -15,16 +15,23 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross.util
 
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import androidx.preference.PreferenceManager
+import arrow.core.None
+import arrow.core.Some
 import com.picross.nonocross.util.Cell.CellShade
+import java.io.BufferedReader
+import java.io.IOException
 import java.io.InputStream
+import java.io.InputStreamReader
 import kotlin.random.Random
 import com.picross.nonocross.LevelDetails as LD
 
-fun generate(context: Context) {
+
+fun generate(context: Context, levelName: String = "", customLevel: Boolean = false) {
 
     val preferences = PreferenceManager.getDefaultSharedPreferences(context)
     val columns = preferences.getInt("columns", 10)
@@ -35,7 +42,7 @@ fun generate(context: Context) {
         System.currentTimeMillis()
     ) else System.currentTimeMillis()
 
-    LD.gridData = if (LD.isRandom) {
+    LD.gridData = if (levelName == "") {
         // Difficulty is set by changing the proportion of filled to empty cell
         val random = Random(LD.randomSeed)
 
@@ -49,18 +56,37 @@ fun generate(context: Context) {
                 ) CellShade.SHADE else CellShade.EMPTY
             }).toGridData2()
     } else {
-        openGridFile(context, LD.levelName)
+        openGridFile(context, levelName, customLevel)
     }
     LD.userGrid = UserGrid(LD.gridData)
 }
 
-fun openGridFile(context: Context, chosenLevelName: String): GridData2 {
-    val inputStream: InputStream = context.resources.assets.open("levels/$chosenLevelName")
+fun openGridFile(context: Context, chosenLevelName: String, customLevel: Boolean): GridData2 {
+    val inputStream: InputStream =
+        if (customLevel) context.openFileInput(chosenLevelName) else context.resources.assets.open("levels/$chosenLevelName")
     val buffer = ByteArray(inputStream.available())
     inputStream.read(buffer)
     val text = String(buffer)
 
-    return parseNonFile(text)
+    return when (val grid = parseNonFile(text)) {
+        is Some -> grid.value
+        is None -> GridData2(0, 0, listOf(), listOf())
+    }
+}
+
+@Throws(IOException::class)
+fun readTextFromUri(uri: Uri, context: Context): String {
+    return context.contentResolver.openInputStream(uri)?.use { inputStream ->
+        BufferedReader(InputStreamReader(inputStream)).use { reader ->
+            reader.readText()
+        }
+    } ?: ""
+}
+
+fun addFile(filename: String, fileContents: String, context: Context) {
+    context.openFileOutput(filename, Context.MODE_PRIVATE).use {
+        it.write(fileContents.toByteArray())
+    }
 }
 
 fun vibrate(context: Context) {

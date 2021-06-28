@@ -15,15 +15,10 @@
         <activity
             android:name=".SettingsActivity"
             android:label=".SettingsActivity" />
-        <activity
-            android:name=".LevelSelectActivity"
-            android:screenOrientation="fullSensor" />
-        <activity
-            android:name=".GameActivity"
-            android:screenOrientation="fullSensor" />
-        <activity
-            android:name=".MainActivity"
-            android:screenOrientation="fullSensor">
+        <activity android:name=".LevelSelectActivity" />
+        <activity android:name=".CustomLevelSelectActivity" />
+        <activity android:name=".GameActivity" />
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -19,7 +19,6 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
     android:layout_height="match_parent">
 
     <TextView
-        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-black"
@@ -56,7 +55,7 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
 
-        app:layout_constraintVertical_bias="0.55" />
+        app:layout_constraintVertical_bias="0.51" />
 
     <Button
         android:id="@+id/preferences"
@@ -69,5 +68,18 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/random_level"
         app:layout_constraintVertical_bias="0.11" />
+
+    <Button
+        android:id="@+id/custom_level"
+        style="@style/Button.Normal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/custom_level"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/preferences"
+        app:layout_constraintVertical_bias="0.13999999" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

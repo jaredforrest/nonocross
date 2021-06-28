@@ -31,6 +31,9 @@
     <string name="show_blue_hints">Show Blue Hints</string>
     <string name="select_seed">Custom Seed</string>
     <string name="enter_seed">Enter seed</string>
-    <string name="menu_copy">Copy</string>
+    <string name="import_level">Import Level</string>
+    <string name="custom_level">Custom Level</string>
+    <string name="action_add">Add Level</string>
+    <string name="remove_level">remove</string>
 
 </resources>

@@ -42,4 +42,12 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         android:layout_gravity="center"
         android:text="@string/play" />
 
+    <Button
+        android:id="@+id/remove_level"
+        style="@style/Widget.AppCompat.Button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/remove_level" />
+
 </LinearLayout>

@@ -36,7 +36,7 @@ data class UserGrid(private val gridData: GridData2) {
     }
 
     private val size = grid.size
-    val width = size / height
+    val width = if (height != 0) size / height else 0
 
     init {
         autoFill()
@@ -142,7 +142,7 @@ data class GridData2(
     val width: Int,
     val height: Int,
     val rowNums: List<List<Int>>,
-    val colNums: List<List<Int>>
+    val colNums: List<List<Int>>,
 ) {
 
     fun isEmpty() = (width == 0 || height == 0)

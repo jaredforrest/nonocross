@@ -17,23 +17,20 @@ package com.picross.nonocross.levelselect
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.GONE
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.view.get
 import androidx.recyclerview.widget.RecyclerView
 import com.picross.nonocross.R
 import com.picross.nonocross.util.openGridFile
 
 
-class LevelSelectAdapter(
-    private val levels: List<String>,
+class CustomLevelSelectAdapter(
+    private val levels: MutableList<String>,
     private val startGame: StartGame,
     private var context: Context
 ) :
-    RecyclerView.Adapter<LevelSelectAdapter.MyViewHolder>() {
+    RecyclerView.Adapter<CustomLevelSelectAdapter.MyViewHolder>() {
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -53,27 +50,33 @@ class LevelSelectAdapter(
         // set the view's size, margins, padding and layout parameters
         //...
         levelView.setPadding(20, 60, 20, 40)
-        // Remove "remove level" button for default levels
-        (levelView as LinearLayout)[3].visibility = GONE
         return MyViewHolder(levelView)
     }
 
-    interface StartGame{
+    interface StartGame {
         fun startGame(levelName: String)
+        fun removeLevel(level: String, position: Int)
     }
 
     // Replace the contents of a view
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val level = openGridFile(context, levels[position], false)
+        val level = openGridFile(context, levels[position], true)
         holder.itemView.findViewById<TextView>(R.id.level_name).text = levels[position]
         holder.itemView.findViewById<TextView>(R.id.gridData).text = context.getString(
             R.string.height_x_width,
             level.height,
             level.width
         )
-        holder.itemView.findViewById<Button>(R.id.level_select).setOnClickListener { startGame.startGame(
-            levels[position]
-        ) }
+        holder.itemView.findViewById<Button>(R.id.level_select).setOnClickListener {
+            startGame.startGame(
+                levels[position]
+            )
+        }
+        holder.itemView.findViewById<Button>(R.id.remove_level).setOnClickListener {
+            val levelName = levels[position]
+            levels.removeAt(position)
+            startGame.removeLevel(levelName, position)
+        }
     }
 
     // Return the size of levels List

@@ -21,8 +21,6 @@ object LevelDetails {
     var gridData = GridData2(0, 0, listOf(), listOf())
     lateinit var userGrid: UserGrid
 
-
-    var levelName = "Level 1"
     var isRandom = false
     var randomSeed = 0L
 
