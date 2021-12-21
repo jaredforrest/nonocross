@@ -14,26 +14,25 @@ You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross.util
 
-class Cell {
-    var userShade = CellShade.EMPTY
+class Cell(var userShade: CellShade = CellShade.EMPTY)
 
-    fun click(invert: Boolean) {
-        userShade = if (invert) {
-            when (userShade) {
-                CellShade.CROSS, CellShade.SHADE -> CellShade.EMPTY
-                CellShade.EMPTY -> CellShade.SHADE
-            }
-        } else {
-            when (userShade) {
-                CellShade.CROSS -> CellShade.EMPTY
-                CellShade.EMPTY, CellShade.SHADE -> CellShade.CROSS
-            }
+enum class CellShade {
+    CROSS,
+    SHADE,
+    EMPTY
+}
+
+fun CellShade.click(invert: Boolean): CellShade {
+    return if (invert) {
+        when (this) {
+            CellShade.CROSS, CellShade.SHADE -> CellShade.EMPTY
+            CellShade.EMPTY -> CellShade.SHADE
+        }
+    } else {
+        when (this) {
+            CellShade.CROSS -> CellShade.EMPTY
+            CellShade.EMPTY, CellShade.SHADE -> CellShade.CROSS
         }
     }
-
-    enum class CellShade {
-        CROSS,
-        SHADE,
-        EMPTY
-    }
 }
+

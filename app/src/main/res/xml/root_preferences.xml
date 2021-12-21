@@ -14,31 +14,42 @@
             app:title="@string/fat_finger_title" />
 
         <SwitchPreferenceCompat
-            app:defaultValue="false"
-            app:key="autoCross"
-            app:summary="@string/auto_cross_summary"
-            app:title="@string/auto_cross_title" />
+            app:defaultValue="true"
+            app:key="uniqueLevel"
+            app:summary="Generate random levels with only one solution.\nNote: Larger levels may have significant loading times"
+            app:title="Unique Levels" />
 
     </PreferenceCategory>
 
     <PreferenceCategory app:title="@string/appearance_header">
 
-        <CheckBoxPreference
-            app:defaultValue="false"
-            app:key="overrideSystemTheme"
-            app:summary="@string/requires_restart"
-            app:title="@string/override_system_theme" />
-
-        <SwitchPreferenceCompat
-            app:dependency="overrideSystemTheme"
+        <DropDownPreference
             app:key="darkMode"
-            app:title="@string/enable_dark_mode" />
+            app:entries="@array/dark_mode_entries"
+            app:entryValues="@array/dark_mode_entries"
+            app:title="Dark Mode"
+            app:useSimpleSummaryProvider="true" />
 
         <SwitchPreferenceCompat
-            app:defaultValue="true"
+            app:defaultValue="false"
             app:key="showBlueHints"
             app:title="@string/show_blue_hints" />
 
     </PreferenceCategory>
 
+    <PreferenceCategory app:title="@string/beta_features">
+
+        <SwitchPreferenceCompat
+            app:defaultValue="false"
+            app:key="showOnline"
+            app:summary="Play online levels at webpbn.com if you have an account"
+            app:title="@string/play_online_levels" />
+
+        <EditTextPreference
+            app:defaultValue=""
+            app:key="apiKey"
+            app:summary="Find this in the url after 'sid=' once you have logged in."
+            app:title="@string/api_key" />
+
+    </PreferenceCategory>
 </PreferenceScreen>

@@ -19,6 +19,7 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
     android:layout_height="match_parent">
 
     <TextView
+        android:id="@+id/game_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:fontFamily="sans-serif-black"
@@ -30,44 +31,31 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.4" />
+        app:layout_constraintVertical_bias="0.45" />
 
     <Button
         android:id="@+id/level_select"
         style="@style/Button.Normal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/practice_grids"
+        android:layout_marginBottom="16dp"
+        android:text="@string/default_levels"
         app:layout_constraintBottom_toTopOf="@+id/random_level"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.9" />
+        app:layout_constraintHorizontal_bias="0.489"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/random_level"
         style="@style/Button.Normal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+
         android:text="@string/random_grid"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/custom_level"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-
-        app:layout_constraintVertical_bias="0.51" />
-
-    <Button
-        android:id="@+id/preferences"
-        style="@style/Button.Normal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/preferences"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/random_level"
-        app:layout_constraintVertical_bias="0.11" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <Button
         android:id="@+id/custom_level"
@@ -75,11 +63,50 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/custom_level"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/guideline2" />
+
+    <Button
+        android:id="@+id/online"
+        style="@style/Button.Normal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/online"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/custom_level" />
+
+    <Button
+        android:id="@+id/preferences"
+        style="@style/Button.Normal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/preferences"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/online" />
+
+    <ProgressBar
+        android:id="@+id/indeterminateBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/preferences"
-        app:layout_constraintVertical_bias="0.13999999" />
+        app:layout_constraintTop_toTopOf="parent" />
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintGuide_percent="0.52"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

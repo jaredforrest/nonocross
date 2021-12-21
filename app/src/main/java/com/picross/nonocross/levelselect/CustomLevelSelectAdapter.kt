@@ -19,16 +19,22 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.get
 import androidx.recyclerview.widget.RecyclerView
+import com.picross.nonocross.LevelDetails
+import com.picross.nonocross.LevelType
 import com.picross.nonocross.R
-import com.picross.nonocross.util.openGridFile
+import com.picross.nonocross.util.usergrid.GridData
+import com.picross.nonocross.util.usergrid.UserGrid
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.coroutines.runBlocking
 
 
 class CustomLevelSelectAdapter(
-    private val levels: MutableList<String>,
     private val startGame: StartGame,
-    private var context: Context
+    private var context: Context,
 ) :
     RecyclerView.Adapter<CustomLevelSelectAdapter.MyViewHolder>() {
 
@@ -50,36 +56,56 @@ class CustomLevelSelectAdapter(
         // set the view's size, margins, padding and layout parameters
         //...
         levelView.setPadding(20, 60, 20, 40)
+
+        // Remove "remove level" button for default levels
+        if (startGame.levels is PersistentList) {
+            (levelView as LinearLayout)[3].visibility = View.GONE
+        }
         return MyViewHolder(levelView)
     }
 
     interface StartGame {
-        fun startGame(levelName: String)
+        fun startGame()
         fun removeLevel(level: String, position: Int)
+        fun openSave(levelName: String): ByteArray
+
+        fun levelType(levelName: String): LevelType
+
+        val levels: List<Pair<String, GridData>>
+
     }
 
     // Replace the contents of a view
-    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val level = openGridFile(context, levels[position], true)
-        holder.itemView.findViewById<TextView>(R.id.level_name).text = levels[position]
-        holder.itemView.findViewById<TextView>(R.id.gridData).text = context.getString(
-            R.string.height_x_width,
-            level.height,
-            level.width
-        )
-        holder.itemView.findViewById<Button>(R.id.level_select).setOnClickListener {
-            startGame.startGame(
-                levels[position]
+    override fun onBindViewHolder(holder: MyViewHolder, position: Int) =
+
+        runBlocking {
+            val levelName = startGame.levels[position].first //levels[position]
+            //val level = openGridFile(context, levelName, isCustom)
+            val level = startGame.levels[position].second //startGame.openGrid(levelName)
+            holder.itemView.findViewById<TextView>(R.id.level_name).text = levelName
+            holder.itemView.findViewById<TextView>(R.id.gridData).text = context.getString(
+                R.string.height_x_width,
+                level.height,
+                level.width
             )
+            holder.itemView.findViewById<Button>(R.id.level_select).setOnClickListener {
+                LevelDetails.levelType = startGame.levelType(levelName)
+//                    if (isCustom) LevelType.Custom(levelName) else
+                LevelDetails.gridData = level
+                LevelDetails.userGrid =
+                    UserGrid(LevelDetails.gridData, startGame.openSave(levelName))
+                startGame.startGame()
+            }
+            if (startGame.levels is MutableList) {
+                holder.itemView.findViewById<Button>(R.id.remove_level).setOnClickListener {
+                    val pos = holder.bindingAdapterPosition
+                    (startGame.levels as MutableList<Pair<String, GridData>>).removeAt(pos)
+                    startGame.removeLevel(levelName, pos)
+                }
+            }
         }
-        holder.itemView.findViewById<Button>(R.id.remove_level).setOnClickListener {
-            val levelName = levels[position]
-            levels.removeAt(position)
-            startGame.removeLevel(levelName, position)
-        }
-    }
 
     // Return the size of levels List
-    override fun getItemCount() = levels.size
+    override fun getItemCount() = startGame.levels.size
 }
 

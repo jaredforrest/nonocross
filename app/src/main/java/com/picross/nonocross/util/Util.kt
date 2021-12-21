@@ -15,82 +15,187 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross.util
 
 import android.content.Context
+import android.content.res.AssetManager
 import android.net.Uri
 import android.os.Build
+import android.os.Build.VERSION_CODES.S
 import android.os.VibrationEffect
 import android.os.Vibrator
+import android.os.VibratorManager
+import android.util.Log
+import android.widget.Toast
 import androidx.preference.PreferenceManager
+import arrow.core.Either
 import arrow.core.None
-import arrow.core.Some
-import com.picross.nonocross.util.Cell.CellShade
-import java.io.BufferedReader
+import arrow.core.Option
+import arrow.core.none
+import com.picross.nonocross.LevelType
+import com.picross.nonocross.util.usergrid.GridData
+import com.picross.nonocross.util.usergrid.UserGrid
+import com.picross.nonocross.util.usergrid.checkUnique
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
-import java.io.InputStream
-import java.io.InputStreamReader
+import java.util.*
 import kotlin.random.Random
-import com.picross.nonocross.LevelDetails as LD
 
-
-fun generate(context: Context, levelName: String = "", customLevel: Boolean = false) {
-
-    val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-    val columns = preferences.getInt("columns", 10)
-    val rows = preferences.getInt("rows", 10)
-    val difficulty = preferences.getInt("difficulty", 10)
-    LD.randomSeed = if (preferences.getBoolean("level seed enable", false)) preferences.getLong(
-        "level seed",
-        System.currentTimeMillis()
-    ) else System.currentTimeMillis()
-
-    LD.gridData = if (levelName == "") {
-        // Difficulty is set by changing the proportion of filled to empty cell
-        val random = Random(LD.randomSeed)
-
-        GridData(
-            rows,
-            List(rows * columns) {
-                if (random.nextInt(
-                        0,
-                        100
-                    ) > 3 * difficulty + 46
-                ) CellShade.SHADE else CellShade.EMPTY
-            }).toGridData2()
-    } else {
-        openGridFile(context, levelName, customLevel)
+/* wHD is triple(width, height, difficulty) */
+/*tailrec */suspend fun newUniqueRandomGrid(
+    wHD: Triple<Int, Int, Int>,
+    random: Random = Random
+): Option<GridData> {
+//    return if(!Thread.interrupted()) {
+    var rec: List<CellShade>//newRandomGrid(wHD, random)
+    var ret = none<GridData>()// = rec.checkUnique(wHD.second)
+    coroutineScope {
+        while (isActive && ret is None) {
+            rec = newRandomGrid(wHD, random)
+            ret = rec.checkUnique(wHD.second)
+        }
     }
-    LD.userGrid = UserGrid(LD.gridData)
+    return ret
+    /*return if(isActive) {
+        val rec = newRandomGrid(wHD, random)
+        when (val ret = rec.checkUnique(wHD.second)) {
+            is None -> newUniqueRandomGrid(wHD, random)
+            is Some -> Some(ret.value)
+        }
+    } else none()*/
 }
 
-fun openGridFile(context: Context, chosenLevelName: String, customLevel: Boolean): GridData2 {
-    val inputStream: InputStream =
-        if (customLevel) context.openFileInput(chosenLevelName) else context.resources.assets.open("levels/$chosenLevelName")
-    val buffer = ByteArray(inputStream.available())
-    inputStream.read(buffer)
-    val text = String(buffer)
+fun newRandomGrid(wHD: Triple<Int, Int, Int>, random: Random = Random) =
+    List(wHD.second * wHD.first) {
+        if (random.nextInt(0, 100) > 4 * wHD.third + 16) CellShade.SHADE
+        else CellShade.EMPTY
+    }
+
+fun getRandomGridPrefs(context: Context): Triple<Int, Int, Int> {
+    val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+    val width = preferences.getInt("columns", 10)
+    val height = preferences.getInt("rows", 10)
+    val difficulty = preferences.getInt("difficulty", 5)
+    return Triple(width, height, difficulty)
+}
+
+fun getOnlineGridPrefs(context: Context): OnlinePrefs {
+    val preferences = PreferenceManager.getDefaultSharedPreferences(context)
+    return OnlinePrefs(
+        preferences.getInt("minCells", 0),
+        preferences.getInt("maxCells", 20),
+        preferences.getInt("minDiff", 4),
+        preferences.getInt("maxDiff", 20),
+        preferences.getBoolean("unratedDiff", true),
+        preferences.getInt("minQual", 4),
+        preferences.getInt("maxQual", 20),
+        preferences.getBoolean("unratedQual", true),
+        preferences.getString("apiKey", "") ?: "",
+    )
+}
+
+fun readTextFromUri(uri: Uri, context: Context): String {
+    return try {
+        context.contentResolver.openInputStream(uri)?.readBytes()?.let { String(it) } ?: ""
+    } catch (e: IOException) {
+        ""
+    }
+}
+
+suspend fun openGridFile(
+    context: Context,
+    chosenLevelName: String,
+    customLevel: Boolean
+): GridData {
+    val text =
+        if (customLevel) File(
+            context.getDir("levels", Context.MODE_PRIVATE),
+            chosenLevelName
+        ).readText()
+        else String(context.resources.assets.openNonBlocking("levels/$chosenLevelName").readBytes())
+    Log.d("grid ios", text)
 
     return when (val grid = parseNonFile(text)) {
-        is Some -> grid.value
-        is None -> GridData2(0, 0, listOf(), listOf())
+        is Either.Right -> grid.value
+        is Either.Left -> throw Exception(grid.value.toString())//Exception("Error parsing level", grid.value)//GridData(0, 0, listOf(), listOf())
     }
 }
 
-@Throws(IOException::class)
-fun readTextFromUri(uri: Uri, context: Context): String {
-    return context.contentResolver.openInputStream(uri)?.use { inputStream ->
-        BufferedReader(InputStreamReader(inputStream)).use { reader ->
-            reader.readText()
-        }
-    } ?: ""
-}
-
-fun addFile(filename: String, fileContents: String, context: Context) {
-    context.openFileOutput(filename, Context.MODE_PRIVATE).use {
+fun addCustomLevel(filename: String, fileContents: String, context: Context) {
+    FileOutputStream(File(context.getDir("levels", Context.MODE_PRIVATE), filename)).use {
         it.write(fileContents.toByteArray())
     }
 }
 
+
+fun saveCurrentGridState(context: Context, lT: LevelType, userGrid: UserGrid) {
+    val fileContents = userGrid.currentState.toByteArray()
+    val saveDir = context.getDir("saves", Context.MODE_PRIVATE)
+    when (lT) {
+        is LevelType.Random, LevelType.Online -> {
+            return
+        }
+        is LevelType.Custom -> {
+            FileOutputStream(File(File(saveDir, "custom"), lT.levelName)).use {
+                it.write(fileContents)
+            }
+        }
+        is LevelType.Default -> {
+            FileOutputStream(File(File(saveDir, "default"), lT.levelName)).use {
+                it.write(fileContents)
+            }
+        }
+    }
+}
+
+suspend fun AssetManager.openNonBlocking(s: String) =
+    withContext(Dispatchers.IO) { open(s) }
+
+// U is an error type/class
+fun <T, U> Either<T, U>.applyNotError(baseContext: Context, f: U.() -> Unit) {
+    Log.d("cooloio", "an ereorereaer")
+    when (this) {
+        is Either.Left -> errorToast(
+            baseContext,
+            this.value.toString()
+        )//Toast.makeText(baseContext,"Error: ${this.value} "/*$errorString" ${this.value.toString()}"*/, Toast.LENGTH_LONG).show()
+        is Either.Right -> f(this.value)
+    }
+}
+
+fun errorToast(context: Context, err: String) {
+    Toast.makeText(context, "Error: $err ", Toast.LENGTH_LONG).show()
+}
+
+fun secondsToTime(seconds: Int): String {
+    val hours: Int = seconds / 3600
+    val minutes: Int = seconds % 3600 / 60
+    val secs: Int = seconds % 60
+
+    // Format the seconds into hours, minutes,
+    // and seconds.
+    return java.lang.String
+        .format(
+            Locale.getDefault(),
+            "%d:%02d:%02d", hours,
+            minutes, secs
+        )
+}
+
 fun vibrate(context: Context) {
     when {
+        Build.VERSION.SDK_INT >= S -> {
+            val vibratorManager =
+                context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            vibratorManager.defaultVibrator.vibrate(
+                VibrationEffect.createOneShot(
+                    50,
+                    VibrationEffect.DEFAULT_AMPLITUDE
+                )
+            )
+        }
         Build.VERSION.SDK_INT >= 26 -> {
             (context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator).vibrate(
                 VibrationEffect.createOneShot(
@@ -104,3 +209,15 @@ fun vibrate(context: Context) {
         }
     }
 }
+
+data class OnlinePrefs(
+    val minSize: Int,
+    val maxSize: Int,
+    val minQuality: Int,
+    val maxQuality: Int,
+    val allowUnratedQual: Boolean,
+    val minDifficulty: Int,
+    val maxDifficulty: Int,
+    val allowUnratedDiff: Boolean,
+    val apiKey: String
+)

@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="app/src/main/res/layout/activity_game.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/activity_level_select.xml" value="0.24909420289855072" />
+        <entry key="app/src/main/res/layout/activity_main.xml" value="0.2755825734549139" />
+        <entry key="app/src/main/res/layout/dialogue_online_grid.xml" value="0.5957446808510638" />
+        <entry key="app/src/main/res/layout/dialogue_random_grid.xml" value="0.29347826086956524" />
+        <entry key="app/src/main/res/layout/edit_text_layout.xml" value="0.24909420289855072" />
+        <entry key="app/src/main/res/layout/level_view.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/settings_activity.xml" value="0.2801418439716312" />
+        <entry key="app/src/main/res/menu/add_level_menu.xml" value="0.3359375" />
+        <entry key="app/src/main/res/xml/root_preferences.xml" value="0.3359375" />
+      </map>
+    </option>
+  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>

@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Nonocross</string>
-    <string name="practice_grids">Practicar</string>
     <string name="rows">Líneas</string>
     <string name="columns">Columna</string>
     <string name="grid_size">Tamaño de Cuadrícula</string>
     <string name="finished">Hecho</string>
     <string name="difficulty">Dificultad</string>
     <string name="reset">Resetear</string>
-    <string name="level_complete">Nivel Completo</string>
     <string name="play">Jugar</string>
     <string name="random_grid">Generar Nivel</string>
     <string name="menu">Menú</string>
@@ -20,15 +18,16 @@
     <string name="usability_header">Funcionalidad</string>
     <string name="vibrate_summary">Vibrar al realizar determinadas acciones</string>
     <string name="appearance_header">Apariencia</string>
-    <string name="override_system_theme">Anular el Tema del Sistema</string>
-    <string name="enable_dark_mode">Habilitar el Tema Oscuro</string>
-    <string name="requires_restart">Requiere Reinicio</string>
     <string name="show_blue_hints">Mostrar Indicios Azul</string>
-    <string name="auto_cross_summary">Llenar líneas con un tono solo</string>
-    <string name="select_seed">Semilla Personilazada</string>
-    <string name="enter_seed">Introducir la semilla</string>
-    <string name="auto_cross_title">Rellenon Automático</string>
-    <string name="long_seed">Semilla: %1$d</string>
-    <string name="seed_copied">Copiado en el portapapeles</string>
     <string name="import_level">Importar nivel</string>
+    <string name="default_levels">Niveles Predeterminados</string>
+    <string name="custom_level">Niveles Guardados</string>
+    <string name="remove_level">eliminar</string>
+    <string name="level_name">Nombre de Nivel</string>
+    <string name="enter_level_name">Entrar el nombre de nivel</string>
+    <string name="import_from_file">Importar archivo</string>
+    <string name="import_from_qr">Importar código QR</string>
+    <string name="qr_code">código QR</string>
+    <string name="untitled_level">Nivel sin Título</string>
+    <string name="level_complete">Nivel Completo\nTiempo Tomado: %1$s</string>
 </resources>

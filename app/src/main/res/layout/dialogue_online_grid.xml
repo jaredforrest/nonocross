@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?><!--*This file is part of Nonocross.
+
+Nonocross is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Nonocross is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/minTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/min"
+            android:textColor="@color/colorPrimary"
+            app:layout_constraintEnd_toEndOf="@+id/minGridCellSpinner"
+            app:layout_constraintStart_toStartOf="@+id/minGridCellSpinner"
+            app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+        <TextView
+            android:id="@+id/difficultyTextView2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/difficulty"
+            android:textColor="@color/colorPrimary"
+            app:layout_constraintEnd_toEndOf="@+id/difficulty_slider"
+            app:layout_constraintStart_toStartOf="@+id/difficulty_slider"
+            app:layout_constraintTop_toBottomOf="@+id/minGridCellSpinner" />
+
+        <TextView
+            android:id="@+id/qualityTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/quality"
+            android:textColor="@color/colorPrimary"
+            app:layout_constraintEnd_toEndOf="@+id/difficulty_slider"
+            app:layout_constraintStart_toStartOf="@+id/difficulty_slider"
+            app:layout_constraintTop_toBottomOf="@+id/difficultyCheckBox" />
+
+        <TextView
+            android:id="@+id/maxTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="@string/max"
+            android:textColor="@color/colorPrimary"
+            app:layout_constraintEnd_toEndOf="@+id/maxGridCellSpinner"
+            app:layout_constraintStart_toStartOf="@+id/maxGridCellSpinner"
+            app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+
+        <!--(minSize: Int, maxSize:Int, minQuality: Int, maxQuality: Int, allowUnratedQual: Boolean, minDifficulty: Int, maxDifficulty: Int, allowUnratedDiff: Boolean-->
+
+        <com.google.android.material.slider.RangeSlider
+            android:id="@+id/difficulty_slider"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:stepSize="1.0"
+            android:theme="@style/MyMaterialTheme"
+            android:valueFrom="4.0"
+            android:valueTo="20.0"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/difficultyTextView2"
+            app:values="@array/initial_slider_values" />
+
+        <com.google.android.material.slider.RangeSlider
+            android:id="@+id/quality_slider"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            android:stepSize="1.0"
+            android:theme="@style/MyMaterialTheme"
+            android:valueFrom="4.0"
+            android:valueTo="20.0"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/qualityTextView"
+            app:values="@array/initial_slider_values" />
+
+        <CheckBox
+            android:id="@+id/difficultyCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:minHeight="48dp"
+            android:text="@string/allow_unrated"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/difficulty_slider" />
+
+        <CheckBox
+            android:id="@+id/qualityCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginBottom="12dp"
+            android:minHeight="48dp"
+            android:text="@string/allow_unrated"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/quality_slider" />
+
+        <Spinner
+            android:id="@+id/minGridCellSpinner"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:ems="10"
+            android:inputType="number"
+            android:minHeight="48dp"
+            app:layout_constraintEnd_toStartOf="@+id/guideline4"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/minTextView" />
+
+        <Spinner
+            android:id="@+id/maxGridCellSpinner"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:ems="10"
+            android:inputType="number"
+            android:minHeight="48dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="@+id/guideline4"
+            app:layout_constraintTop_toBottomOf="@+id/maxTextView" />
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline4"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_begin="205dp" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/number_of_grid_cells"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

@@ -14,19 +14,46 @@ You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross
 
-import com.picross.nonocross.util.GridData2
-import com.picross.nonocross.util.UserGrid
+import com.picross.nonocross.util.usergrid.GridData
+import com.picross.nonocross.util.usergrid.UserGrid
+import kotlinx.collections.immutable.PersistentList
 
 object LevelDetails {
-    var gridData = GridData2(0, 0, listOf(), listOf())
+    var gridData =
+        GridData(1, 1, listOf(listOf(2), listOf(2)), listOf(listOf(2), listOf(2)))//: GridData
     lateinit var userGrid: UserGrid
+    //var levelName
 
-    var isRandom = false
-    var randomSeed = 0L
+    var levelType: LevelType = LevelType.Random
 
     var toggleCross = false
 
-    fun isReady(): Boolean {
+    /*fun isReady(): Boolean {
         return ::userGrid.isInitialized
-    }
+    }*/
+
+    /* Not sure if this is the best place to define this
+    It is used for generating a unique random level
+     */
+    //val myThreadGroup = ThreadGroup("Native Thread Group")
+
+    lateinit var levels: PersistentList<Pair<String, GridData>>
+    lateinit var customLevels: MutableList<Pair<String, GridData>>
+
+}
+
+sealed class LevelType {
+
+    object Random : LevelType()
+
+    data class Custom(
+        val levelName: String
+    ) : LevelType()
+
+
+    data class Default(
+        val levelName: String
+    ) : LevelType()
+
+    object Online : LevelType()
 }

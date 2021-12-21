@@ -1,19 +1,18 @@
 <resources>
     <string name="app_name">Nonocross</string>
-    <string name="practice_grids">Practice Grids</string>
-    <string name="random_grid">Random Grid</string>
+    <string name="default_levels">Default Levels</string>
+    <string name="random_grid">Random Level</string>
     <string name="play">play</string>
     <string name="height_x_width">%1$d x %2$d</string>
-    <string name="level_complete">Level Complete</string>
+    <string name="level_complete">Level Complete\n\nTime Taken: %1$s</string>
     <string name="menu">Menu</string>
     <string name="reset">Reset</string>
     <string name="difficulty">Difficulty</string>
     <string name="rows">Rows</string>
     <string name="columns">Columns</string>
     <string name="grid_size">Grid Size</string>
+    <string name="grid_options">Grid Options</string>
     <string name="finished">Finished</string>
-    <string name="long_seed">Seed: %1$d</string>
-    <string name="seed_copied">Copied to the clipboard</string>
 
     <!-- Preferences -->
     <string name="preferences">Preferences</string>
@@ -21,19 +20,58 @@
     <string name="vibrate_title">Vibrate</string>
     <string name="fat_finger_title">Single Line Fill Mode</string>
     <string name="fat_finger_summary">Enable if it is difficult to touch individual squares</string>
-    <string name="auto_cross_title">Auto Fill</string>
-    <string name="auto_cross_summary">Automatically fill lines with only one shade</string>
     <string name="vibrate_summary">Vibrate when performing certain actions</string>
     <string name="appearance_header">Appearance</string>
-    <string name="override_system_theme">Override System Theme</string>
-    <string name="enable_dark_mode">Enable Dark Mode</string>
-    <string name="requires_restart">Requires Restart</string>
     <string name="show_blue_hints">Show Blue Hints</string>
-    <string name="select_seed">Custom Seed</string>
-    <string name="enter_seed">Enter seed</string>
     <string name="import_level">Import Level</string>
-    <string name="custom_level">Custom Level</string>
-    <string name="action_add">Add Level</string>
+    <string name="custom_level">Saved Levels</string>
     <string name="remove_level">remove</string>
+    <string name="level_name">Level Name</string>
+    <string name="enter_level_name">Enter the name of the level</string>
+    <string name="import_from_file">Import from file</string>
+    <string name="import_from_qr">Import from QR code</string>
+    <string name="qr_code">QR code</string>
+    <string name="untitled_level">Untitled Level</string>
+    <string name="online">online</string>
+    <string name="play_online_levels">Play Online Levels</string>
+    <string name="beta_features">Beta Features</string>
+    <string name="api_key">API Key</string>
+    <string name="quality">Quality</string>
+    <string name="max">Max</string>
+    <string name="min">Min</string>
+    <string name="allow_unrated">Allow Unrated</string>
+    <string name="number_of_grid_cells">Number of Grid Cells</string>
+    <string-array name="dark_mode_entries">
+        <item>System</item>
+        <item>Dark</item>
+        <item>Light</item>
+    </string-array>
+    <array name="initial_slider_values">
+        <item>4.0</item>
+        <item>20.0</item>
+    </array>
+    <string-array name="grid_size_array">
+        <item>0</item>
+        <item>25</item>
+        <item>100</item>
+        <item>225</item>
+        <item>400</item>
+        <item>625</item>
+        <item>900</item>
+        <item>1225</item>
+        <item>1600</item>
+        <item>2025</item>
+        <item>2500</item>
+        <item>3025</item>
+        <item>3600</item>
+        <item>4225</item>
+        <item>4900</item>
+        <item>5625</item>
+        <item>6400</item>
+        <item>7225</item>
+        <item>8100</item>
+        <item>9025</item>
+        <item>10000</item>
+    </string-array>
 
 </resources>

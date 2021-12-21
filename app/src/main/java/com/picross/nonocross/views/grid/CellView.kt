@@ -20,6 +20,7 @@ import android.graphics.Paint
 import androidx.core.content.res.ResourcesCompat
 import com.picross.nonocross.R
 import com.picross.nonocross.util.Cell
+import com.picross.nonocross.util.CellShade
 
 class CellView(
     val cell: Cell,
@@ -50,9 +51,9 @@ class CellView(
 
     fun draw(canvas: Canvas) {
         when (cell.userShade) {
-            Cell.CellShade.EMPTY -> canvas.drawRect(left, top, right, bottom, paintEmpty)
-            Cell.CellShade.SHADE -> canvas.drawRect(left, top, right, bottom, paintShade)
-            Cell.CellShade.CROSS -> drawCross(canvas)
+            CellShade.EMPTY -> canvas.drawRect(left, top, right, bottom, paintEmpty)
+            CellShade.SHADE -> canvas.drawRect(left, top, right, bottom, paintShade)
+            CellShade.CROSS -> drawCross(canvas)
         }
     }
 

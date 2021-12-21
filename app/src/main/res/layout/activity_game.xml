@@ -42,17 +42,43 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/info"
+        android:id="@+id/new_grid"
         android:layout_width="51dp"
         android:layout_height="32dp"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginRight="16dp"
         android:drawablePadding="5sp"
         android:text=""
         android:textSize="55sp"
-        app:drawableTopCompat="@drawable/ic_baseline_info_32"
+        android:visibility="gone"
         app:layout_constraintEnd_toEndOf="parent"
+        app:drawableTopCompat="@drawable/ic_baseline_refresh_32"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/save"
+        android:layout_width="51dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:drawablePadding="5sp"
+        android:text=""
+        android:textSize="55sp"
+        android:visibility="gone"
+        app:drawableTopCompat="@drawable/ic_baseline_save_32"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/qrcode"
+        android:layout_width="51dp"
+        android:layout_height="32dp"
+        android:layout_marginTop="16dp"
+        android:drawablePadding="5sp"
+        android:text=""
+        android:textSize="55sp"
+        app:drawableTopCompat="@drawable/ic_baseline_qr_code_32"
+        app:layout_constraintStart_toEndOf="@+id/save"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
@@ -70,17 +96,74 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
+        android:id="@+id/zoom"
+        android:layout_width="51dp"
+        android:layout_height="32dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:drawablePadding="5sp"
+        android:text=""
+        android:textSize="55sp"
+        app:drawableTopCompat="@drawable/ic_baseline_zoom_out_map_32"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
         android:id="@+id/clear"
         android:layout_width="51dp"
         android:layout_height="32dp"
+        android:layout_marginEnd="8dp"
         android:layout_marginBottom="8dp"
         android:drawablePadding="5sp"
         android:text=""
         android:textSize="55sp"
         app:drawableTopCompat="@drawable/ic_baseline_delete_32"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <TextView
+        android:id="@+id/redo"
+        android:layout_width="51dp"
+        android:layout_height="32dp"
+        android:layout_marginBottom="8dp"
+        android:drawablePadding="5sp"
+        android:text=""
+        android:textSize="55sp"
+        app:drawableTopCompat="@drawable/ic_baseline_redo_32"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.58"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <ProgressBar
+        android:id="@+id/indeterminateBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/img_result_qr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/qr_code"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/time_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toggleCross" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -27,7 +27,7 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/rowsTextView"
+            android:id="@+id/minTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -43,10 +43,10 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toStartOf="@id/cols_picker"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/rowsTextView" />
+            app:layout_constraintTop_toBottomOf="@+id/minTextView" />
 
         <TextView
-            android:id="@+id/colsTextView"
+            android:id="@+id/maxTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
@@ -61,10 +61,9 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:layout_marginLeft="4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/rows_picker"
-            app:layout_constraintTop_toBottomOf="@+id/colsTextView" />
+            app:layout_constraintTop_toBottomOf="@+id/maxTextView" />
 
 
         <TextView
@@ -85,31 +84,6 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/difficultyTextView" />
-
-        <EditText
-            android:id="@+id/seed_select"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:autofillHints="seed"
-            android:layout_marginBottom="4dp"
-            android:ems="10"
-            android:hint="@string/enter_seed"
-            android:inputType="numberSigned"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:visibility="gone"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/seed_select_enable" />
-
-        <CheckBox
-            android:id="@+id/seed_select_enable"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="@string/select_seed"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/difficulty_picker" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>

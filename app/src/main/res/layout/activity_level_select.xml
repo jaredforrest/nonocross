@@ -24,7 +24,6 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="28dp"
-        android:layout_marginRight="28dp"
         android:layout_marginBottom="28dp"
         android:clickable="true"
         android:contentDescription="@string/import_level"

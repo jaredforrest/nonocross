@@ -14,18 +14,14 @@ You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross
 
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.picross.nonocross.levelselect.CustomLevelSelectAdapter
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileNotFoundException
 
-class LevelSelectActivity : AppCompatActivity(), CustomLevelSelectAdapter.StartGame {
+class OnlineLevelSelectActivity : AppCompatActivity(), CustomLevelSelectAdapter.StartGame {
     private lateinit var recyclerView: RecyclerView
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
@@ -60,18 +56,11 @@ class LevelSelectActivity : AppCompatActivity(), CustomLevelSelectAdapter.StartG
     override fun removeLevel(level: String, position: Int) {
     }
 
-    override fun levelType(levelName: String): LevelType =
-        LevelType.Default(levelName)
+    override fun levelType(levelName: String) =
+        LevelType.Online//(levelName)
 
     override fun openSave(levelName: String): ByteArray {
-        val saveDir = getDir("saves", Context.MODE_PRIVATE)
-        val saveFile =
-            try {
-                FileInputStream(File(File(saveDir, "default"), levelName))
-            } catch (e: FileNotFoundException) {
-                return byteArrayOf()
-            }
-        return saveFile.readBytes()
+        return byteArrayOf()
     }
 
 }

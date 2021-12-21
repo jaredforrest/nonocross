@@ -1,74 +1,62 @@
 package com.picross.nonocross.util
 
 import android.content.Context
-import android.content.res.AssetFileDescriptor
 import android.net.Uri
 import android.provider.OpenableColumns
-import android.util.Log
-import arrow.core.Either
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import kotlinx.collections.immutable.*
+import arrow.core.*
+import arrow.core.computations.either
+import com.picross.nonocross.util.usergrid.GridData
 
 
 /** Takes a .non file (represented as a list of strings by each new line) and outputs the grid */
-fun parseNonFile(lines: String): Option<GridData2> {
+suspend fun parseNonFile(lines: String): Either<ParseError, GridData> {
 
-    fun parseLine(line: String, data: Pair<Int, Int>): Pair<Int, Int> {
-        return when (line.substringBefore(" ")) {
+    fun parseLine(line: String, data: Pair<Int, Int>): Pair<Int, Int> =
+        when (line.substringBefore(" ")) {
             "width" -> Pair(line.substringAfter(" ").toInt(), data.second)
             "height" -> Pair(data.first, line.substringAfter(" ").toInt())
             else -> data
         }
-    }
 
     tailrec fun heightWidthAcc(
         lines: String,
         data: Pair<Int, Int> = Pair(0, 0)
-    ): Pair<String, Pair<Int, Int>> {
-        return if (lines == "" || (data.first != 0 && data.second != 0)) Pair(lines, data)
+    ): Either<ParseError.WidthHeightError, Pair<String, Pair<Int, Int>>> =
+        if (data.first != 0 && data.second != 0) Either.Right(Pair(lines, data))
+        else if (lines == "") Either.Left(ParseError.WidthHeightError)
         else {
             heightWidthAcc(
                 lines.dropWhile { it != '\n' }.drop(1),
                 parseLine(lines.takeWhile { it != '\n' }, data)
             )
         }
-    }
 
-    fun parseNum(rowNum: String): Option<ImmutableList<Int>> {
-        return if (rowNum == "0") Some(persistentListOf())
+    fun parseNum(rowNum: String): Option<List<Int>> =
+        if (rowNum == "0") Some(listOf())
         else {
-            val plist = persistentListOf<Int>()
-            val builder = plist.builder()
-            builder.addAll(rowNum.split(',').map { it.toIntOrNull() ?: return None })
-            builder.build()
-            Some(rowNum.split(',').map { it.toInt() }.toPersistentList())
+            Some(rowNum.split(',').map { it.toIntOrNull() ?: return none() })
         }
-    }
 
     tailrec fun parseNums(
         lines: String,
         size: Int,
-        acc: ImmutableList<ImmutableList<Int>> = persistentListOf()
-    ): Option<Pair<String, ImmutableList<ImmutableList<Int>>>> {
-        return if (size == 0) Some(Pair(lines, acc))
-        else when (val next = parseNum(lines.substringBefore('\n'))) {
-            is Some -> parseNums(
-                lines.substringAfter('\n'),
-                size - 1,
-                (acc as PersistentList) + persistentListOf(next.value)
-            )
-            is None -> None
-        }
+        acc: List<List<Int>> = listOf()
+    ): Option<Pair<String, List<List<Int>>>> = if (size == 0) Some(Pair(lines, acc))
+    else when (val next = parseNum(lines.substringBefore('\n'))) {
+        is Some -> parseNums(
+            lines.substringAfter('\n'),
+            size - 1,
+            acc + listOf(next.value)
+        )
+        is None -> None
     }
 
     fun parseLine2(
         lines: String,
         widthHeight: Pair<Int, Int>,
-        data: Pair<ImmutableList<ImmutableList<Int>>, ImmutableList<ImmutableList<Int>>>
-    ): Option<Triple<String, ImmutableList<ImmutableList<Int>>, ImmutableList<ImmutableList<Int>>>> {
-        return when (lines.substringBefore('\n')) {
+        data: Pair<List<List<Int>>, List<List<Int>>>
+    ): Option<Triple<String, List<List<Int>>, List<List<Int>>>> =
+        when (lines.substringBefore('\n')) {
             "rows" -> {
                 when (val output = parseNums(lines.substringAfter('\n'), widthHeight.second)) {
                     is Some -> Some(Triple(output.value.first, output.value.second, data.second))
@@ -84,17 +72,16 @@ fun parseNonFile(lines: String): Option<GridData2> {
             }
             else -> Some(Triple(lines.substringAfter('\n'), data.first, data.second))
         }
-    }
 
     tailrec fun rowColAcc(
         lines: String,
         widthHeight: Pair<Int, Int>,
-        data: Pair<ImmutableList<ImmutableList<Int>>, ImmutableList<ImmutableList<Int>>> = Pair(
-            persistentListOf(),
-            persistentListOf()
+        data: Pair<List<List<Int>>, List<List<Int>>> = Pair(
+            listOf(),
+            listOf()
         )
-    ): Option<Triple<String, Pair<Int, Int>, Pair<ImmutableList<ImmutableList<Int>>, ImmutableList<ImmutableList<Int>>>>> {
-        return if (lines == "" || (data.first.isNotEmpty() && data.second.isNotEmpty())) Some(
+    ): Either<ParseError.RowsColsError, Triple<String, Pair<Int, Int>, Pair<List<List<Int>>, List<List<Int>>>>> =
+        if (lines == "" || (data.first.isNotEmpty() && data.second.isNotEmpty())) Either.Right(
             Triple(
                 lines,
                 widthHeight,
@@ -108,75 +95,73 @@ fun parseNonFile(lines: String): Option<GridData2> {
                     widthHeight,
                     Pair(output.value.second, output.value.third)
                 )
-                is None -> None
+                is None -> Either.Left(ParseError.RowsColsError)
             }
         }
-    }
 
-    val (lines2, widthHeight) = heightWidthAcc(lines)
-    if (widthHeight.first == 0 || widthHeight.second == 0) return None
-    val widthHeight2: Pair<Int, Int>
-    val rowNumsColNums: Pair<ImmutableList<ImmutableList<Int>>, ImmutableList<ImmutableList<Int>>>
-    when (val rowsCols = rowColAcc(lines2, widthHeight)) {
-        is Some -> {
-            widthHeight2 = rowsCols.value.second
-            rowNumsColNums = rowsCols.value.third
-        }
-        is None -> return None
-    }
 
-    Log.d(
-        "fdsasa", GridData2(
+    return either {
+        val (lines2, widthHeight) = heightWidthAcc(lines).bind()
+        val rowsCols = rowColAcc(lines2, widthHeight).bind()
+        val widthHeight2 = rowsCols.second
+        val rowNumsColNums = rowsCols.third
+        GridData(
             widthHeight2.first,
             widthHeight2.second,
             rowNumsColNums.first,
-            rowNumsColNums.second
-        ).toString()
-    )
-    return Some(
-        GridData2(
-            widthHeight2.first,
-            widthHeight2.second,
-            rowNumsColNums.first,
-            rowNumsColNums.second
+            rowNumsColNums.second,
         )
-    )
 
-
+    }
 }
 
-/** Returns (FileName, File contents) */
-fun checkValidNonFile(uri: Uri?, context: Context): Either<Error, Pair<String, String>> {
-    if (uri == null) return Either.Left(Error.UriNull)
-    val afd: AssetFileDescriptor = context.contentResolver.openAssetFileDescriptor(uri, "r")
-        ?: return Either.Left(Error.FileReadError)
-    if (afd.length > 10000 /* 10kb max file size */) {
-        afd.close()
-        return Either.Left(Error.FileTooBig)
+fun GridData.toNonFile() = "width ${width}\nheight ${height}\n\nrows\n" + rowNums
+    .fold("") { acc, i ->
+        if (i.isEmpty()) "${acc}0\n" else acc + i.fold("") { acc2, j -> "$acc2$j," }
+            .dropLast(1) + "\n"
+    } + "\n" + "columns\n" + colNums
+    .fold("") { acc, i ->
+        if (i.isEmpty()) "${acc}0\n" else acc + i.fold("") { acc2, j -> "$acc2$j," }
+            .dropLast(1) + "\n"
     }
-    afd.close()
 
-    val filename = context.contentResolver.query(uri, null, null, null, null).use { cursor ->
+
+/** Returns (FileName, File contents) */
+suspend fun checkValidNonFile(uri: Uri, context: Context): Either<FileError, Pair<String, String>> =
+    if (checkValidFile(uri, context)) either {
+        val filename = getFileNameFromUri(uri, context)
+        val text = readTextFromUri(uri, context)
+
+        parseNonFile(text).bind()
+        Pair(filename, text)
+    } else {
+        ParseError.FileTooBigError.left()
+    }
+
+fun getFileNameFromUri(uri: Uri, context: Context): String =
+    context.contentResolver.query(uri, null, null, null, null).use { cursor ->
         val nameIndex = cursor?.getColumnIndex(OpenableColumns.DISPLAY_NAME)
         cursor?.moveToFirst()
         if (nameIndex != null) cursor.getString(nameIndex) else ""
     }.substringBeforeLast('.')
 
-    val text = readTextFromUri(uri, context)
-    return when (filename) {
-        "" -> Either.Left(Error.NoFileName)
-        else ->
-            when (parseNonFile(text)) {
-                is Some -> Either.Right(Pair(filename, text))
-                is None -> Either.Left(Error.FileParseError)
-            }
-    }
+fun checkValidFile(uri: Uri, context: Context) = context.contentResolver.openAssetFileDescriptor(
+    uri,
+    "r"
+)?.length ?: 10001 < 10000 /* 10kb max file size */
+
+sealed class FileError {
+/*    object FileReadError : FileError()
+    object FileTooBig : FileError()
+    data class FileParseError(val parseError: ParseError) : FileError()*/
 }
 
-sealed class Error {
-    object UriNull : Error()
-    object FileReadError : Error()
-    object FileTooBig : Error()
-    object FileParseError : Error()
-    object NoFileName : Error()
+sealed class ParseError : FileError() {
+    object WidthHeightError : ParseError()
+    object RowsColsError : ParseError()
+    object FileTooBigError : ParseError() {
+        override fun toString() = "File is too big"
+    }
+
+    override fun toString() = "Invalid File/QR Code"
 }

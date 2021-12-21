@@ -11,4 +11,9 @@
         <item name="colorAccent">@color/colorCross</item>
         <item name="colorSwitchThumbNormal">@color/colorShade</item>
     </style>
+
+    <style name="MyMaterialTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- Add attributes here -->
+        <item name="colorPrimary">@color/colorPrimary</item>
+    </style>
 </resources>
