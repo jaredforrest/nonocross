@@ -14,6 +14,10 @@ You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross
 
+//import io.ktor.client.*
+//import io.ktor.client.features.*
+//import io.ktor.client.features.logging.*
+//import io.ktor.utils.io.errors.*
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -27,17 +31,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
-import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
-import com.google.android.material.slider.RangeSlider
 import com.picross.nonocross.util.*
 import com.picross.nonocross.util.usergrid.UserGrid
 import com.picross.nonocross.util.usergrid.toGridData
-import io.ktor.client.*
-import io.ktor.client.features.*
-import io.ktor.client.features.logging.*
-import io.ktor.utils.io.errors.*
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.*
@@ -96,7 +94,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /** Called when the user taps the Online button */
-    private fun openOnlineLevel() {
+    /*private fun openOnlineLevel() {
         val inflater = this@MainActivity.layoutInflater
         val dialogView: View = inflater.inflate(R.layout.dialogue_online_grid, null)
         val minEdit = dialogView.findViewById<Spinner>(R.id.minGridCellSpinner)
@@ -202,7 +200,7 @@ class MainActivity : AppCompatActivity() {
 
             .create()
             .show()
-    }
+    }*/
 
     /** Called when the user taps the Random Level button */
     private fun openRandomLevel() {
@@ -312,7 +310,7 @@ class MainActivity : AppCompatActivity() {
         levelSelectButton.setOnClickListener { openLevelSelect() }
         preferencesButton.setOnClickListener { openPreferences() }
         savedLevelSelect.setOnClickListener { openCustomLevel() }
-        onlineButton.setOnClickListener { openOnlineLevel() }
+        //onlineButton.setOnClickListener { openOnlineLevel() }
 
     }
 

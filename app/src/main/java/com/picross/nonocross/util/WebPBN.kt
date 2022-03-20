@@ -1,6 +1,6 @@
 package com.picross.nonocross.util
 
-import android.util.Log
+/*import android.util.Log
 import arrow.core.*
 import com.picross.nonocross.util.usergrid.GridData
 import io.ktor.client.*
@@ -188,3 +188,4 @@ suspend fun getRandomWebPBNs(onlinePrefs: OnlinePrefs): Either<String, Persisten
     //.toOption()
     return ids//Either.Right(ids)
 }
+*/

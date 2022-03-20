@@ -37,7 +37,7 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory app:title="@string/beta_features">
+    <!--PreferenceCategory app:title="@string/beta_features">
 
         <SwitchPreferenceCompat
             app:defaultValue="false"
@@ -51,5 +51,5 @@
             app:summary="Find this in the url after 'sid=' once you have logged in."
             app:title="@string/api_key" />
 
-    </PreferenceCategory>
+    </PreferenceCategory-->
 </PreferenceScreen>
