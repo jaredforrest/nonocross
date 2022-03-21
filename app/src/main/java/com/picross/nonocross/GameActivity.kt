@@ -156,7 +156,7 @@ class GameActivity : AppCompatActivity() {
                         val temp =
                             constraintLayout.findViewById<EditText>(R.id.edit_level_name).text.toString()
                         val fileName = if (temp == "") "Untitled Level" else temp
-                        addCustomLevel(fileName, fileContents, this)
+                        addCustomLevel(fileName, fileContents, this, LD.userGrid)
                     }
                     .setNegativeButton(android.R.string.cancel, null)
                     .create()

@@ -123,9 +123,17 @@ suspend fun openGridFile(
     }
 }
 
-fun addCustomLevel(filename: String, fileContents: String, context: Context) {
+fun addCustomLevel(
+    filename: String,
+    fileContents: String,
+    context: Context,
+    userGrid: UserGrid? = null
+) {
     FileOutputStream(File(context.getDir("levels", Context.MODE_PRIVATE), filename)).use {
         it.write(fileContents.toByteArray())
+    }
+    if (userGrid != null) {
+        saveCurrentGridState(context, LevelType.Custom(filename), userGrid)
     }
 }
 
