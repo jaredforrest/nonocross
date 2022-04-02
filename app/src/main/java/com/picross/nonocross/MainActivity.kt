@@ -49,7 +49,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var levelSelectButton: View
     private lateinit var preferencesButton: View
     private lateinit var savedLevelSelect: View
-    private lateinit var onlineButton: View
+    //private lateinit var onlineButton: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -299,12 +299,12 @@ class MainActivity : AppCompatActivity() {
         levelSelectButton = findViewById(R.id.level_select)
         preferencesButton = findViewById(R.id.preferences)
         savedLevelSelect = findViewById(R.id.custom_level)
-        onlineButton = findViewById(R.id.online)
+        //onlineButton = findViewById(R.id.online)
 
-        val showOnline = preferences.getBoolean("showOnline", false)
-        if (showOnline) {
-            onlineButton.visibility = VISIBLE
-        }
+        //val showOnline = preferences.getBoolean("showOnline", false)
+        //if (showOnline) {
+        //    onlineButton.visibility = VISIBLE
+        //}
 
         randomLevelButton.setOnClickListener { openRandomLevel() }
         levelSelectButton.setOnClickListener { openLevelSelect() }
@@ -322,7 +322,7 @@ class MainActivity : AppCompatActivity() {
         levelSelectButton.visibility = invisibility
         preferencesButton.visibility = invisibility
         savedLevelSelect.visibility = invisibility
-        onlineButton.visibility = invisibility
+        //onlineButton.visibility = invisibility
         findViewById<View>(R.id.game_text).visibility = invisibility
         findViewById<View>(R.id.indeterminateBar).visibility = visibility
     }

@@ -17,6 +17,8 @@ package com.picross.nonocross
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.view.View.GONE
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -50,6 +52,7 @@ class LevelSelectActivity : AppCompatActivity(), CustomLevelSelectAdapter.StartG
             // specify an viewAdapter
             adapter = viewAdapter
         }
+        findViewById<View>(R.id.import_level_button).visibility = GONE
     }
 
     override fun startGame() {
