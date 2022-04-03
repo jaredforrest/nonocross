@@ -2,17 +2,16 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 31
-    buildToolsVersion "30.0.2"
+    compileSdkVersion 32
     kotlinOptions.useIR = true
 
     defaultConfig {
         applicationId "com.picross.nonocross"
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 32
         multiDexEnabled true
-        versionCode 6
-        versionName "1.3"
+        versionCode 7
+        versionName "1.3.1"
 
         vectorDrawables.useSupportLibrary true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -56,7 +55,7 @@ android {
     externalNativeBuild {
         cmake {
             path file('src/main/cpp/CMakeLists.txt')
-            version '3.10.2'
+            version '3.18.1'
         }
     }
 }
@@ -76,19 +75,19 @@ dependencies {
 //    implementation "io.ktor:ktor-client-core:1.6.1"
 //    implementation "io.ktor:ktor-client-android:1.6.1"
     debugImplementation "ch.qos.logback:logback-classic:1.2.6"
-//    debugImplementation "io.ktor:ktor-client-logging:1.6.1"
+//    debugImplementation 'io.ktor:ktor-client-logging:1.6.1'
     implementation('com.journeyapps:zxing-android-embedded:4.2.0') { transitive = false }
 //    implementation("org.jsoup:jsoup:1.11.3")
     // Android Compose
-    implementation "androidx.compose.ui:ui:1.1.1"
-    implementation "androidx.compose.material:material:1.1.1"
+    implementation 'androidx.compose.ui:ui:1.1.1'
+    implementation 'androidx.compose.material:material:1.1.1'
     // Do not update
     implementation 'com.google.zxing:core:3.3.0'
-    implementation "io.arrow-kt:arrow-core:0.13.2"
+    implementation 'io.arrow-kt:arrow-core:0.13.2'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     annotationProcessor 'androidx.room:room-compiler:2.4.2'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
-    implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.4")
+    implementation 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.4'
 }
