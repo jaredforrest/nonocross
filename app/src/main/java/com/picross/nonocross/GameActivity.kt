@@ -18,12 +18,11 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-import android.view.View.INVISIBLE
-import android.view.View.VISIBLE
+import android.view.View.*
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.activity.addCallback
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
@@ -53,7 +52,7 @@ class GameActivity : AppCompatActivity() {
     private lateinit var clear: View
     private lateinit var refresh: View
     lateinit var save: View
-    private lateinit var qrCode: View
+    private lateinit var qrCode: ImageView
     private lateinit var qrCodeImage: ImageView
     private lateinit var progress: View
     private lateinit var gameView: GameView
@@ -140,51 +139,49 @@ class GameActivity : AppCompatActivity() {
         }
 
         if (LD.levelType is LevelType.Random || LD.levelType is LevelType.Online) {
+            onBackPressedDispatcher.addCallback(this, confirmExit)
             save.visibility = VISIBLE
             save.setOnClickListener {
-                val fileContents = LD.gridData.toNonFile()
-
-                // dialog message view
-                val constraintLayout = layoutInflater.inflate(R.layout.edit_text_layout, null)
-
-                AlertDialog.Builder(this)
-                    .setTitle(R.string.level_name)
-                    .setMessage(R.string.enter_level_name)
-                    .setView(constraintLayout)
-                    .setPositiveButton(
-                        android.R.string.ok
-                    ) { _, _ ->
-                        val temp =
-                            constraintLayout.findViewById<EditText>(R.id.edit_level_name).text.toString()
-                        val fileName = if (temp == "") "Untitled Level" else temp
-                        addCustomLevel(fileName, fileContents, this, LD.userGrid)
-                    }
-                    .setNegativeButton(android.R.string.cancel, null)
-                    .create()
-                    .show()
+                saveGrid()
             }
         }
+
 
         qrCode.setOnClickListener {
-            if (qrFirstClick) {
-                val content = LD.gridData.toNonFile()
+            if (qrCodeImage.visibility == VISIBLE) {
+                qrCode.setImageResource(R.drawable.ic_baseline_qr_code_32)
 
-                val multiFormatWriter = MultiFormatWriter()
-                val width = resources.displayMetrics.widthPixels
-                val height = resources.displayMetrics.heightPixels
-                val size = (width.coerceAtMost(height) * 0.8).toInt()
-                val bitMatrix =
-                    multiFormatWriter.encode(content, BarcodeFormat.QR_CODE, size, size)
-                val barcodeEncoder = BarcodeEncoder()
-                val bitmap = barcodeEncoder.createBitmap(bitMatrix)
-                qrCodeImage.setImageBitmap(bitmap)
-                qrCodeImage.visibility = VISIBLE
-                qrFirstClick = false
+                nonocrossGridView.visibility = VISIBLE
+                rowNumsView.visibility = VISIBLE
+                colNumsView.visibility = VISIBLE
+                qrCodeImage.visibility = INVISIBLE
+                running = true
             } else {
-                if (qrCodeImage.visibility == VISIBLE) qrCodeImage.visibility = INVISIBLE
-                else qrCodeImage.visibility = VISIBLE
+                if (qrFirstClick) {
+                    val content = LD.gridData.toNonFile()
+
+                    val multiFormatWriter = MultiFormatWriter()
+                    val width = resources.displayMetrics.widthPixels
+                    val height = resources.displayMetrics.heightPixels
+                    val size = (width.coerceAtMost(height) * 0.8).toInt()
+                    val bitMatrix =
+                        multiFormatWriter.encode(content, BarcodeFormat.QR_CODE, size, size)
+                    val barcodeEncoder = BarcodeEncoder()
+                    val bitmap = barcodeEncoder.createBitmap(bitMatrix)
+                    qrCodeImage.setImageBitmap(bitmap)
+                    qrFirstClick = false
+                }
+
+                qrCode.setImageResource(R.drawable.ic_baseline_grid_on_32)
+                running = false
+                qrCodeImage.visibility = VISIBLE
+                nonocrossGridView.visibility = INVISIBLE
+                rowNumsView.visibility = INVISIBLE
+                colNumsView.visibility = INVISIBLE
+
             }
         }
+
     }
 
     override fun onPause() {
@@ -239,11 +236,15 @@ class GameActivity : AppCompatActivity() {
                             is None -> TODO()
                         }
                     }
-                    onBackPressedDispatcher.addCallback(this) {
-                        randomJob.cancel()
-                        loadingMenu(false)
-                        onBackPressedDispatcher.addCallback(this@GameActivity) { finish() }
+                    val cancelLoad = object : OnBackPressedCallback(true) {
+                        override fun handleOnBackPressed() {
+                            randomJob.cancel()
+                            loadingMenu(false)
+                            this.isEnabled = false
+                        }
                     }
+                    onBackPressedDispatcher.addCallback(this, cancelLoad)
+                    cancelLoad.isEnabled = false
                     //}, "Native Thread", 1024L * 1024L)
                     //myThread?.start()
                 } else {
@@ -268,6 +269,33 @@ class GameActivity : AppCompatActivity() {
                 handler.post(countSecond)
             }
         }
+    }
+
+    private fun saveGrid(andQuit: Boolean = false) {
+        val fileContents = LD.gridData.toNonFile()
+
+        // dialog message view
+        val constraintLayout = layoutInflater.inflate(R.layout.edit_text_layout, null)
+
+        AlertDialog.Builder(this)
+            .setTitle(R.string.level_name)
+            .setMessage(R.string.enter_level_name)
+            .setView(constraintLayout)
+            .setPositiveButton(
+                android.R.string.ok
+            ) { _, _ ->
+                val temp =
+                    constraintLayout.findViewById<EditText>(R.id.edit_level_name).text.toString()
+                val fileName = if (temp == "") "Untitled Level" else temp
+                addCustomLevel(fileName, fileContents, this, LD.userGrid)
+                if (andQuit) finish()
+                save.visibility = GONE
+                LD.levelType = LevelType.Random(Some(fileName))
+                confirmExit.isEnabled = false
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+            .show()
     }
 
     private fun runTimer() {
@@ -313,5 +341,27 @@ class GameActivity : AppCompatActivity() {
         var mScaleFactor = 1f
         var mTransX = 0f
         var mTransY = 0f
+    }
+
+    private val confirmExit = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            // dialog message view
+
+            AlertDialog.Builder(this@GameActivity)
+                .setTitle("Are you sure you want to exit?")
+                .setMessage("Any unsaved data will be lost.")
+                .setNeutralButton(
+                    "Don't Save"
+                ) { _, _ ->
+                    finish()
+                }
+                .setPositiveButton("Save")
+                { _, _ ->
+                    saveGrid(true)
+                }
+                .setNegativeButton(android.R.string.cancel, null)
+                .create()
+                .show()
+        }
     }
 }

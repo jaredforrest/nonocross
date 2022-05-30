@@ -23,8 +23,9 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
-import android.view.View.*
-import android.widget.*
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
+import android.widget.NumberPicker
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -33,12 +34,16 @@ import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import arrow.core.None
 import arrow.core.Some
-import com.picross.nonocross.util.*
+import com.picross.nonocross.util.getRandomGridPrefs
+import com.picross.nonocross.util.newRandomGrid
+import com.picross.nonocross.util.newUniqueRandomGrid
+import com.picross.nonocross.util.openGridFile
 import com.picross.nonocross.util.usergrid.UserGrid
 import com.picross.nonocross.util.usergrid.toGridData
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.File
 
 
@@ -233,7 +238,7 @@ class MainActivity : AppCompatActivity() {
                 editor.putInt("difficulty", diffPicker.value)
                 editor.apply()
 
-                LevelDetails.levelType = LevelType.Random
+                LevelDetails.levelType = LevelType.Random()
 
                 if (preferences.getBoolean("uniqueLevel", true)) {
                     loadingMenu(true)

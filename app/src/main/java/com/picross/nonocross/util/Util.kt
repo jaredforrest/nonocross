@@ -25,10 +25,7 @@ import android.os.VibratorManager
 import android.util.Log
 import android.widget.Toast
 import androidx.preference.PreferenceManager
-import arrow.core.Either
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.none
+import arrow.core.*
 import com.picross.nonocross.LevelType
 import com.picross.nonocross.util.usergrid.GridData
 import com.picross.nonocross.util.usergrid.UserGrid
@@ -142,7 +139,15 @@ fun saveCurrentGridState(context: Context, lT: LevelType, userGrid: UserGrid) {
     val fileContents = userGrid.currentState.toByteArray()
     val saveDir = context.getDir("saves", Context.MODE_PRIVATE)
     when (lT) {
-        is LevelType.Random, LevelType.Online -> {
+        is LevelType.Random -> {
+            when (lT.levelName) {
+                is None -> return
+                is Some -> FileOutputStream(File(File(saveDir, "custom"), lT.levelName.value)).use {
+                    it.write(fileContents)
+                }
+            }
+        }
+        is LevelType.Online -> {
             return
         }
         is LevelType.Custom -> {

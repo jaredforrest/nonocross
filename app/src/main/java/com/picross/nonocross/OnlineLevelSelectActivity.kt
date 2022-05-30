@@ -57,7 +57,7 @@ class OnlineLevelSelectActivity : AppCompatActivity(), CustomLevelSelectAdapter.
     }
 
     override fun levelType(levelName: String) =
-        LevelType.Online//(levelName)
+        LevelType.Online()//(levelName)
 
     override fun openSave(levelName: String): ByteArray {
         return byteArrayOf()

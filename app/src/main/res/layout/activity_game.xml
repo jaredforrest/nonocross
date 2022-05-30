@@ -86,7 +86,7 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <ImageView
         android:id="@+id/qrcode"
         android:layout_width="51dp"
         android:layout_height="32dp"
@@ -94,9 +94,9 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         android:drawablePadding="5sp"
         android:text=""
         android:textSize="55sp"
-        app:drawableTopCompat="@drawable/ic_baseline_qr_code_32"
         app:layout_constraintStart_toEndOf="@+id/save"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/ic_baseline_qr_code_32" />
 
     <TextView
         android:id="@+id/undo"

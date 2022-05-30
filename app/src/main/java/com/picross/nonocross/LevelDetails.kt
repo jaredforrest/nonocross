@@ -14,6 +14,8 @@ You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross
 
+import arrow.core.Option
+import arrow.core.none
 import com.picross.nonocross.util.usergrid.GridData
 import com.picross.nonocross.util.usergrid.UserGrid
 import kotlinx.collections.immutable.PersistentList
@@ -24,7 +26,7 @@ object LevelDetails {
     lateinit var userGrid: UserGrid
     //var levelName
 
-    var levelType: LevelType = LevelType.Random
+    var levelType: LevelType = LevelType.Random()
 
     var toggleCross = false
 
@@ -44,7 +46,9 @@ object LevelDetails {
 
 sealed class LevelType {
 
-    object Random : LevelType()
+    data class Random(
+        val levelName: Option<String> = none()
+    ) : LevelType()
 
     data class Custom(
         val levelName: String
@@ -55,5 +59,7 @@ sealed class LevelType {
         val levelName: String
     ) : LevelType()
 
-    object Online : LevelType()
+    data class Online(
+        val levelName: Option<String> = none()
+    ) : LevelType()
 }
