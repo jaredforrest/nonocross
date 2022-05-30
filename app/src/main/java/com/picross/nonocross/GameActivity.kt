@@ -99,7 +99,7 @@ class GameActivity : AppCompatActivity() {
         LD.toggleCross = false
         toggleGroup.check(R.id.toggleFill)
         toggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
-            LD.toggleCross = !(checkedId == R.id.toggleFill && isChecked)
+            LD.toggleCross = (checkedId == R.id.toggleFill) xor isChecked
         }
 
         //progress.visibility = INVISIBLE
