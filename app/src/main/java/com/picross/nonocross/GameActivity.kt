@@ -26,11 +26,11 @@ import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.SwitchCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import arrow.core.None
 import arrow.core.Some
+import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.journeyapps.barcodescanner.BarcodeEncoder
@@ -47,7 +47,7 @@ import com.picross.nonocross.LevelDetails as LD
 
 
 class GameActivity : AppCompatActivity() {
-    private lateinit var toggleCross: SwitchCompat
+    private lateinit var toggleGroup: MaterialButtonToggleGroup
     private lateinit var undo: View
     private lateinit var redo: View
     private lateinit var clear: View
@@ -79,7 +79,7 @@ class GameActivity : AppCompatActivity() {
 
         runTimer()
 
-        toggleCross = findViewById(R.id.toggleCross)
+        toggleGroup = findViewById(R.id.toggleGroup)
         undo = findViewById(R.id.undo)
         redo = findViewById(R.id.redo)
         clear = findViewById(R.id.clear)
@@ -97,8 +97,9 @@ class GameActivity : AppCompatActivity() {
         nonocrossGridView = gameView.getChildAt(2) as GridView
 
         LD.toggleCross = false
-        toggleCross.setOnCheckedChangeListener { _, isChecked ->
-            LD.toggleCross = isChecked
+        toggleGroup.check(R.id.toggleFill)
+        toggleGroup.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            LD.toggleCross = !(checkedId == R.id.toggleFill && isChecked)
         }
 
         //progress.visibility = INVISIBLE
@@ -232,7 +233,7 @@ class GameActivity : AppCompatActivity() {
                                 refresh.visibility = VISIBLE
                                 qrFirstClick = true
                                 qrCode.visibility = VISIBLE
-                                toggleCross.visibility = VISIBLE
+                                toggleGroup.visibility = VISIBLE
                                 progress.visibility = INVISIBLE
                             }
                             is None -> TODO()
@@ -289,7 +290,7 @@ class GameActivity : AppCompatActivity() {
     private fun loadingMenu(enable: Boolean) {
         val visibility = if (enable) VISIBLE else INVISIBLE
         val invisibility = if (enable) INVISIBLE else VISIBLE
-        toggleCross.visibility = invisibility
+        toggleGroup.visibility = invisibility
         qrCode.visibility = invisibility
         qrCodeImage.visibility = invisibility
         gameView.visibility = invisibility

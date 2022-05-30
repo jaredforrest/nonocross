@@ -1,14 +1,30 @@
 <resources>
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <!-- Customize your theme here. -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Buttons -->
         <item name="colorPrimary">@color/colorPrimary</item>
+        <!-- Top Bar -->
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <!-- Toggles and less important text -->
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="My.Widget.Toggle" parent="Theme.AppCompat.Light">
-        <item name="colorAccent">@color/colorCross</item>
-        <item name="colorSwitchThumbNormal">@color/colorShade</item>
+    <style name="Widget.App.Button.OutlinedButton.IconOnly" parent="Widget.MaterialComponents.Button.OutlinedButton">
+        <item name="iconPadding">0dp</item>
+        <item name="android:insetTop">0dp</item>
+        <item name="android:insetBottom">0dp</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingRight">12dp</item>
+        <item name="android:minWidth">16dp</item>
+        <item name="android:minHeight">16dp</item>
     </style>
+
+    <style name="Widget.App.Button.OutlinedButton.IconOnly.Cross" parent="Widget.App.Button.OutlinedButton.IconOnly">
+        <item name="materialThemeOverlay">@style/CrossButtonThemeOverlay</item>
+    </style>
+
+    <style name="CrossButtonThemeOverlay">
+        <item name="colorPrimary">@color/colorCross</item>
+    </style>
+
 </resources>
