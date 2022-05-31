@@ -260,15 +260,9 @@ class GridView @JvmOverloads constructor(
         (context as GameActivity).resetGrid()
     }
 
-    fun undo() {
-        nonoGrid.userGrid.undo()
-        invalidate()
-    }
+    fun undo() = nonoGrid.userGrid.undo()
 
-    fun redo() {
-        nonoGrid.userGrid.redo()
-        invalidate()
-    }
+    fun redo() = nonoGrid.userGrid.redo()
 
     fun clear() {
         nonoGrid.userGrid.clear()

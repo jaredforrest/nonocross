@@ -22,11 +22,13 @@ import android.view.View.*
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
+import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -78,6 +80,8 @@ class GameActivity : AppCompatActivity() {
 
         runTimer()
 
+        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
+
         toggleGroup = findViewById(R.id.toggleGroup)
         undo = findViewById(R.id.undo)
         redo = findViewById(R.id.redo)
@@ -101,18 +105,30 @@ class GameActivity : AppCompatActivity() {
             LD.toggleCross = (checkedId == R.id.toggleFill) xor isChecked
         }
 
+        if (preferences.getBoolean("timer", false)) {
+            timeView.visibility = VISIBLE
+        }
+
         //progress.visibility = INVISIBLE
         undo.setOnClickListener {
-            qrCodeImage.visibility = INVISIBLE
-            nonocrossGridView.undo()
-            rowNumsView.invalidate()
-            colNumsView.invalidate()
+            when (nonocrossGridView.undo()) {
+                is Either.Right -> {
+                    nonocrossGridView.invalidate()
+                    rowNumsView.invalidate()
+                    colNumsView.invalidate()
+                }
+                is Either.Left -> Toast.makeText(this, "Nothing to undo", Toast.LENGTH_SHORT).show()
+            }
         }
         redo.setOnClickListener {
-            qrCodeImage.visibility = INVISIBLE
-            nonocrossGridView.redo()
-            rowNumsView.invalidate()
-            colNumsView.invalidate()
+            when (nonocrossGridView.redo()) {
+                is Either.Right -> {
+                    nonocrossGridView.invalidate()
+                    rowNumsView.invalidate()
+                    colNumsView.invalidate()
+                }
+                is Either.Left -> Toast.makeText(this, "Nothing to redo", Toast.LENGTH_SHORT).show()
+            }
         }
         clear.setOnClickListener {
             qrCodeImage.visibility = INVISIBLE
@@ -139,7 +155,9 @@ class GameActivity : AppCompatActivity() {
         }
 
         if (LD.levelType is LevelType.Random || LD.levelType is LevelType.Online) {
-            onBackPressedDispatcher.addCallback(this, confirmExit)
+            if (preferences.getBoolean("saveWarn", true)) {
+                onBackPressedDispatcher.addCallback(this, confirmExit)
+            }
             save.visibility = VISIBLE
             save.setOnClickListener {
                 saveGrid()
@@ -151,6 +169,8 @@ class GameActivity : AppCompatActivity() {
             if (qrCodeImage.visibility == VISIBLE) {
                 qrCode.setImageResource(R.drawable.ic_baseline_qr_code_32)
 
+                undo.visibility = VISIBLE
+                redo.visibility = VISIBLE
                 nonocrossGridView.visibility = VISIBLE
                 rowNumsView.visibility = VISIBLE
                 colNumsView.visibility = VISIBLE
@@ -175,6 +195,8 @@ class GameActivity : AppCompatActivity() {
                 qrCode.setImageResource(R.drawable.ic_baseline_grid_on_32)
                 running = false
                 qrCodeImage.visibility = VISIBLE
+                undo.visibility = INVISIBLE
+                redo.visibility = INVISIBLE
                 nonocrossGridView.visibility = INVISIBLE
                 rowNumsView.visibility = INVISIBLE
                 colNumsView.visibility = INVISIBLE

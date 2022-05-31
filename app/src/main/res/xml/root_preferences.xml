@@ -35,6 +35,19 @@
             app:key="showBlueHints"
             app:title="@string/show_blue_hints" />
 
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="saveWarn"
+            app:summary="Show warning when leaving a level with unsaved progress"
+            app:title="Show Save Warning"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:key="timer"
+            app:summary="Show a timer at the top of level"
+            app:title="Show Timer"
+            app:useSimpleSummaryProvider="true" />
+
     </PreferenceCategory>
 
     <!--PreferenceCategory app:title="@string/beta_features">

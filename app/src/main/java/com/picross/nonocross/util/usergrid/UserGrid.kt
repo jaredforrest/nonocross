@@ -1,10 +1,7 @@
 package com.picross.nonocross.util.usergrid
 
 import android.content.Context
-import arrow.core.None
-import arrow.core.Option
-import arrow.core.Some
-import arrow.core.none
+import arrow.core.*
 import com.picross.nonocross.util.Cell
 import com.picross.nonocross.util.CellShade
 import com.picross.nonocross.views.grid.CellView
@@ -88,17 +85,29 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
 
     private var undoList = UndoList(none(), data, none())
 
-    fun undo() {
-        undoList = undoList.undo()
-        grid.forEachIndexed { i, cell ->
-            cell.userShade = undoList[i]
+    fun undo(): Either<UndoListException.NoMoreUndo, Unit> {
+        return when (val _undoList = undoList.undo()) {
+            is Either.Left -> _undoList
+            is Either.Right -> {
+                undoList = _undoList.value
+                grid.forEachIndexed { i, cell ->
+                    cell.userShade = undoList[i]
+                }
+                Either.Right(Unit)
+            }
         }
     }
 
-    fun redo() {
-        undoList = undoList.redo()
-        grid.forEachIndexed { i, cell ->
-            cell.userShade = undoList[i]
+    fun redo(): Either<UndoListException.NoMoreRedo, Unit> {
+        return when (val _undoList = undoList.redo()) {
+            is Either.Left -> _undoList
+            is Either.Right -> {
+                undoList = _undoList.value
+                grid.forEachIndexed { i, cell ->
+                    cell.userShade = undoList[i]
+                }
+                Either.Right(Unit)
+            }
         }
     }
 
@@ -185,9 +194,10 @@ data class GridData(
 
     /** Gets the width and height of the longest row and column */
     val longestRowNum =
-        rowNums.fold(0,
-            { acc, i -> (i.size + if (i.count { it >= 10 } > 0) 1 else 0).coerceAtLeast(acc) })
-    val longestColNum = colNums.fold(0, { acc, i -> i.size.coerceAtLeast(acc) })
+        rowNums.fold(
+            0
+        ) { acc, i -> (i.size + if (i.count { it >= 10 } > 0) 1 else 0).coerceAtLeast(acc) }
+    val longestColNum = colNums.fold(0) { acc, i -> i.size.coerceAtLeast(acc) }
 }
 
 /* this is like a linked list */
@@ -200,14 +210,19 @@ data class UndoList(
     operator fun get(i: Int) = data[i]
 
     fun undo() = when (prev) {
-        is Some -> UndoList(prev.value.prev, prev.value.data, Some(this))
-        is None -> this
+        is Some -> Either.Right(UndoList(prev.value.prev, prev.value.data, Some(this)))
+        is None -> Either.Left(UndoListException.NoMoreUndo)
     }
 
     fun redo() = when (next) {
-        is Some -> UndoList(Some(this), next.value.data, next.value.next)
-        is None -> this
+        is Some -> Either.Right(UndoList(Some(this), next.value.data, next.value.next))
+        is None -> Either.Left(UndoListException.NoMoreRedo)
     }
 
     fun addToList(data: List<CellShade>) = UndoList(Some(this), data, none())
+}
+
+sealed class UndoListException {
+    object NoMoreRedo : UndoListException()
+    object NoMoreUndo : UndoListException()
 }
