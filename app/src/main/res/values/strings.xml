@@ -5,6 +5,7 @@
     <string name="play">play</string>
     <string name="height_x_width">%1$d x %2$d</string>
     <string name="level_complete">Level Complete\n\nTime Taken: %1$s</string>
+    <string name="level_complete_no_time">Level Complete</string>
     <string name="menu">Menu</string>
     <string name="reset">Reset</string>
     <string name="difficulty">Difficulty</string>

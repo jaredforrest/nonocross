@@ -68,6 +68,7 @@ class GameActivity : AppCompatActivity() {
     private lateinit var nonocrossGridView: GridView
 
     private var showTime by Delegates.notNull<Boolean>()
+    private var trackTime by Delegates.notNull<Boolean>()
 
     private val handler = Handler(Looper.getMainLooper())
 
@@ -82,6 +83,7 @@ class GameActivity : AppCompatActivity() {
         resetZoom()
 
         val preferences = PreferenceManager.getDefaultSharedPreferences(this)
+        trackTime = preferences.getBoolean("tracktimer", true)
         showTime = preferences.getBoolean("timer", false)
         val saveWarn = preferences.getBoolean("saveWarn", true)
 
@@ -108,9 +110,11 @@ class GameActivity : AppCompatActivity() {
             LD.toggleCross = (checkedId == R.id.toggleFill) xor isChecked
         }
 
-        runTimer()
-        if (showTime) {
-            timeView.visibility = VISIBLE
+        if (trackTime) {
+            runTimer()
+            if (showTime) {
+                timeView.visibility = VISIBLE
+            }
         }
 
         undo.setOnClickListener {
@@ -335,7 +339,7 @@ class GameActivity : AppCompatActivity() {
         val invisibility = if (enable) INVISIBLE else VISIBLE
         toggleGroup.visibility = invisibility
         gameView.visibility = invisibility
-        if (showTime) {
+        if (trackTime && showTime) {
             timeView.visibility = invisibility
         }
         undo.visibility = invisibility

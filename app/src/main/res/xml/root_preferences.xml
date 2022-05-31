@@ -43,6 +43,14 @@
             app:useSimpleSummaryProvider="true" />
 
         <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="tracktimer"
+            app:summary="Time how long it takes to complete a level"
+            app:title="Track Time"
+            app:useSimpleSummaryProvider="true" />
+
+        <SwitchPreferenceCompat
+            app:dependency="tracktimer"
             app:key="timer"
             app:summary="Show a timer at the top of level"
             app:title="Show Timer"

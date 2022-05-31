@@ -249,11 +249,14 @@ class GridView @JvmOverloads constructor(
         AlertDialog.Builder(context)
             .setTitle(R.string.finished)
             .setMessage(
-                context.getString(
-                    R.string.level_complete,
-                    secondsToTime(LD.userGrid.timeElapsed)
-//                secondsToTime((context as GameActivity).seconds)
-                )
+                if (LD.userGrid.timeElapsed > 0u) {
+                    context.getString(
+                        R.string.level_complete,
+                        secondsToTime(LD.userGrid.timeElapsed)
+                    )
+                } else {
+                    context.getString(R.string.level_complete_no_time)
+                }
             )
             .setPositiveButton(
                 R.string.menu
