@@ -31,6 +31,7 @@ import com.picross.nonocross.GameActivity.TransformDetails.mScaleFactor
 import com.picross.nonocross.GameActivity.TransformDetails.mTransX
 import com.picross.nonocross.GameActivity.TransformDetails.mTransY
 import com.picross.nonocross.R
+import com.picross.nonocross.util.CellShade
 import com.picross.nonocross.util.click
 import com.picross.nonocross.util.secondsToTime
 import com.picross.nonocross.util.usergrid.UserGridView
@@ -44,11 +45,8 @@ class GridView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    //    var mScaleFactor = 1f
     private var oldScaleFactor = 1f
 
-    //    private var mTransX = 0f
-//    var mTransY = 0f
     private var oldTransX = 0f
     private var oldTransY = 0f
 
@@ -151,6 +149,12 @@ class GridView @JvmOverloads constructor(
         PreferenceManager.getDefaultSharedPreferences(context)
     private val fatFingerMode = sharedPreferences.getBoolean("fatFinger", true)
     private val vibrateOn = sharedPreferences.getBoolean("vibrate", false)
+    private val fillMode = when (val fM = sharedPreferences.getString("fillMode", "Default")) {
+        "Lax" -> 0
+        "Default" -> 1
+        "Strict" -> 2
+        else -> 1
+    }
 
     private var isFirstCell = true
     private var isLongPress = false
@@ -160,6 +164,9 @@ class GridView @JvmOverloads constructor(
 
     /** Active cell */
     private lateinit var aC: CellView
+
+    /** First cell's initial user shading */
+    private lateinit var initShade: CellShade
 
     /** If true fill horizontally, false fill vertically */
     private var fillHori = true
@@ -180,6 +187,7 @@ class GridView @JvmOverloads constructor(
 
             aC = it
             fC = it
+            initShade = it.cell.userShade
             isFirstCell = true
             isLongPress = false
         })
@@ -206,13 +214,17 @@ class GridView @JvmOverloads constructor(
                             fC.row,
                             fC.col,
                             it.col,
-                            fC.cell.userShade
+                            fC.cell.userShade,
+                            initShade,
+                            fillMode
                         )
                         else nonoGrid.userGrid.copyColInRange(
                             fC.col,
                             fC.row,
                             it.row,
-                            fC.cell.userShade
+                            fC.cell.userShade,
+                            initShade,
+                            fillMode
                         )
                     }
                     invalidate()

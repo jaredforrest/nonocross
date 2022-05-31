@@ -48,6 +48,13 @@
             app:title="Show Timer"
             app:useSimpleSummaryProvider="true" />
 
+        <DropDownPreference
+            app:entries="@array/fill_mode_entries"
+            app:entryValues="@array/fill_mode_entries"
+            app:key="fillMode"
+            app:title="Overwrite Mode"
+            app:useSimpleSummaryProvider="true" />
+
     </PreferenceCategory>
 
     <!--PreferenceCategory app:title="@string/beta_features">

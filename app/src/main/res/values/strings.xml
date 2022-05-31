@@ -41,6 +41,11 @@
     <string name="min">Min</string>
     <string name="allow_unrated">Allow Unrated</string>
     <string name="number_of_grid_cells">Number of Grid Cells</string>
+    <string-array name="fill_mode_entries">
+        <item>Default</item>
+        <item>Lax</item>
+        <item>Strict</item>
+    </string-array>
     <string-array name="dark_mode_entries">
         <item>System</item>
         <item>Dark</item>

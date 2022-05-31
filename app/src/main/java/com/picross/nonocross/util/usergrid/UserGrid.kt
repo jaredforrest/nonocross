@@ -151,10 +151,10 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
     }
 
     private fun fillRow(row: Int, cellShade: CellShade) =
-        copyRowInRange(row, 0, width - 1, cellShade)
+        copyInSlice(row * width until (row + 1) * width, cellShade, CellShade.EMPTY, 0)
 
-    private fun fillCol(row: Int, cellShade: CellShade) =
-        copyColInRange(row, 0, height - 1, cellShade)
+    private fun fillCol(col: Int, cellShade: CellShade) =
+        copyInSlice(col until col + height * width step width, cellShade, CellShade.EMPTY, 0)
 
     /** Fills a the cells in a Row from initCol to currCol (both inclusive) */
     fun copyRowInRange(
@@ -162,21 +162,13 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
         initCol: Int,
         currCol: Int,
         cellShade: CellShade,
-        overwriteCell: Boolean = true
+        initShade: CellShade,
+        mode: Int
     ) {
         val startCol = initCol.coerceAtMost(currCol)
         val endCol = initCol.coerceAtLeast(currCol)
-        if (!overwriteCell || cellShade == CellShade.EMPTY) {
-            grid.forEachIndexed { i, cell ->
-                cell.userShade =
-                    if (i in (startCol + row * width..endCol + row * width)) cellShade else cell.userShade
-            }
-        } else {
-            grid.forEachIndexed { i, cell ->
-                cell.userShade =
-                    if ((cell.userShade == CellShade.EMPTY) && i in (startCol + row * width..endCol + row * width)) cellShade else cell.userShade
-            }
-        }
+        val slice = startCol + row * width..endCol + row * width
+        copyInSlice(slice, cellShade, initShade, mode)
     }
 
     /** Fills a the cells in a column from initRow to currRow (both inclusive) */
@@ -185,20 +177,34 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
         initRow: Int,
         currRow: Int,
         cellShade: CellShade,
-        overwriteCell: Boolean = true
+        initShade: CellShade,
+        mode: Int
     ) {
         val startRow = initRow.coerceAtMost(currRow)
         val endRow = initRow.coerceAtLeast(currRow)
-        if (!overwriteCell || cellShade == CellShade.EMPTY) {
-            grid.forEachIndexed { i, cell ->
+        val slice = col + startRow * width..col + endRow * width step width
+        copyInSlice(slice, cellShade, initShade, mode)
+    }
+
+    /** Mode 0 overwrite all, Mode 1 classic, Mode 2 never overwrite */
+    private fun copyInSlice(
+        slice: Iterable<Int>,
+        cellShade: CellShade,
+        initShade: CellShade,
+        mode: Int
+    ) {
+        if (mode == 0 || (mode == 1 && cellShade == CellShade.EMPTY)) {
+            grid.slice(slice).forEach { cell ->
+                cell.userShade = cellShade
+            }
+        } else if (mode == 1) {
+            grid.slice(slice).forEach { cell ->
                 cell.userShade =
-                    if (i in (col + startRow * width..col + endRow * width step width)) cellShade else cell.userShade
+                    if (cell.userShade == CellShade.EMPTY) cellShade else cell.userShade
             }
         } else {
-            grid.forEachIndexed { i, cell ->
-                cell.userShade =
-                    if ((cell.userShade == CellShade.EMPTY) && i in (col + startRow * width..col + endRow * width step width)) cellShade else cell.userShade
-
+            grid.slice(slice).forEach { cell ->
+                cell.userShade = if (cell.userShade == initShade) cellShade else cell.userShade
             }
         }
     }
