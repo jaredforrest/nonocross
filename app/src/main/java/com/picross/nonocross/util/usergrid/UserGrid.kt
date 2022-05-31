@@ -33,7 +33,9 @@ class UserGridView(val userGrid: UserGrid, cellLength: Int, context: Context) {
 /** UserGrid is a 1D list encoding a 2D array (the grid) */
 class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArrayOf()) {
 
-    var timeElapsed = 0
+    var complete: Boolean
+    var paused = false
+    var timeElapsed: UInt
 
     private val height = gridData.height
     val width = gridData.width
@@ -42,11 +44,35 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
     var grid: List<Cell>
 
     init {
+        /** No save */
         if (initialState.isEmpty()) {
+            timeElapsed = 0u
+            complete = false
             grid = List(size) { Cell() }
             autoFill()
+            /** Version 2 saves */
+        } else if (initialState.last() == (2).toByte()) {
+            timeElapsed = initialState[1].toUByte().toUInt() * 256u +
+                    initialState[2].toUByte().toUInt() * 256u * 256u +
+                    initialState[3].toUByte().toUInt() * 256u +
+                    initialState[4].toUByte().toUInt()
+            complete = when (initialState[5]) {
+                0b1.toByte() -> true
+                0b0.toByte() -> false
+                else -> false
+            }
+            grid = initialState.drop(6).dropLast(1).map {
+                when (it) {
+                    0b00.toByte() -> Cell()
+                    0b01.toByte() -> Cell(CellShade.SHADE)
+                    0b10.toByte() -> Cell(CellShade.CROSS)
+                    else -> Cell()
+                }
+            }
+            /** Version 1 saves */
         } else {
-            timeElapsed = initialState.first().toInt()
+            timeElapsed = initialState.first().toUInt()
+            complete = false
             grid = initialState.drop(1).map {
                 when (it) {
                     0x00.toByte() -> Cell()
@@ -62,14 +88,23 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
 
     private val data get() = grid.map { it.userShade }
 
-    val currentState
-        get() = listOf(timeElapsed.toByte()) + grid.map {
-            when (it.userShade) {
-                CellShade.EMPTY -> 0x00.toByte()
-                CellShade.SHADE -> 0x01.toByte()
-                CellShade.CROSS -> 0x10.toByte()
-            }
-        }
+    val currentState: List<Byte>
+        /** First Byte is version code (2), 2-5 time elapsed, 6 whether complete, 7+ the grid, last byte also version code */
+        get() = listOf(
+            2,
+            (timeElapsed / 256u / 256u / 256u).toUByte().toByte(),
+            (timeElapsed / 256u / 256u).toUByte().toByte(),
+            (timeElapsed / 256u).toUByte().toByte(),
+            timeElapsed.toUByte().toByte()
+        ) +
+                (if (complete) 0b1 else 0b0) +
+                grid.map {
+                    when (it.userShade) {
+                        CellShade.EMPTY -> 0b00.toByte()
+                        CellShade.SHADE -> 0b01.toByte()
+                        CellShade.CROSS -> 0b10.toByte()
+                    }
+                } + listOf(2)
 
     val rowNums get() = data.getRowNums(gridData.height)
     val colNums get() = data.getColNums(gridData.height)
@@ -178,6 +213,12 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
             else if (colNum == listOf(height)) fillCol(i, CellShade.SHADE)
         }
     }
+
+    fun countSecond() {
+        if (!(paused or complete))
+            timeElapsed++
+    }
+
 }
 
 data class GridData(

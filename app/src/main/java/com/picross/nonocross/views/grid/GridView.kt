@@ -233,6 +233,7 @@ class GridView @JvmOverloads constructor(
 
     /** When the game is finished show a dialog */
     private fun gameDoneAlert() {
+        LD.userGrid.complete = true
         AlertDialog.Builder(context)
             .setTitle(R.string.finished)
             .setMessage(

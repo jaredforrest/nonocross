@@ -18,7 +18,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.View
-import android.view.View.*
+import android.view.View.INVISIBLE
+import android.view.View.VISIBLE
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
@@ -44,6 +45,7 @@ import com.picross.nonocross.views.grid.GridView
 import com.picross.nonocross.views.grid.RowNumsView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlin.properties.Delegates
 import com.picross.nonocross.LevelDetails as LD
 
 
@@ -65,22 +67,21 @@ class GameActivity : AppCompatActivity() {
     private lateinit var rowNumsView: RowNumsView
     private lateinit var nonocrossGridView: GridView
 
+    private var showTime by Delegates.notNull<Boolean>()
+
     private val handler = Handler(Looper.getMainLooper())
 
     private var qrFirstClick = true
 
-    private var running = true
     private lateinit var countSecond: Runnable
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
 
-        resetZoom()
-
-        runTimer()
-
         val preferences = PreferenceManager.getDefaultSharedPreferences(this)
+        showTime = preferences.getBoolean("timer", false)
+        val saveWarn = preferences.getBoolean("saveWarn", true)
 
         toggleGroup = findViewById(R.id.toggleGroup)
         undo = findViewById(R.id.undo)
@@ -105,11 +106,11 @@ class GameActivity : AppCompatActivity() {
             LD.toggleCross = (checkedId == R.id.toggleFill) xor isChecked
         }
 
-        if (preferences.getBoolean("timer", false)) {
+        runTimer()
+        if (showTime) {
             timeView.visibility = VISIBLE
         }
 
-        //progress.visibility = INVISIBLE
         undo.setOnClickListener {
             when (nonocrossGridView.undo()) {
                 is Either.Right -> {
@@ -145,8 +146,6 @@ class GameActivity : AppCompatActivity() {
             colNumsView.invalidate()
         }
 
-
-
         if (LD.levelType is LevelType.Random) {
             refresh.visibility = VISIBLE
             refresh.setOnClickListener {
@@ -155,7 +154,7 @@ class GameActivity : AppCompatActivity() {
         }
 
         if (LD.levelType is LevelType.Random || LD.levelType is LevelType.Online) {
-            if (preferences.getBoolean("saveWarn", true)) {
+            if (saveWarn) {
                 onBackPressedDispatcher.addCallback(this, confirmExit)
             }
             save.visibility = VISIBLE
@@ -164,18 +163,15 @@ class GameActivity : AppCompatActivity() {
             }
         }
 
+        onBackPressedDispatcher.addCallback(this, leaveQR)
 
         qrCode.setOnClickListener {
             if (qrCodeImage.visibility == VISIBLE) {
+                leaveQR.isEnabled = false
                 qrCode.setImageResource(R.drawable.ic_baseline_qr_code_32)
-
-                undo.visibility = VISIBLE
-                redo.visibility = VISIBLE
-                nonocrossGridView.visibility = VISIBLE
-                rowNumsView.visibility = VISIBLE
-                colNumsView.visibility = VISIBLE
+                hideShowBoard(false)
                 qrCodeImage.visibility = INVISIBLE
-                running = true
+                LD.userGrid.paused = false
             } else {
                 if (qrFirstClick) {
                     val content = LD.gridData.toNonFile()
@@ -191,16 +187,11 @@ class GameActivity : AppCompatActivity() {
                     qrCodeImage.setImageBitmap(bitmap)
                     qrFirstClick = false
                 }
-
                 qrCode.setImageResource(R.drawable.ic_baseline_grid_on_32)
-                running = false
+                LD.userGrid.paused = true
+                hideShowBoard(true)
                 qrCodeImage.visibility = VISIBLE
-                undo.visibility = INVISIBLE
-                redo.visibility = INVISIBLE
-                nonocrossGridView.visibility = INVISIBLE
-                rowNumsView.visibility = INVISIBLE
-                colNumsView.visibility = INVISIBLE
-
+                leaveQR.isEnabled = true
             }
         }
 
@@ -208,13 +199,18 @@ class GameActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        running = false
+        LD.userGrid.paused = true
         saveCurrentGridState(this, LD.levelType, LD.userGrid)
     }
 
     override fun onResume() {
         super.onResume()
-        running = true
+        LD.userGrid.paused = false
+    }
+
+    override fun onStop() {
+        handler.removeCallbacks(countSecond)
+        super.onStop()
     }
 
     fun resetGrid() {
@@ -223,7 +219,9 @@ class GameActivity : AppCompatActivity() {
                 if (PreferenceManager.getDefaultSharedPreferences(this)
                         .getBoolean("uniqueLevel", true)
                 ) {
-                    loadingMenu(true)
+                    hideShowBoard(true)
+                    qrCode.visibility = INVISIBLE
+                    progress.visibility = VISIBLE
 
                     val randomJob = lifecycleScope.launch(Dispatchers.IO) {
                         //myThread = Thread(LD.myThreadGroup, {
@@ -240,19 +238,12 @@ class GameActivity : AppCompatActivity() {
                                 colNumsView.invalidate()
                                 resetZoom()
                                 nonocrossGridView.invalidate()
-                                LD.userGrid.timeElapsed = 0
+                                LD.userGrid.timeElapsed = 0u
                                 handler.removeCallbacks(countSecond)
                                 handler.post(countSecond)
-                                timeView.visibility = VISIBLE
-                                gameView.visibility = VISIBLE
-                                undo.visibility = VISIBLE
-                                redo.visibility = VISIBLE
-                                clear.visibility = VISIBLE
-                                save.visibility = VISIBLE
-                                refresh.visibility = VISIBLE
+                                hideShowBoard(false)
                                 qrFirstClick = true
                                 qrCode.visibility = VISIBLE
-                                toggleGroup.visibility = VISIBLE
                                 progress.visibility = INVISIBLE
                             }
                             is None -> TODO()
@@ -261,7 +252,9 @@ class GameActivity : AppCompatActivity() {
                     val cancelLoad = object : OnBackPressedCallback(true) {
                         override fun handleOnBackPressed() {
                             randomJob.cancel()
-                            loadingMenu(false)
+                            hideShowBoard(false)
+                            qrCode.visibility = VISIBLE
+                            progress.visibility = INVISIBLE
                             this.isEnabled = false
                         }
                     }
@@ -286,7 +279,7 @@ class GameActivity : AppCompatActivity() {
                 rowNumsView.invalidate()
                 colNumsView.invalidate()
                 nonocrossGridView.invalidate()
-                LD.userGrid.timeElapsed = 0
+                LD.userGrid.timeElapsed = 0u
                 handler.removeCallbacks(countSecond)
                 handler.post(countSecond)
             }
@@ -311,7 +304,7 @@ class GameActivity : AppCompatActivity() {
                 val fileName = if (temp == "") "Untitled Level" else temp
                 addCustomLevel(fileName, fileContents, this, LD.userGrid)
                 if (andQuit) finish()
-                save.visibility = GONE
+                save.visibility = INVISIBLE
                 LD.levelType = LevelType.Random(Some(fileName))
                 confirmExit.isEnabled = false
             }
@@ -322,35 +315,33 @@ class GameActivity : AppCompatActivity() {
 
     private fun runTimer() {
 
+        timeView.text = secondsToTime(LD.userGrid.timeElapsed)
+
         countSecond = Runnable {
 
+            LD.userGrid.countSecond()
             timeView.text = secondsToTime(LD.userGrid.timeElapsed)
-
-            if (running) {
-                LD.userGrid.timeElapsed++
-            }
 
             handler.postDelayed(countSecond, 1000)
         }
 
-        handler.post(countSecond)
+        handler.postDelayed(countSecond, 1000)
     }
 
-    /** Enable gives a choice whether to show or hide the loading menu */
-    private fun loadingMenu(enable: Boolean) {
-        val visibility = if (enable) VISIBLE else INVISIBLE
+    /** Enable gives a choice whether to show or hide most of the ui elements */
+    private fun hideShowBoard(enable: Boolean) {
         val invisibility = if (enable) INVISIBLE else VISIBLE
         toggleGroup.visibility = invisibility
-        qrCode.visibility = invisibility
-        qrCodeImage.visibility = invisibility
         gameView.visibility = invisibility
-        timeView.visibility = invisibility
+        if (showTime) {
+            timeView.visibility = invisibility
+        }
         undo.visibility = invisibility
         redo.visibility = invisibility
         clear.visibility = invisibility
         save.visibility = invisibility
         refresh.visibility = invisibility
-        progress.visibility = visibility
+        zoom.visibility = invisibility
     }
 
     private fun resetZoom() {
@@ -384,6 +375,16 @@ class GameActivity : AppCompatActivity() {
                 .setNegativeButton(android.R.string.cancel, null)
                 .create()
                 .show()
+        }
+    }
+
+    private val leaveQR = object : OnBackPressedCallback(false) {
+        override fun handleOnBackPressed() {
+            qrCode.setImageResource(R.drawable.ic_baseline_qr_code_32)
+            hideShowBoard(false)
+            qrCodeImage.visibility = INVISIBLE
+            LD.userGrid.paused = false
+            isEnabled = false
         }
     }
 }

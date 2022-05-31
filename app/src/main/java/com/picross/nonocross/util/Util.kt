@@ -37,7 +37,6 @@ import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.util.*
 import kotlin.random.Random
 
 /* wHD is triple(width, height, difficulty) */
@@ -182,19 +181,16 @@ fun errorToast(context: Context, err: String) {
     Toast.makeText(context, "Error: $err ", Toast.LENGTH_LONG).show()
 }
 
-fun secondsToTime(seconds: Int): String {
-    val hours: Int = seconds / 3600
-    val minutes: Int = seconds % 3600 / 60
-    val secs: Int = seconds % 60
+fun secondsToTime(seconds: UInt): String {
+    val hours: UInt = seconds / 3600u
+    val minutes: UInt = seconds % 3600u / 60u
+    val secs: UInt = seconds % 60u
 
     // Format the seconds into hours, minutes,
     // and seconds.
-    return java.lang.String
-        .format(
-            Locale.getDefault(),
-            "%d:%02d:%02d", hours,
-            minutes, secs
-        )
+    return ("$hours:" + if (minutes < 10u) "0$minutes:" else {
+        "$minutes:"
+    } + if (secs < 10u) "0$secs" else "$secs")
 }
 
 fun vibrate(context: Context) {

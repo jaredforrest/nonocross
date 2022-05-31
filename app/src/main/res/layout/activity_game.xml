@@ -76,14 +76,13 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         android:id="@+id/save"
         android:layout_width="51dp"
         android:layout_height="32dp"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:drawablePadding="5sp"
         android:text=""
+        android:visibility="invisible"
         android:textSize="55sp"
-        android:visibility="gone"
         app:drawableTopCompat="@drawable/ic_baseline_save_32"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/qrcode"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
@@ -91,10 +90,11 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         android:layout_width="51dp"
         android:layout_height="32dp"
         android:layout_marginTop="16dp"
+        android:contentDescription="QR code icon"
         android:drawablePadding="5sp"
         android:text=""
         android:textSize="55sp"
-        app:layout_constraintStart_toEndOf="@+id/save"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_baseline_qr_code_32" />
 
@@ -175,6 +175,7 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
 
     <TextView
         android:id="@+id/time_view"
+        android:visibility="gone"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
