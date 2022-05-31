@@ -24,7 +24,7 @@
     <PreferenceCategory app:title="@string/appearance_header">
 
         <DropDownPreference
-            app:key="darkMode"
+            app:key="darkMode2"
             app:entries="@array/dark_mode_entries"
             app:entryValues="@array/dark_mode_entries"
             app:title="Dark Mode"
