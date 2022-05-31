@@ -70,7 +70,6 @@ class RowNumsView(context: Context) : View(context) {
                 oldTransX = transX
             }
             MotionEvent.ACTION_MOVE -> {
-//                Log.d("pekferp", "$curBot")
                 transX = max(
                     min(
                         event.getX(0) - initX + oldTransX,
@@ -102,7 +101,7 @@ class RowNumsView(context: Context) : View(context) {
             var counter = 0
             LD.gridData.rowNums.forEachIndexed { i, col ->
                 col.reversed().forEachIndexed { j, num ->
-                    if (//LD.isReady() &&
+                    if (
                         LD.userGrid.rowNums.getOrElse(i) { listOf(0) }.reversed()
                             .getOrElse(j) { 0 } == num
                     ) {
@@ -117,6 +116,8 @@ class RowNumsView(context: Context) : View(context) {
         } else {
             blackTemplate.forEach { canvas.drawPicture(it) }
         }
+
+        canvas.restore()
     }
 
     private fun getTemplate(width: Int, height: Int, paint: Paint): MutableList<Picture> {

@@ -79,6 +79,8 @@ class GameActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_game)
 
+        resetZoom()
+
         val preferences = PreferenceManager.getDefaultSharedPreferences(this)
         showTime = preferences.getBoolean("timer", false)
         val saveWarn = preferences.getBoolean("saveWarn", true)

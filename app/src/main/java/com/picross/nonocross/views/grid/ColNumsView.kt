@@ -71,7 +71,6 @@ class ColNumsView(context: Context) : View(context) {
                 oldTransY = transY
             }
             MotionEvent.ACTION_MOVE -> {
-//               Log.d("pekferp", "$curBot")
                 transY = max(
                     min(
                         event.getY(0) - initY + oldTransY,
@@ -103,7 +102,7 @@ class ColNumsView(context: Context) : View(context) {
             var counter = 0
             LD.gridData.colNums.forEachIndexed { i, col ->
                 col.reversed().forEachIndexed { j, num ->
-                    if (blueHints && //LD.isReady() &&
+                    if (
                         LD.userGrid.colNums.getOrElse(i) { listOf(0) }.reversed()
                             .getOrElse(j) { 0 } == num
                     ) {
@@ -122,10 +121,8 @@ class ColNumsView(context: Context) : View(context) {
         canvas.restore()
     }
 
-
     private fun getTemplate(width: Int, height: Int, paint: Paint): MutableList<Picture> {
         val pictures: MutableList<Picture> = mutableListOf()
-
         var curBot: Float
 
         var curLeft: Float = cellLength.toFloat() * 0.5F
