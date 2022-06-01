@@ -1,0 +1,5 @@
+- Fix Level 4
+- Change Style of toggle switch
+- Add prompt asking to save when quitting level
+- Fix timer and add ability to disable
+- Other minor bug fixes
