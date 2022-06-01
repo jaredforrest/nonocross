@@ -2,6 +2,7 @@ package com.picross.nonocross.util.usergrid
 
 import android.content.Context
 import arrow.core.*
+import com.picross.nonocross.LevelDetails
 import com.picross.nonocross.util.Cell
 import com.picross.nonocross.util.CellShade
 import com.picross.nonocross.views.grid.CellView
@@ -31,7 +32,7 @@ class UserGridView(val userGrid: UserGrid, cellLength: Int, context: Context) {
 }
 
 /** UserGrid is a 1D list encoding a 2D array (the grid) */
-class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArrayOf()) {
+class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArrayOf(), private val autoFill: Boolean = true) {
 
     var complete: Boolean
     var paused = false
@@ -49,7 +50,9 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
             timeElapsed = 0u
             complete = false
             grid = List(size) { Cell() }
-            autoFill()
+            if(autoFill) {
+                autoFill()
+            }
             /** Version 2 saves */
         } else if (initialState.last() == (2).toByte()) {
             timeElapsed = initialState[1].toUByte().toUInt() * 256u +
@@ -115,7 +118,9 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
 
     fun clear() {
         grid.forEach { it.userShade = CellShade.EMPTY }
-        autoFill()
+        if(autoFill) {
+            autoFill()
+        }
     }
 
     private var undoList = UndoList(none(), data, none())

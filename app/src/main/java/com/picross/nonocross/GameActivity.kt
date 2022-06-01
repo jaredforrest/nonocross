@@ -292,7 +292,7 @@ class GameActivity : AppCompatActivity() {
         }
     }
 
-    private fun saveGrid(andQuit: Boolean = false) {
+    fun saveGrid(andQuit: Boolean = false) {
         val fileContents = LD.gridData.toNonFile()
 
         // dialog message view

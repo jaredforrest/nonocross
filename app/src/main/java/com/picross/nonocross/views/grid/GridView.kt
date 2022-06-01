@@ -26,10 +26,12 @@ import android.view.View
 import android.view.ViewConfiguration
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
+import arrow.core.None
 import com.picross.nonocross.GameActivity
 import com.picross.nonocross.GameActivity.TransformDetails.mScaleFactor
 import com.picross.nonocross.GameActivity.TransformDetails.mTransX
 import com.picross.nonocross.GameActivity.TransformDetails.mTransY
+import com.picross.nonocross.LevelType
 import com.picross.nonocross.R
 import com.picross.nonocross.util.CellShade
 import com.picross.nonocross.util.click
@@ -246,7 +248,7 @@ class GridView @JvmOverloads constructor(
     /** When the game is finished show a dialog */
     private fun gameDoneAlert() {
         LD.userGrid.complete = true
-        AlertDialog.Builder(context)
+        val done = AlertDialog.Builder(context)
             .setTitle(R.string.finished)
             .setMessage(
                 if (LD.userGrid.timeElapsed > 0u) {
@@ -269,7 +271,13 @@ class GridView @JvmOverloads constructor(
                 if (vibrateOn) vibrate(context)
                 resetGrid()
             }
-            .show()
+
+        val lT = LD.levelType
+        if(lT is LevelType.Random && lT.levelName is None) done.setNeutralButton("Save"){ _, _ ->
+            (context as? GameActivity)?.saveGrid(false)
+        }
+
+        done.show()
     }
 
     private fun resetGrid() {

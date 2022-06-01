@@ -93,7 +93,9 @@ class CustomLevelSelectAdapter(
 //                    if (isCustom) LevelType.Custom(levelName) else
                 LevelDetails.gridData = level
                 LevelDetails.userGrid =
-                    UserGrid(LevelDetails.gridData, startGame.openSave(levelName))
+                    UserGrid(LevelDetails.gridData, startGame.openSave(levelName),
+                        LevelDetails.levelType !is LevelType.Default
+                    )
                 startGame.startGame()
             }
             if (startGame.levels is MutableList) {
