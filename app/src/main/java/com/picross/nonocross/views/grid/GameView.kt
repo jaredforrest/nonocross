@@ -15,6 +15,7 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross.views.grid
 
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ViewGroup
@@ -27,8 +28,12 @@ class GameView @JvmOverloads constructor(
 
     init {
         val colNumsView = ColNumsView(context)
+        if(Build.VERSION.SDK_INT < 23)
+            colNumsView.setLayerType(LAYER_TYPE_SOFTWARE, null)
         this.addView(colNumsView, 0)
         val rowNumsView = RowNumsView(context)
+        if(Build.VERSION.SDK_INT < 23)
+            rowNumsView.setLayerType(LAYER_TYPE_SOFTWARE,null)
         this.addView(rowNumsView, 1)
         val nonocrossGridView = GridView(context, attrs, defStyleAttr)
         nonocrossGridView.setBackgroundColor(0xFF444444.toInt())
