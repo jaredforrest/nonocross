@@ -71,7 +71,7 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
             }
             /** Version 1 saves */
         } else {
-            timeElapsed = initialState.first().toUInt()
+            timeElapsed = 0u//There is an overflow bug initialState.first().toUInt()
             complete = false
             grid = initialState.drop(1).map {
                 when (it) {

@@ -18,6 +18,12 @@
             app:key="uniqueLevel"
             app:summary="Generate random levels with only one solution.\nNote: Larger levels may have significant loading times"
             app:title="Unique Levels" />
+        <DropDownPreference
+            app:entries="@array/fill_mode_entries"
+            app:entryValues="@array/fill_mode_entries"
+            app:key="fillMode"
+            app:title="Overwrite Cell Mode"
+            app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
 
@@ -54,13 +60,6 @@
             app:key="timer"
             app:summary="Show a timer at the top of level"
             app:title="Show Timer"
-            app:useSimpleSummaryProvider="true" />
-
-        <DropDownPreference
-            app:entries="@array/fill_mode_entries"
-            app:entryValues="@array/fill_mode_entries"
-            app:key="fillMode"
-            app:title="Overwrite Mode"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>

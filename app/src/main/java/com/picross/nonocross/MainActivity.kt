@@ -289,13 +289,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val darkMode = preferences.getString("darkMode2", "System")
-        //val override = preferences.getBoolean("overrideSystemTheme", false)
-        //val darkMode = preferences.getBoolean("darkMode", false)
-        if (darkMode != "System") {
-            if (darkMode == "Dark") {
+        when (preferences.getString("darkMode2", "System")) {
+            "System" -> {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            }
+            "Dark" -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            } else {
+            }
+            else -> {
                 AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
             }
         }
