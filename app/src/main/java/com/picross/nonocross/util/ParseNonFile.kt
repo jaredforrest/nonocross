@@ -145,10 +145,10 @@ fun getFileNameFromUri(uri: Uri, context: Context): String =
         if (nameIndex != null) cursor.getString(nameIndex) else ""
     }.substringBeforeLast('.')
 
-fun checkValidFile(uri: Uri, context: Context) = context.contentResolver.openAssetFileDescriptor(
+fun checkValidFile(uri: Uri, context: Context) = (context.contentResolver.openAssetFileDescriptor(
     uri,
     "r"
-)?.length ?: 10001 < 10000 /* 10kb max file size */
+)?.length ?: 10001) < 10000 /* 10kb max file size */
 
 sealed class FileError {
 /*    object FileReadError : FileError()
