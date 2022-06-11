@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <string name="app_name">Nonocross</string>
+    <string name="default_levels">Vorgegebene Levels</string>
+    <string name="random_grid">Zufällige Levels</string>
+    <string name="play">Spielen</string>
+    <string name="height_x_width">%1$d x %2$d</string>
+    <string name="level_complete">Level beendet\n\nBenötigte Zeit: %1$s</string>
+    <string name="level_complete_no_time">Level beendet</string>
+    <string name="menu">Menü</string>
+    <string name="reset">Zurücksetzen</string>
+    <string name="difficulty">Schwierigkeit</string>
+    <string name="rows">Reihen</string>
+    <string name="columns">Spalten</string>
+    <string name="grid_size">Gittergröße</string>
+    <string name="finished">Beendet</string>
+
+    <!-- Preferences -->
+    <string name="preferences">Einstellungen</string>
+    <string name="usability_header">Bedienbarkeit</string>
+    <string name="vibrate_title">Vibrieren</string>
+    <string name="fat_finger_title">Einzelne-Zeilen-Füllmodus</string>
+    <string name="fat_finger_summary">Einschalten falls es schwierig ist, einzelne Quadrate zu treffen</string>
+    <string name="vibrate_summary">Vibriere bei bestimmten Aktionen</string>
+    <string name="appearance_header">Erscheinungsbild</string>
+    <string name="show_blue_hints">Zeige blaue Hinweise</string>
+    <string name="import_level">Importiere Level</string>
+    <string name="custom_level">Gespeicherte Levels</string>
+    <string name="remove_level">entfernen</string>
+    <string name="level_name">Level-Name</string>
+    <string name="enter_level_name">Gib einen Namen für das Level an</string>
+    <string name="import_from_file">Importiere aus Datei</string>
+    <string name="import_from_qr">Importiere von QR-Code</string>
+    <string name="qr_code">QR-Code</string>
+    <string name="untitled_level">Level ohne Titel</string>
+    <string name="online">online</string>
+    <string-array name="fill_mode_entries">
+        <item>Standard</item>
+        <item>Lax</item>
+        <item>Strikt</item>
+    </string-array>
+    <string-array name="dark_mode_entries">
+        <item>System</item>
+        <item>Dunkel</item>
+        <item>Hell</item>
+    </string-array>
+
+</resources>
