@@ -77,21 +77,6 @@ fun getRandomGridPrefs(context: Context): Triple<Int, Int, Int> {
     return Triple(width, height, difficulty)
 }
 
-fun getOnlineGridPrefs(context: Context): OnlinePrefs {
-    val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-    return OnlinePrefs(
-        preferences.getInt("minCells", 0),
-        preferences.getInt("maxCells", 20),
-        preferences.getInt("minDiff", 4),
-        preferences.getInt("maxDiff", 20),
-        preferences.getBoolean("unratedDiff", true),
-        preferences.getInt("minQual", 4),
-        preferences.getInt("maxQual", 20),
-        preferences.getBoolean("unratedQual", true),
-        preferences.getString("apiKey", "") ?: "",
-    )
-}
-
 fun readTextFromUri(uri: Uri, context: Context): String {
     return try {
         context.contentResolver.openInputStream(uri)?.readBytes()?.let { String(it) } ?: ""
@@ -104,7 +89,7 @@ suspend fun openGridFile(
     context: Context,
     chosenLevelName: String,
     customLevel: Boolean
-): GridData {
+): Either<ParseError, GridData> {
     val text =
         if (customLevel) File(
             context.getDir("levels", Context.MODE_PRIVATE),
@@ -113,24 +98,30 @@ suspend fun openGridFile(
         else String(context.resources.assets.openNonBlocking("levels/$chosenLevelName").readBytes())
     Log.d("grid ios", text)
 
-    return when (val grid = parseNonFile(text)) {
-        is Either.Right -> grid.value
-        is Either.Left -> throw Exception(grid.value.toString())//Exception("Error parsing level", grid.value)//GridData(0, 0, listOf(), listOf())
-    }
+    return parseNonFile(text)
 }
 
-fun addCustomLevel(
-    filename: String,
+tailrec fun addCustomLevel(
+    _filename: String,
     fileContents: String,
     context: Context,
-    userGrid: UserGrid? = null
-) {
+    userGrid: UserGrid? = null,
+    copy: UInt = 0u
+): String {
+    val filename = if(_filename == "")
+        "Untitled Level"
+    else
+        _filename
+    if(File(context.getDir("levels", Context.MODE_PRIVATE), filename).isFile){
+        return addCustomLevel("$filename - copy",fileContents,context,userGrid,copy.inc())
+    }
     FileOutputStream(File(context.getDir("levels", Context.MODE_PRIVATE), filename)).use {
         it.write(fileContents.toByteArray())
     }
     if (userGrid != null) {
         saveCurrentGridState(context, LevelType.Custom(filename), userGrid)
     }
+    return filename
 }
 
 
@@ -167,13 +158,12 @@ suspend fun AssetManager.openNonBlocking(s: String) =
 
 // U is an error type/class
 fun <T, U> Either<T, U>.applyNotError(baseContext: Context, f: U.() -> Unit) {
-    Log.d("cooloio", "an ereorereaer")
     when (this) {
+        is Either.Right -> this.value.apply(f)
         is Either.Left -> errorToast(
             baseContext,
             this.value.toString()
-        )//Toast.makeText(baseContext,"Error: ${this.value} "/*$errorString" ${this.value.toString()}"*/, Toast.LENGTH_LONG).show()
-        is Either.Right -> f(this.value)
+        )
     }
 }
 
@@ -219,14 +209,3 @@ fun vibrate(context: Context) {
     }
 }
 
-data class OnlinePrefs(
-    val minSize: Int,
-    val maxSize: Int,
-    val minQuality: Int,
-    val maxQuality: Int,
-    val allowUnratedQual: Boolean,
-    val minDifficulty: Int,
-    val maxDifficulty: Int,
-    val allowUnratedDiff: Boolean,
-    val apiKey: String
-)

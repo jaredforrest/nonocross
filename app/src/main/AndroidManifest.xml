@@ -20,7 +20,6 @@
             android:label=".SettingsActivity" />
         <activity android:name=".LevelSelectActivity" />
         <activity android:name=".CustomLevelSelectActivity" />
-        <activity android:name=".OnlineLevelSelectActivity" />
         <activity android:name=".GameActivity" />
         <activity
             android:name=".MainActivity"

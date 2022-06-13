@@ -40,7 +40,7 @@ object LevelDetails {
     //val myThreadGroup = ThreadGroup("Native Thread Group")
 
     lateinit var levels: PersistentList<Pair<String, GridData>>
-    lateinit var customLevels: MutableList<Pair<String, GridData>>
+    lateinit var customLevels: PersistentList<Pair<String, GridData>>
 
 }
 

@@ -1,5 +1,5 @@
 /**
- * This Programm, which is solving Japan Croswords.
+ * This Program, which is solving Japan Crosswords.
  * author: Syromolotov Evgeniy.
  * email: zhesyr@sampo.ru.
  * License: GPL2. */

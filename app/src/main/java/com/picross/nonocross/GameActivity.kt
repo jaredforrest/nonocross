@@ -14,6 +14,7 @@ You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -27,6 +28,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import arrow.core.Either
@@ -189,7 +191,10 @@ class GameActivity : AppCompatActivity() {
                     val bitMatrix =
                         multiFormatWriter.encode(content, BarcodeFormat.QR_CODE, size, size)
                     val barcodeEncoder = BarcodeEncoder()
-                    val bitmap = barcodeEncoder.createBitmap(bitMatrix)
+                    val bitmap = when (this.resources.configuration.uiMode.and(Configuration.UI_MODE_NIGHT_MASK)) {
+                        Configuration.UI_MODE_NIGHT_YES -> invertBitmap(barcodeEncoder.createBitmap(bitMatrix))
+                        else -> barcodeEncoder.createBitmap(bitMatrix)
+                    }
                     qrCodeImage.setImageBitmap(bitmap)
                     qrFirstClick = false
                 }
@@ -236,6 +241,7 @@ class GameActivity : AppCompatActivity() {
                             is Some -> runOnUiThread {
                                 LD.gridData = temp.value
                                 LD.userGrid = UserGrid(LD.gridData)
+                                LD.levelType = LevelType.Random()
                                 nonocrossGridView.updateNonoGrid()
                                 gameView.refreshLayout()
                                 rowNumsView.refreshTemplates = true

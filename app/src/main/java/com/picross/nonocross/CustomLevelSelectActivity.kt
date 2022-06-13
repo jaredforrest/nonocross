@@ -27,8 +27,11 @@ import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import arrow.core.Either
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.zxing.integration.android.IntentIntegrator
+import com.google.zxing.client.android.Intents
+import com.journeyapps.barcodescanner.ScanContract
+import com.journeyapps.barcodescanner.ScanOptions
 import com.picross.nonocross.levelselect.CustomLevelSelectAdapter
 import com.picross.nonocross.util.*
 import kotlinx.coroutines.launch
@@ -42,8 +45,9 @@ class CustomLevelSelectActivity : AppCompatActivity(), CustomLevelSelectAdapter.
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
 
-    override val levels =
-        LevelDetails.customLevels //runBlocking { getAllCustomLevels(this@CustomLevelSelectActivity) }
+    override val isCustom = true
+
+    override var levels = LevelDetails.customLevels
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,10 +77,12 @@ class CustomLevelSelectActivity : AppCompatActivity(), CustomLevelSelectAdapter.
                             true
                         }
                         R.id.import_qr -> {
-                            val intentIntegrator = IntentIntegrator(this@CustomLevelSelectActivity)
-                            intentIntegrator.setPrompt("Scan a QR Code")
-                            intentIntegrator.setOrientationLocked(false)
-                            gettyQR.launch(intentIntegrator.createScanIntent())
+                            val scanOptions = ScanOptions()
+                            scanOptions.setPrompt("Scan a QR Code")
+                            scanOptions.setOrientationLocked(false)
+                            scanOptions.setDesiredBarcodeFormats("QR_CODE")
+                            scanOptions.addExtra(Intents.Scan.SCAN_TYPE, Intents.Scan.MIXED_SCAN)
+                            gettyQR.launch(scanOptions)
                             true
                         }
                         else -> false
@@ -121,25 +127,28 @@ class CustomLevelSelectActivity : AppCompatActivity(), CustomLevelSelectAdapter.
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
             lifecycleScope.launch {
                 if (uri != null) {
-                    checkValidNonFile(
-                        uri,
-                        this@CustomLevelSelectActivity
-                    ).applyNotError(baseContext) {
-                        addCustomLevel(first, second, this@CustomLevelSelectActivity)
-                        this@CustomLevelSelectActivity.recreate()
+                    getNonFile(uri, this@CustomLevelSelectActivity)
+                        .applyNotError(baseContext) {
+                            when(val gridData = parseNonFile(second)) {
+                                is Either.Right -> {
+                                    val filename = addCustomLevel(first, second, this@CustomLevelSelectActivity)
+                                    levels.add(Pair(filename, gridData.value))
+                                    viewAdapter.notifyItemInserted(levels.size - 1)
+                                }
+                                is Either.Left ->
+                                    errorToast(this@CustomLevelSelectActivity, gridData.value.toString())
+                        }
                     }
                 }
             }
         }
 
     private val gettyQR =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            lifecycleScope.launch {
-                val intentResult = IntentIntegrator.parseActivityResult(it.resultCode, it.data)
-                if (intentResult.contents == null) {
+        registerForActivityResult(ScanContract()) {
+                if (it.contents == null) {
                     Toast.makeText(baseContext, "Cancelled", Toast.LENGTH_SHORT).show()
                 } else {
-                    parseNonFile(intentResult.contents).applyNotError(baseContext) {
+                    parseNonFile(it.contents).applyNotError(baseContext) {
                         val constraintLayout =
                             layoutInflater.inflate(R.layout.edit_text_layout, null)
 
@@ -152,20 +161,19 @@ class CustomLevelSelectActivity : AppCompatActivity(), CustomLevelSelectAdapter.
                             ) { _, _ ->
                                 val temp =
                                     constraintLayout.findViewById<EditText>(R.id.edit_level_name).text.toString()
-                                val fileName = if (temp == "") "Untitled Level" else temp
-                                addCustomLevel(
-                                    fileName.substringBefore('\n'),
-                                    intentResult.contents,
+                                val filename = addCustomLevel(
+                                    temp.substringBefore('\n'),
+                                    it.contents,
                                     this@CustomLevelSelectActivity
                                 )
-                                this@CustomLevelSelectActivity.recreate()
+                                levels.add(Pair(filename,this))
+                                viewAdapter.notifyItemInserted(levels.size - 1)
                             }
                             .setNegativeButton(android.R.string.cancel, null)
                             .create()
                             .show()
                     }
                 }
-            }
         }
 }
 

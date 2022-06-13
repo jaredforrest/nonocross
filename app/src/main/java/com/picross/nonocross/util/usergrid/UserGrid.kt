@@ -1,32 +1,41 @@
 package com.picross.nonocross.util.usergrid
 
-import android.content.Context
+import android.graphics.Canvas
+import android.graphics.Paint
 import arrow.core.*
-import com.picross.nonocross.LevelDetails
-import com.picross.nonocross.util.Cell
 import com.picross.nonocross.util.CellShade
+import com.picross.nonocross.util.click
 import com.picross.nonocross.views.grid.CellView
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.toPersistentList
 import java.security.InvalidParameterException
 
-class UserGridView(val userGrid: UserGrid, cellLength: Int, context: Context) {
+class UserGridView(width: Int, height: Int, cellLength: Int, paintEmpty: Paint, paintShade: Paint, paintCross: Paint) {
 
-    operator fun get(i: Int, j: Int) = gridView[i * userGrid.width + j]
-
-    val gridView = userGrid.grid.mapIndexed { index, cell ->
+    private val gridView = List(width * height) {
         CellView(
-            cell,
-            index / userGrid.width,
-            index % userGrid.width,
+            it / width,
+            it % width,
             cellLength,
-            context
+            paintEmpty,
+            paintShade,
+            paintCross
         )
     }
 
-    fun getCellAt(x: Float, y: Float): Option<CellView> {
-        val cellView = this.gridView.find { cellView -> cellView.isInside(x, y) }
-        return if (cellView != null) {
+    /** Returns position of Cell which contains coordinate */
+    fun getCellAt(x: Float, y: Float): Option<Int> {
+        val cellView = this.gridView.indexOfFirst { cellView -> cellView.isInside(x, y) }
+        return if (cellView != -1) {
             Some(cellView)
         } else none()
+    }
+
+    fun isInside(index: Int, x: Float, y: Float) = gridView[index].isInside(x, y)
+
+    fun draw(userGrid: List<CellShade>, canvas: Canvas) {
+        for(i in gridView.indices)
+            gridView[i].draw(userGrid[i], canvas)
     }
 
 }
@@ -40,16 +49,19 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
 
     private val height = gridData.height
     val width = gridData.width
-    private val size = gridData.width * gridData.height
+    val size = gridData.width * gridData.height
 
-    var grid: List<Cell>
+    var grid: PersistentList<CellShade>
+
+    var rowNums : List<List<Int>>//get() = data.getRowNums(gridData.height)
+    var colNums : List<List<Int>>//get() = data.getColNums(gridData.height)
 
     init {
         /** No save */
         if (initialState.isEmpty()) {
             timeElapsed = 0u
             complete = false
-            grid = List(size) { Cell() }
+            grid = List(size) { CellShade.EMPTY }.toPersistentList()
             if(autoFill) {
                 autoFill()
             }
@@ -66,30 +78,28 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
             }
             grid = initialState.drop(6).dropLast(1).map {
                 when (it) {
-                    0b00.toByte() -> Cell()
-                    0b01.toByte() -> Cell(CellShade.SHADE)
-                    0b10.toByte() -> Cell(CellShade.CROSS)
-                    else -> Cell()
+                    0b00.toByte() -> CellShade.EMPTY
+                    0b01.toByte() -> CellShade.SHADE
+                    0b10.toByte() -> CellShade.CROSS
+                    else -> CellShade.EMPTY
                 }
-            }
+            }.toPersistentList()
             /** Version 1 saves */
         } else {
             timeElapsed = 0u//There is an overflow bug initialState.first().toUInt()
             complete = false
             grid = initialState.drop(1).map {
                 when (it) {
-                    0x00.toByte() -> Cell()
-                    0x01.toByte() -> Cell(CellShade.SHADE)
-                    0x10.toByte() -> Cell(CellShade.CROSS)
-                    else -> Cell(CellShade.EMPTY)
+                    0x00.toByte() -> CellShade.EMPTY
+                    0x01.toByte() -> CellShade.SHADE
+                    0x10.toByte() -> CellShade.CROSS
+                    else -> CellShade.EMPTY
                 }
-            }
+            }.toPersistentList()
         }
+        rowNums = grid.getRowNums(gridData.height)
+        colNums = grid.getColNums(gridData.height)
     }
-
-    operator fun get(i: Int, j: Int) = grid[i * width + j]
-
-    private val data get() = grid.map { it.userShade }
 
     val currentState: List<Byte>
         /** First Byte is version code (2), 2-5 time elapsed, 6 whether complete, 7+ the grid, last byte also version code */
@@ -102,37 +112,35 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
         ) +
                 (if (complete) 0b1 else 0b0) +
                 grid.map {
-                    when (it.userShade) {
+                    when (it) {
                         CellShade.EMPTY -> 0b00.toByte()
                         CellShade.SHADE -> 0b01.toByte()
                         CellShade.CROSS -> 0b10.toByte()
                     }
                 } + listOf(2)
 
-    val rowNums get() = data.getRowNums(gridData.height)
-    val colNums get() = data.getColNums(gridData.height)
-
     fun checkDone(): Boolean {
         return rowNums == gridData.rowNums && colNums == gridData.colNums
     }
 
     fun clear() {
-        grid.forEach { it.userShade = CellShade.EMPTY }
+        grid = List(size) { CellShade.EMPTY }.toPersistentList()
+/*        for(index in grid.indices)
+            grid[index] = CellShade.EMPTY*/
+
         if(autoFill) {
             autoFill()
         }
     }
 
-    private var undoList = UndoList(none(), data, none())
+    private var undoList = UndoList(none(), grid, none())
 
     fun undo(): Either<UndoListException.NoMoreUndo, Unit> {
         return when (val _undoList = undoList.undo()) {
             is Either.Left -> _undoList
             is Either.Right -> {
                 undoList = _undoList.value
-                grid.forEachIndexed { i, cell ->
-                    cell.userShade = undoList[i]
-                }
+                grid = undoList.data
                 Either.Right(Unit)
             }
         }
@@ -143,16 +151,14 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
             is Either.Left -> _undoList
             is Either.Right -> {
                 undoList = _undoList.value
-                grid.forEachIndexed { i, cell ->
-                    cell.userShade = undoList[i]
-                }
+                grid = undoList.data
                 Either.Right(Unit)
             }
         }
     }
 
     fun undoAddStack() {
-        undoList = undoList.addToList(data)
+        undoList = undoList.addToList(grid)
     }
 
     private fun fillRow(row: Int, cellShade: CellShade) =
@@ -161,15 +167,16 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
     private fun fillCol(col: Int, cellShade: CellShade) =
         copyInSlice(col until col + height * width step width, cellShade, CellShade.EMPTY, 0)
 
-    /** Fills a the cells in a Row from initCol to currCol (both inclusive) */
     fun copyRowInRange(
-        row: Int,
-        initCol: Int,
-        currCol: Int,
-        cellShade: CellShade,
+        index1: Int,
+        index2: Int,
         initShade: CellShade,
         mode: Int
     ) {
+        val initCol = index1 % width
+        val currCol = index2 % width
+        val row = index1 / width
+        val cellShade = grid[index1]
         val startCol = initCol.coerceAtMost(currCol)
         val endCol = initCol.coerceAtLeast(currCol)
         val slice = startCol + row * width..endCol + row * width
@@ -178,13 +185,15 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
 
     /** Fills a the cells in a column from initRow to currRow (both inclusive) */
     fun copyColInRange(
-        col: Int,
-        initRow: Int,
-        currRow: Int,
-        cellShade: CellShade,
+        index1: Int,
+        index2: Int,
         initShade: CellShade,
         mode: Int
     ) {
+        val initRow = index1 / width
+        val currRow = index2 / width
+        val col = index1 % width
+        val cellShade = grid[index1]
         val startRow = initRow.coerceAtMost(currRow)
         val endRow = initRow.coerceAtLeast(currRow)
         val slice = col + startRow * width..col + endRow * width step width
@@ -199,19 +208,20 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
         mode: Int
     ) {
         if (mode == 0 || (mode == 1 && cellShade == CellShade.EMPTY)) {
-            grid.slice(slice).forEach { cell ->
-                cell.userShade = cellShade
+            for(index in slice) {
+                grid = grid.set(index, cellShade)
             }
         } else if (mode == 1) {
-            grid.slice(slice).forEach { cell ->
-                cell.userShade =
-                    if (cell.userShade == CellShade.EMPTY) cellShade else cell.userShade
+            for(index in slice){
+                grid = grid.set(index, (if (grid[index] == CellShade.EMPTY) cellShade else grid[index]))
             }
         } else {
-            grid.slice(slice).forEach { cell ->
-                cell.userShade = if (cell.userShade == initShade) cellShade else cell.userShade
+            for(index in slice){
+                grid = grid.set(index, if (grid[index] == initShade) cellShade else grid[index])
             }
         }
+        rowNums = grid.getRowNums(gridData.height)
+        colNums = grid.getColNums(gridData.height)
     }
 
     private fun autoFill() {
@@ -225,10 +235,27 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
         }
     }
 
+    fun click(index: Int, toggleCross: Boolean) {
+        grid = grid.set(index,grid[index].click(toggleCross))
+        rowNums = grid.getRowNums(gridData.height)
+        colNums = grid.getColNums(gridData.height)
+    }
+
     fun countSecond() {
         if (!(paused or complete))
             timeElapsed++
     }
+
+    fun getShade(index: Int) = grid[index]
+
+    fun copyShade(fromIndex: Int, toIndex: Int) {
+        grid = grid.set(toIndex, grid[fromIndex])
+        rowNums = grid.getRowNums(gridData.height)
+        colNums = grid.getColNums(gridData.height)
+    }
+
+    fun sameRow(index1: Int, index2: Int) = (index1 / width == index2 / width)
+
 
 }
 
@@ -255,7 +282,7 @@ data class GridData(
 /* this is like a linked list */
 data class UndoList(
     val prev: Option<UndoList>,
-    val data: List<CellShade>,
+    val data: PersistentList<CellShade>,
     val next: Option<UndoList>
 ) {
 
@@ -271,7 +298,7 @@ data class UndoList(
         is None -> Either.Left(UndoListException.NoMoreRedo)
     }
 
-    fun addToList(data: List<CellShade>) = UndoList(Some(this), data, none())
+    fun addToList(data: PersistentList<CellShade>) = UndoList(Some(this), data, none())
 }
 
 sealed class UndoListException {

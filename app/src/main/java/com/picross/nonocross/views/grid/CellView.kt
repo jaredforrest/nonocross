@@ -14,20 +14,18 @@ You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross.views.grid
 
-import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import androidx.core.content.res.ResourcesCompat
-import com.picross.nonocross.R
-import com.picross.nonocross.util.Cell
 import com.picross.nonocross.util.CellShade
 
 class CellView(
-    val cell: Cell,
-    val row: Int,
-    val col: Int,
+//    var cellShade: CellShade,
+    row: Int,
+    col: Int,
     private val cellLength: Int,
-    context: Context
+    private val paintEmpty: Paint,
+    private val paintShade: Paint,
+    private val paintCross: Paint
 ) {
     private val top = (1 + row * (cellLength + 1) + 2 * (row / 5)).toFloat()
     private val left = (1 + col * (cellLength + 1) + 2 * (col / 5)).toFloat()
@@ -39,18 +37,9 @@ class CellView(
     private val rightBound = right + if (row % 5 == 4) 1.5 else 0.5
     private val bottomBound = bottom - if (col % 5 == 4 && col != 0) 1.5 else 0.5
 
-    private val colorCross = ResourcesCompat.getColor(context.resources, R.color.colorCross, null)
-    private val colorShade = ResourcesCompat.getColor(context.resources, R.color.colorShade, null)
-    private val colorEmpty = ResourcesCompat.getColor(context.resources, R.color.colorEmpty, null)
 
-    private val paintEmpty = Paint().apply { color = colorEmpty }
-    private val paintShade = Paint().apply { color = colorShade }
-    private val paintCross = Paint().apply { color = colorCross }
-        .apply { strokeCap = Paint.Cap.ROUND }
-        .apply { isAntiAlias = true }
-
-    fun draw(canvas: Canvas) {
-        when (cell.userShade) {
+    fun draw(cellShade: CellShade, canvas: Canvas) {
+        when (cellShade) {
             CellShade.EMPTY -> canvas.drawRect(left, top, right, bottom, paintEmpty)
             CellShade.SHADE -> canvas.drawRect(left, top, right, bottom, paintShade)
             CellShade.CROSS -> drawCross(canvas)

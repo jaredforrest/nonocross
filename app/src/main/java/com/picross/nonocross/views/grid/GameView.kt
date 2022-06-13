@@ -19,6 +19,7 @@ import android.os.Build
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ViewGroup
+import com.picross.nonocross.LevelDetails
 import com.picross.nonocross.LevelDetails.gridData
 
 
@@ -36,6 +37,8 @@ class GameView @JvmOverloads constructor(
             rowNumsView.setLayerType(LAYER_TYPE_SOFTWARE,null)
         this.addView(rowNumsView, 1)
         val nonocrossGridView = GridView(context, attrs, defStyleAttr)
+        if(Build.VERSION.SDK_INT < 23)
+            nonocrossGridView.setLayerType(LAYER_TYPE_SOFTWARE,null)
         nonocrossGridView.setBackgroundColor(0xFF444444.toInt())
         this.addView(nonocrossGridView, 2)
     }

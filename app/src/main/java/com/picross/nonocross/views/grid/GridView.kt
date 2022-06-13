@@ -20,11 +20,13 @@ import android.content.Context
 import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.graphics.Canvas
+import android.graphics.Paint
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import androidx.preference.PreferenceManager
 import arrow.core.None
 import com.picross.nonocross.GameActivity
@@ -34,7 +36,6 @@ import com.picross.nonocross.GameActivity.TransformDetails.mTransY
 import com.picross.nonocross.LevelType
 import com.picross.nonocross.R
 import com.picross.nonocross.util.CellShade
-import com.picross.nonocross.util.click
 import com.picross.nonocross.util.secondsToTime
 import com.picross.nonocross.util.usergrid.UserGridView
 import com.picross.nonocross.util.vibrate
@@ -46,6 +47,16 @@ import com.picross.nonocross.LevelDetails as LD
 class GridView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
+
+    private val colorCross = ResourcesCompat.getColor(context.resources, R.color.colorCross, null)
+    private val colorShade = ResourcesCompat.getColor(context.resources, R.color.colorShade, null)
+    private val colorEmpty = ResourcesCompat.getColor(context.resources, R.color.colorEmpty, null)
+
+    private val paintEmpty = Paint().apply { color = colorEmpty }
+    private val paintShade = Paint().apply { color = colorShade }
+    private val paintCross = Paint().apply { color = colorCross }
+        .apply { strokeCap = Paint.Cap.ROUND }
+        .apply { isAntiAlias = true }
 
     private var oldScaleFactor = 1f
 
@@ -68,9 +79,7 @@ class GridView @JvmOverloads constructor(
     @SuppressLint("DrawAllocation")
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        nonoGrid = UserGridView(LD.userGrid, cellLength, context)
-        fC = nonoGrid[0, 0]
-        aC = nonoGrid[0, 0]
+        nonoGrid = UserGridView(LD.gridData.width, LD.gridData.height, cellLength, paintEmpty, paintShade, paintCross)
         mWidth = width.toFloat()
         midpoint = (width / 2).toFloat()
         //mHeight = height
@@ -81,7 +90,7 @@ class GridView @JvmOverloads constructor(
         canvas.save()
         canvas.translate(mTransX, mTransY)
         canvas.scale(mScaleFactor, mScaleFactor)
-        nonoGrid.gridView.forEach { it.draw(canvas) }
+        nonoGrid.draw(LD.userGrid.grid, canvas)
         canvas.restore()
     }
 
@@ -162,10 +171,10 @@ class GridView @JvmOverloads constructor(
     private var isLongPress = false
 
     /** First cell */
-    private lateinit var fC: CellView
+    private var fC = 0
 
     /** Active cell */
-    private lateinit var aC: CellView
+    private var aC = 0
 
     /** First cell's initial user shading */
     private lateinit var initShade: CellShade
@@ -174,7 +183,7 @@ class GridView @JvmOverloads constructor(
     private var fillHori = true
 
     private var mLongPressed = Runnable {
-        fC.cell.userShade = fC.cell.userShade.click(LD.toggleCross)
+        LD.userGrid.click(fC, LD.toggleCross)
         invalidate()
         isLongPress = true
         if (vibrateOn) vibrate(context)
@@ -189,7 +198,7 @@ class GridView @JvmOverloads constructor(
 
             aC = it
             fC = it
-            initShade = it.cell.userShade
+            initShade = LD.userGrid.getShade(it)
             isFirstCell = true
             isLongPress = false
         })
@@ -197,37 +206,23 @@ class GridView @JvmOverloads constructor(
 
     private fun startFill(x: Float, y: Float) {
         // Only run if current cell has moved
-        if (!aC.isInside((x - mTransX) / mScaleFactor, (y - mTransY) / mScaleFactor)) {
+        if (!nonoGrid.isInside(aC, (x - mTransX) / mScaleFactor, (y - mTransY) / mScaleFactor)) {
             if (isFirstCell) {
                 isFirstCell = false
                 handler.removeCallbacks(mLongPressed)
-                if (!isLongPress) fC.cell.userShade = fC.cell.userShade.click(!LD.toggleCross)
+                if (!isLongPress) LD.userGrid.click(fC, !LD.toggleCross)
                 invalidate()
 
                 nonoGrid.getCellAt((x - mTransX) / mScaleFactor, (y - mTransY) / mScaleFactor)
-                    .fold({}, { fillHori = (it.row == fC.row) })
+                    .fold({}, { fillHori = (LD.userGrid.sameRow(it, fC)) })
             }
             nonoGrid.getCellAt((x - mTransX) / mScaleFactor, (y - mTransY) / mScaleFactor)
                 .fold({}, {
                     if (!fatFingerMode) {
-                        it.cell.userShade = fC.cell.userShade
+                        LD.userGrid.copyShade(fC,it)
                     } else {
-                        if (fillHori) nonoGrid.userGrid.copyRowInRange(
-                            fC.row,
-                            fC.col,
-                            it.col,
-                            fC.cell.userShade,
-                            initShade,
-                            fillMode
-                        )
-                        else nonoGrid.userGrid.copyColInRange(
-                            fC.col,
-                            fC.row,
-                            it.row,
-                            fC.cell.userShade,
-                            initShade,
-                            fillMode
-                        )
+                        if (fillHori) LD.userGrid.copyRowInRange(fC, it, initShade, fillMode)
+                        else LD.userGrid.copyColInRange(fC, it, initShade, fillMode)
                     }
                     invalidate()
                     aC = it
@@ -238,11 +233,11 @@ class GridView @JvmOverloads constructor(
     private fun endFill() {
         handler.removeCallbacks(mLongPressed)
         if (isFirstCell and !isLongPress) {
-            fC.cell.userShade = fC.cell.userShade.click(!LD.toggleCross)
+            LD.userGrid.click(fC, !LD.toggleCross)
             invalidate()
         }
-        nonoGrid.userGrid.undoAddStack()
-        if (nonoGrid.userGrid.checkDone()) gameDoneAlert()
+        LD.userGrid.undoAddStack()
+        if (LD.userGrid.checkDone()) gameDoneAlert()
     }
 
     /** When the game is finished show a dialog */
@@ -284,18 +279,18 @@ class GridView @JvmOverloads constructor(
         (context as GameActivity).resetGrid()
     }
 
-    fun undo() = nonoGrid.userGrid.undo()
+    fun undo() = LD.userGrid.undo()
 
-    fun redo() = nonoGrid.userGrid.redo()
+    fun redo() = LD.userGrid.redo()
 
     fun clear() {
-        nonoGrid.userGrid.clear()
-        nonoGrid.userGrid.undoAddStack()
+        LD.userGrid.clear()
+        LD.userGrid.undoAddStack()
         invalidate()
     }
 
     fun updateNonoGrid() {
-        nonoGrid = UserGridView(LD.userGrid, cellLength, context)
+        nonoGrid = UserGridView(LD.gridData.width, LD.gridData.height, cellLength, paintEmpty, paintShade, paintCross)
     }
 
 }

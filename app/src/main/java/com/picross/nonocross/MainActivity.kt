@@ -14,10 +14,6 @@ You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross
 
-//import io.ktor.client.*
-//import io.ktor.client.features.*
-//import io.ktor.client.features.logging.*
-//import io.ktor.utils.io.errors.*
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
@@ -32,16 +28,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
+import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
-import com.picross.nonocross.util.getRandomGridPrefs
-import com.picross.nonocross.util.newRandomGrid
-import com.picross.nonocross.util.newUniqueRandomGrid
-import com.picross.nonocross.util.openGridFile
+import com.picross.nonocross.util.*
+import com.picross.nonocross.util.usergrid.GridData
 import com.picross.nonocross.util.usergrid.UserGrid
 import com.picross.nonocross.util.usergrid.toGridData
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.plus
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.io.File
@@ -54,7 +49,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var levelSelectButton: View
     private lateinit var preferencesButton: View
     private lateinit var savedLevelSelect: View
-    //private lateinit var onlineButton: View
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,12 +65,19 @@ class MainActivity : AppCompatActivity() {
     /** Called when the user taps the Start Level button */
     private fun openLevelSelect() {
         lifecycleScope.launch(Dispatchers.IO) {
-            val levelNames = resources.assets.list("levels")?.toList()?.toPersistentList()
-                ?: persistentListOf<String>()
 
-            LevelDetails.levels = levelNames.map { levelName ->
-                Pair(levelName, openGridFile(this@MainActivity, levelName, false))
-            }.toPersistentList()
+            val levelNames = persistentListOf<String>() + (resources.assets.list("levels")?.toList() ?: persistentListOf())
+
+            LevelDetails.levels = persistentListOf<Pair<String,GridData>>() + levelNames.map { levelName ->
+                when(val gridData = openGridFile(this@MainActivity,levelName,false)){
+                    is Either.Left -> {
+                        runOnUiThread { errorToast(this@MainActivity, gridData.value.toString()) }
+                        return@launch
+                    }
+                    is Either.Right ->
+                        Pair(levelName, gridData.value)
+                }
+            }
 
             val intent = Intent(this@MainActivity, LevelSelectActivity::class.java)
             startActivity(intent)
@@ -86,126 +87,24 @@ class MainActivity : AppCompatActivity() {
     /** Called when the user taps the Custom Level button */
     private fun openCustomLevel() {
         lifecycleScope.launch(Dispatchers.IO) {
-            val levelNames = getDir("levels", Context.MODE_PRIVATE).listFiles()?.map { it.name }
-                ?.toMutableList() ?: mutableListOf()
 
-            LevelDetails.customLevels = levelNames.map { levelName ->
-                Pair(levelName, openGridFile(this@MainActivity, levelName, true))
-            }.toMutableList()
+            val levelNames = persistentListOf<String>() + (getDir("levels", Context.MODE_PRIVATE).listFiles()?.map { it.name } ?: persistentListOf())
+
+            LevelDetails.customLevels = persistentListOf<Pair<String, GridData>>() + levelNames.map { levelName ->
+                when(val gridData = openGridFile(this@MainActivity,levelName,true)){
+                    is Either.Left -> {
+                        runOnUiThread { errorToast(this@MainActivity, gridData.value.toString()) }
+                        return@launch
+                    }
+                    is Either.Right ->
+                        Pair(levelName, gridData.value)
+                }
+            }
 
             val intent = Intent(this@MainActivity, CustomLevelSelectActivity::class.java)
             startActivity(intent)
         }
     }
-
-    /** Called when the user taps the Online button */
-    /*private fun openOnlineLevel() {
-        val inflater = this@MainActivity.layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialogue_online_grid, null)
-        val minEdit = dialogView.findViewById<Spinner>(R.id.minGridCellSpinner)
-        val maxEdit = dialogView.findViewById<Spinner>(R.id.maxGridCellSpinner)
-        val diff = dialogView.findViewById<RangeSlider>(R.id.difficulty_slider)
-        val unratedDiff = dialogView.findViewById<CheckBox>(R.id.difficultyCheckBox)
-        val qual = dialogView.findViewById<RangeSlider>(R.id.quality_slider)
-        val unratedQual = dialogView.findViewById<CheckBox>(R.id.qualityCheckBox)
-        ArrayAdapter.createFromResource(
-            this,
-            R.array.grid_size_array,
-            android.R.layout.simple_spinner_item
-        ).also { adapter ->
-            // Specify the layout to use when the list of choices appears
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            // Apply the adapter to the spinner
-            minEdit.adapter = adapter
-            maxEdit.adapter = adapter
-        }
-        minEdit.setSelection(
-            preferences.getInt(
-                "minCells",
-                0
-            )
-        )//.setText( preferences.getInt("minCells", 0).toString() )
-        maxEdit.setSelection(preferences.getInt("maxCells", 20))
-        //maxEdit.setText( preferences.getInt("minCells", 100_000).toString() )
-        diff.setLabelFormatter { (it / 4).toString() }
-        diff.values = listOf(
-            preferences.getInt("minDiff", 4).toFloat(),
-            preferences.getInt("maxDiff", 20).toFloat()
-        )
-        unratedDiff.isChecked = preferences.getBoolean("unratedDiff", true)
-        qual.setLabelFormatter { (it / 4).toString() }
-        qual.values = listOf(
-            preferences.getInt("minQual", 4).toFloat(),
-            preferences.getInt("maxQual", 20).toFloat()
-        )
-        unratedQual.isChecked = preferences.getBoolean("unratedQual", true)
-
-        AlertDialog.Builder(this@MainActivity)
-            .setTitle(R.string.grid_options)
-            .setView(dialogView)
-            .setPositiveButton(
-                android.R.string.ok
-            ) { _, _ ->
-                val editor = preferences.edit()
-                editor.putInt("minCells", minEdit.selectedItemPosition)
-                editor.putInt("maxCells", maxEdit.selectedItemPosition)
-                editor.putInt("minDiff", diff.values[0].toInt())
-                editor.putInt("maxDiff", diff.values[1].toInt())
-                editor.putBoolean("unratedDiff", unratedDiff.isChecked)
-                editor.putInt("minQual", qual.values[0].toInt())
-                editor.putInt("maxQual", qual.values[1].toInt())
-                editor.putBoolean("unratedQual", unratedQual.isChecked)
-                editor.apply()
-
-                loadingMenu(true)
-
-                val onlineJob = lifecycleScope.launch(Dispatchers.IO) {
-
-                    val rawLevels = getRandomWebPBNs(getOnlineGridPrefs(this@MainActivity))
-
-                    if (isActive) {
-                        when (rawLevels) {
-                            is Either.Right -> {
-                                if (rawLevels.value.isEmpty()) {
-                                    runOnUiThread {
-                                        errorToast(baseContext, "No levels found")
-                                        loadingMenu(false)
-                                    }
-                                } else {
-                                    LevelDetails.levels = getWebPBNsById(rawLevels.value)
-
-                                    val intent =
-                                        Intent(
-                                            this@MainActivity,
-                                            OnlineLevelSelectActivity::class.java
-                                        )
-                                    startActivity(intent)
-                                }
-                            }
-                            is Either.Left -> runOnUiThread {
-                                errorToast(baseContext, rawLevels.value)
-                                loadingMenu(false)
-                            }
-                        }
-                    }
-                }
-                onBackPressedDispatcher.addCallback(this@MainActivity) {
-                    if (findViewById<View>(R.id.indeterminateBar).visibility == VISIBLE) {
-                        onlineJob.cancel()
-                        loadingMenu(false)
-                        onBackPressedDispatcher.addCallback(this@MainActivity) { finish() }
-                    } else {
-                        finish()
-                    }
-                }
-            }
-            .setNegativeButton(
-                android.R.string.cancel
-            ) { _, _ -> }
-
-            .create()
-            .show()
-    }*/
 
     /** Called when the user taps the Random Level button */
     private fun openRandomLevel() {
@@ -244,8 +143,6 @@ class MainActivity : AppCompatActivity() {
                     loadingMenu(true)
 
                     val randomJob = lifecycleScope.launch(Dispatchers.IO) {
-                        /* Would prefer to use Kotlin coroutines but it causes stack overflow */
-                        //    myThread = Thread(LevelDetails.myThreadGroup, {
                         when (val temp =
                             newUniqueRandomGrid(getRandomGridPrefs(this@MainActivity))) {
                             is Some -> {
@@ -256,8 +153,6 @@ class MainActivity : AppCompatActivity() {
                             }
                             is None -> TODO()
                         }
-                        /*    }, "Native Thread", 1024L * 1024L)
-                            myThread?.start() */
                     }
                     onBackPressedDispatcher.addCallback(this@MainActivity) {
                         randomJob.cancel()
@@ -305,18 +200,11 @@ class MainActivity : AppCompatActivity() {
         levelSelectButton = findViewById(R.id.level_select)
         preferencesButton = findViewById(R.id.preferences)
         savedLevelSelect = findViewById(R.id.custom_level)
-        //onlineButton = findViewById(R.id.online)
-
-        //val showOnline = preferences.getBoolean("showOnline", false)
-        //if (showOnline) {
-        //    onlineButton.visibility = VISIBLE
-        //}
 
         randomLevelButton.setOnClickListener { openRandomLevel() }
         levelSelectButton.setOnClickListener { openLevelSelect() }
         preferencesButton.setOnClickListener { openPreferences() }
         savedLevelSelect.setOnClickListener { openCustomLevel() }
-        //onlineButton.setOnClickListener { openOnlineLevel() }
 
     }
 
@@ -328,7 +216,6 @@ class MainActivity : AppCompatActivity() {
         levelSelectButton.visibility = invisibility
         preferencesButton.visibility = invisibility
         savedLevelSelect.visibility = invisibility
-        //onlineButton.visibility = invisibility
         findViewById<View>(R.id.game_text).visibility = invisibility
         findViewById<View>(R.id.indeterminateBar).visibility = visibility
     }

@@ -58,7 +58,7 @@ class CustomLevelSelectAdapter(
         levelView.setPadding(20, 60, 20, 40)
 
         // Remove "remove level" button for default levels
-        if (startGame.levels is PersistentList) {
+        if (!startGame.isCustom) {
             (levelView as LinearLayout)[3].visibility = View.GONE
         }
         return MyViewHolder(levelView)
@@ -71,7 +71,8 @@ class CustomLevelSelectAdapter(
 
         fun levelType(levelName: String): LevelType
 
-        val levels: List<Pair<String, GridData>>
+        var levels: PersistentList<Pair<String, GridData>>
+        val isCustom : Boolean
 
     }
 
@@ -80,7 +81,6 @@ class CustomLevelSelectAdapter(
 
         runBlocking {
             val levelName = startGame.levels[position].first //levels[position]
-            //val level = openGridFile(context, levelName, isCustom)
             val level = startGame.levels[position].second //startGame.openGrid(levelName)
             holder.itemView.findViewById<TextView>(R.id.level_name).text = levelName
             holder.itemView.findViewById<TextView>(R.id.gridData).text = context.getString(
@@ -90,7 +90,6 @@ class CustomLevelSelectAdapter(
             )
             holder.itemView.findViewById<Button>(R.id.level_select).setOnClickListener {
                 LevelDetails.levelType = startGame.levelType(levelName)
-//                    if (isCustom) LevelType.Custom(levelName) else
                 LevelDetails.gridData = level
                 LevelDetails.userGrid =
                     UserGrid(LevelDetails.gridData, startGame.openSave(levelName),
@@ -98,10 +97,10 @@ class CustomLevelSelectAdapter(
                     )
                 startGame.startGame()
             }
-            if (startGame.levels is MutableList) {
+            if (startGame.isCustom) {
                 holder.itemView.findViewById<Button>(R.id.remove_level).setOnClickListener {
                     val pos = holder.bindingAdapterPosition
-                    (startGame.levels as MutableList<Pair<String, GridData>>).removeAt(pos)
+                    startGame.levels = startGame.levels.removeAt(pos)
                     startGame.removeLevel(levelName, pos)
                 }
             }

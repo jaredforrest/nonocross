@@ -32,7 +32,9 @@ class LevelSelectActivity : AppCompatActivity(), CustomLevelSelectAdapter.StartG
     private lateinit var viewAdapter: RecyclerView.Adapter<*>
     private lateinit var viewManager: RecyclerView.LayoutManager
 
-    override val levels = LevelDetails.levels
+    override val isCustom = false
+
+    override var levels = LevelDetails.levels
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

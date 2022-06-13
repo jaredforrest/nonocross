@@ -14,8 +14,6 @@ You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross.util
 
-class Cell(var userShade: CellShade = CellShade.EMPTY)
-
 enum class CellShade {
     CROSS,
     SHADE,
@@ -35,4 +33,3 @@ fun CellShade.click(invert: Boolean): CellShade {
         }
     }
 }
-
