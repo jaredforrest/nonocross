@@ -12,3 +12,7 @@ Currently there are very few pre-made levels, so I would recommend the random mo
 
 # License
 This program is Free Software: You can use, study share and improve it at your will. Specifically you can redistribute and/or modify it under the terms of the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.html) as published by the Free Software Foundation, version 3 of the License.
+
+# Donate
+
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/jaredtf)
