@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8" ?>
 <resources>
     <string name="app_name">Nonocross</string>
     <string name="default_levels">Default Levels</string>
@@ -12,7 +13,6 @@
     <string name="rows">Rows</string>
     <string name="columns">Columns</string>
     <string name="grid_size">Grid Size</string>
-    <!--string name="grid_options">Grid Options</string-->
     <string name="finished">Finished</string>
 
     <!-- Preferences -->
@@ -34,14 +34,6 @@
     <string name="qr_code">QR code</string>
     <string name="untitled_level">Untitled Level</string>
     <string name="online">online</string>
-    <!--string name="play_online_levels">Play Online Levels</string>
-    <string name="beta_features">Beta Features</string>
-    <string name="api_key">API Key</string>
-    <string name="quality">Quality</string>
-    <string name="max">Max</string>
-    <string name="min">Min</string>
-    <string name="allow_unrated">Allow Unrated</string>
-    <string name="number_of_grid_cells">Number of Grid Cells</string-->
     <string name="reset_complete">Unique Levels</string>
     <string name="unique_level">Reset Complete Levels</string>
     <string name="unique_level_summary">Generate random levels with only one solution.\nNote: Larger levels may have significant loading times</string>
@@ -63,33 +55,6 @@
         <item>System</item>
         <item>Dark</item>
         <item>Light</item>
-    </string-array>
-    <array name="initial_slider_values">
-        <item>4.0</item>
-        <item>20.0</item>
-    </array>
-    <string-array name="grid_size_array">
-        <item>0</item>
-        <item>25</item>
-        <item>100</item>
-        <item>225</item>
-        <item>400</item>
-        <item>625</item>
-        <item>900</item>
-        <item>1225</item>
-        <item>1600</item>
-        <item>2025</item>
-        <item>2500</item>
-        <item>3025</item>
-        <item>3600</item>
-        <item>4225</item>
-        <item>4900</item>
-        <item>5625</item>
-        <item>6400</item>
-        <item>7225</item>
-        <item>8100</item>
-        <item>9025</item>
-        <item>10000</item>
     </string-array>
 
 </resources>
