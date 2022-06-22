@@ -128,6 +128,16 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
         if(autoFill) {
             autoFill()
         }
+        undoAddStack()
+        rowNums = grid.getRowNums(gridData.height)
+        colNums = grid.getColNums(gridData.height)
+    }
+
+    fun superClear() {
+        clear()
+        undoList = UndoList(none(), grid, none())
+        timeElapsed = 0u
+        complete = false
     }
 
     private var undoList = UndoList(none(), grid, none())
@@ -138,6 +148,8 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
             is Either.Right -> {
                 undoList = _undoList.value
                 grid = undoList.data
+                rowNums = grid.getRowNums(gridData.height)
+                colNums = grid.getColNums(gridData.height)
                 Either.Right(Unit)
             }
         }
@@ -149,6 +161,8 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
             is Either.Right -> {
                 undoList = _undoList.value
                 grid = undoList.data
+                rowNums = grid.getRowNums(gridData.height)
+                colNums = grid.getColNums(gridData.height)
                 Either.Right(Unit)
             }
         }

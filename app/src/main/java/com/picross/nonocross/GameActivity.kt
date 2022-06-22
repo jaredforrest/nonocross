@@ -144,9 +144,21 @@ class GameActivity : AppCompatActivity() {
             qrCodeImage.visibility = INVISIBLE
             nonocrossGridView.clear()
             resetZoom()
+            nonocrossGridView.invalidate()
+            rowNumsView.invalidate()
+            colNumsView.invalidate()
+        }
+
+        clear.setOnLongClickListener {
+            qrCodeImage.visibility = INVISIBLE
+            stopTimer()
+            nonocrossGridView.superClear()
+            resetZoom()
+            nonocrossGridView.invalidate()
             rowNumsView.invalidate()
             colNumsView.invalidate()
             runTimer()
+            true
         }
 
         zoom.setOnClickListener {
