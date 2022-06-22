@@ -283,11 +283,9 @@ class GridView @JvmOverloads constructor(
 
     fun redo() = LD.userGrid.redo()
 
-    fun clear() {
-        LD.userGrid.clear()
-        LD.userGrid.undoAddStack()
-        invalidate()
-    }
+    fun clear() = LD.userGrid.clear()
+
+    fun superClear() = LD.userGrid.superClear()
 
     fun updateNonoGrid() {
         nonoGrid = UserGridView(LD.gridData.width, LD.gridData.height, cellLength, paintEmpty, paintShade, paintCross)

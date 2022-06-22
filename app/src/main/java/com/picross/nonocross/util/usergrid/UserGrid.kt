@@ -44,7 +44,6 @@ class UserGridView(width: Int, height: Int, cellLength: Int, paintEmpty: Paint, 
 class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArrayOf(), private val autoFill: Boolean = true) {
 
     var complete: Boolean
-    var paused = false
     var timeElapsed: UInt
 
     private val height = gridData.height
@@ -125,8 +124,6 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
 
     fun clear() {
         grid = List(size) { CellShade.EMPTY }.toPersistentList()
-/*        for(index in grid.indices)
-            grid[index] = CellShade.EMPTY*/
 
         if(autoFill) {
             autoFill()
@@ -242,7 +239,7 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
     }
 
     fun countSecond() {
-        if (!(paused or complete))
+        if (!(complete))
             timeElapsed++
     }
 

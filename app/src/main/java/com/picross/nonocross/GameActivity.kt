@@ -77,6 +77,7 @@ class GameActivity : AppCompatActivity() {
     private var qrFirstClick = true
 
     private lateinit var countSecond: Runnable
+    private var running = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -145,6 +146,7 @@ class GameActivity : AppCompatActivity() {
             resetZoom()
             rowNumsView.invalidate()
             colNumsView.invalidate()
+            runTimer()
         }
 
         zoom.setOnClickListener {
@@ -179,7 +181,7 @@ class GameActivity : AppCompatActivity() {
                 qrCode.setImageResource(R.drawable.ic_baseline_qr_code_32)
                 hideShowBoard(false)
                 qrCodeImage.visibility = INVISIBLE
-                LD.userGrid.paused = false
+                runTimer()
             } else {
                 if (qrFirstClick) {
                     val content = LD.gridData.toNonFile()
@@ -199,7 +201,7 @@ class GameActivity : AppCompatActivity() {
                     qrFirstClick = false
                 }
                 qrCode.setImageResource(R.drawable.ic_baseline_grid_on_32)
-                LD.userGrid.paused = true
+                stopTimer()
                 hideShowBoard(true)
                 qrCodeImage.visibility = VISIBLE
                 leaveQR.isEnabled = true
@@ -209,19 +211,14 @@ class GameActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
+        stopTimer()
         super.onPause()
-        LD.userGrid.paused = true
         saveCurrentGridState(this, LD.levelType, LD.userGrid)
     }
 
     override fun onResume() {
         super.onResume()
-        LD.userGrid.paused = false
-    }
-
-    override fun onStop() {
-        handler.removeCallbacks(countSecond)
-        super.onStop()
+            runTimer()
     }
 
     fun resetGrid() {
@@ -251,8 +248,8 @@ class GameActivity : AppCompatActivity() {
                                 resetZoom()
                                 nonocrossGridView.invalidate()
                                 LD.userGrid.timeElapsed = 0u
-                                handler.removeCallbacks(countSecond)
-                                handler.post(countSecond)
+                                stopTimer()
+                                runTimer()
                                 hideShowBoard(false)
                                 qrFirstClick = true
                                 qrCode.visibility = VISIBLE
@@ -291,9 +288,6 @@ class GameActivity : AppCompatActivity() {
                 rowNumsView.invalidate()
                 colNumsView.invalidate()
                 nonocrossGridView.invalidate()
-                LD.userGrid.timeElapsed = 0u
-                handler.removeCallbacks(countSecond)
-                handler.post(countSecond)
             }
         }
     }
@@ -327,17 +321,27 @@ class GameActivity : AppCompatActivity() {
 
     private fun runTimer() {
 
-        timeView.text = secondsToTime(LD.userGrid.timeElapsed)
-
-        countSecond = Runnable {
-
-            LD.userGrid.countSecond()
+        if(trackTime && !running) {
             timeView.text = secondsToTime(LD.userGrid.timeElapsed)
 
-            handler.postDelayed(countSecond, 1000)
-        }
+            countSecond = Runnable {
 
-        handler.postDelayed(countSecond, 1000)
+                LD.userGrid.countSecond()
+                timeView.text = secondsToTime(LD.userGrid.timeElapsed)
+
+                handler.postDelayed(countSecond, 1000)
+            }
+
+            handler.postDelayed(countSecond, 1000)
+            running = true
+        }
+    }
+
+    private fun stopTimer() {
+        if(running) {
+            handler.removeCallbacks(countSecond)
+            running = false
+        }
     }
 
     /** Enable gives a choice whether to show or hide most of the ui elements */
@@ -395,7 +399,7 @@ class GameActivity : AppCompatActivity() {
             qrCode.setImageResource(R.drawable.ic_baseline_qr_code_32)
             hideShowBoard(false)
             qrCodeImage.visibility = INVISIBLE
-            LD.userGrid.paused = false
+            runTimer()
             isEnabled = false
         }
     }
