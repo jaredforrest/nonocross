@@ -19,7 +19,7 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <!--androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
 
         android:layout_height="wrap_content"
@@ -70,9 +70,9 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
             app:layout_constraintTop_toBottomOf="@+id/textView" />
 
 
-        <!--(minSize: Int, maxSize:Int, minQuality: Int, maxQuality: Int, allowUnratedQual: Boolean, minDifficulty: Int, maxDifficulty: Int, allowUnratedDiff: Boolean-->
+        <!-(minSize: Int, maxSize:Int, minQuality: Int, maxQuality: Int, allowUnratedQual: Boolean, minDifficulty: Int, maxDifficulty: Int, allowUnratedDiff: Boolean-->
 
-        <com.google.android.material.slider.RangeSlider
+        <!--com.google.android.material.slider.RangeSlider
             android:id="@+id/difficulty_slider"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -164,5 +164,5 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
             app:layout_constraintTop_toTopOf="parent" />
 
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout-->
 </ScrollView>

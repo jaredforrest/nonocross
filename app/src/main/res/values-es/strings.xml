@@ -30,4 +30,6 @@
     <string name="qr_code">código QR</string>
     <string name="untitled_level">Nivel sin Título</string>
     <string name="level_complete">Nivel Completo\nTiempo Tomado: %1$s</string>
+    <string name="level_complete_no_time">Nivel Completo</string>
+    <string name="online">en línea</string>
 </resources>

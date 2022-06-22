@@ -22,7 +22,7 @@
             app:entries="@array/fill_mode_entries"
             app:entryValues="@array/fill_mode_entries"
             app:key="fillMode"
-            app:title="Overwrite Cell Mode"
+            app:title="@string/overwrite_cell_mode"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
@@ -33,7 +33,7 @@
             app:key="darkMode2"
             app:entries="@array/dark_mode_entries"
             app:entryValues="@array/dark_mode_entries"
-            app:title="Dark Mode"
+            app:title="@string/dark_mode"
             app:useSimpleSummaryProvider="true" />
 
         <SwitchPreferenceCompat
@@ -44,22 +44,22 @@
         <SwitchPreferenceCompat
             app:defaultValue="true"
             app:key="saveWarn"
-            app:summary="Show warning when leaving a level with unsaved progress"
-            app:title="Show Save Warning"
+            app:summary="@string/show_save_warning_summary"
+            app:title="@string/show_save_warning"
             app:useSimpleSummaryProvider="true" />
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
             app:key="tracktimer"
-            app:summary="Time how long it takes to complete a level"
-            app:title="Track Time"
+            app:summary="@string/track_time_summary"
+            app:title="@string/track_time"
             app:useSimpleSummaryProvider="true" />
 
         <SwitchPreferenceCompat
             app:dependency="tracktimer"
             app:key="timer"
-            app:summary="Show a timer at the top of level"
-            app:title="Show Timer"
+            app:summary="@string/show_timer_summary"
+            app:title="@string/show_timer"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>

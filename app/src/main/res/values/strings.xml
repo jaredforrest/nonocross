@@ -12,7 +12,7 @@
     <string name="rows">Rows</string>
     <string name="columns">Columns</string>
     <string name="grid_size">Grid Size</string>
-    <string name="grid_options">Grid Options</string>
+    <!--string name="grid_options">Grid Options</string-->
     <string name="finished">Finished</string>
 
     <!-- Preferences -->
@@ -34,14 +34,26 @@
     <string name="qr_code">QR code</string>
     <string name="untitled_level">Untitled Level</string>
     <string name="online">online</string>
-    <string name="play_online_levels">Play Online Levels</string>
+    <!--string name="play_online_levels">Play Online Levels</string>
     <string name="beta_features">Beta Features</string>
     <string name="api_key">API Key</string>
     <string name="quality">Quality</string>
     <string name="max">Max</string>
     <string name="min">Min</string>
     <string name="allow_unrated">Allow Unrated</string>
-    <string name="number_of_grid_cells">Number of Grid Cells</string>
+    <string name="number_of_grid_cells">Number of Grid Cells</string-->
+    <string name="reset_complete">Unique Levels</string>
+    <string name="unique_level">Reset Complete Levels</string>
+    <string name="unique_level_summary">Generate random levels with only one solution.\nNote: Larger levels may have significant loading times</string>
+    <string name="show_timer">Show Timer</string>
+    <string name="show_timer_summary">Show a timer at the top of level</string>
+    <string name="track_time">Track Time</string>
+    <string name="track_time_summary">Time how long it takes to complete a level</string>
+    <string name="reset_complete_summary">Reset a completed level when re-opening.</string>
+    <string name="overwrite_cell_mode">Overwrite Cell Mode</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="show_save_warning_summary">Show warning when leaving a level with unsaved progress</string>
+    <string name="show_save_warning">Show Save Warning</string>
     <string-array name="fill_mode_entries">
         <item>Default</item>
         <item>Lax</item>
