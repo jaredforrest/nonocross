@@ -16,8 +16,15 @@
         <SwitchPreferenceCompat
             app:defaultValue="true"
             app:key="uniqueLevel"
-            app:summary="Generate random levels with only one solution.\nNote: Larger levels may have significant loading times"
-            app:title="Unique Levels" />
+            app:summary="@string/unique_level_summary"
+            app:title="@string/unique_level" />
+
+        <SwitchPreferenceCompat
+            app:defaultValue="true"
+            app:key="resetComplete"
+            app:summary="@string/reset_complete_summary"
+            app:title="@string/reset_complete" />
+
         <DropDownPreference
             app:entries="@array/fill_mode_entries"
             app:entryValues="@array/fill_mode_entries"

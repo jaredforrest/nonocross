@@ -28,7 +28,6 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.app.AppCompatDelegate
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import arrow.core.Either
@@ -249,7 +248,7 @@ class GameActivity : AppCompatActivity() {
                             newUniqueRandomGrid(getRandomGridPrefs(this@GameActivity))) {
                             is Some -> runOnUiThread {
                                 LD.gridData = temp.value
-                                LD.userGrid = UserGrid(LD.gridData)
+                                LD.userGrid = UserGrid(LD.gridData, autoFill = true, resetComplete = PreferenceManager.getDefaultSharedPreferences(this@GameActivity).getBoolean("resetComplete", true))
                                 LD.levelType = LevelType.Random()
                                 nonocrossGridView.updateNonoGrid()
                                 gameView.refreshLayout()
@@ -286,7 +285,7 @@ class GameActivity : AppCompatActivity() {
                 } else {
                     val wHD = getRandomGridPrefs(this)
                     LD.gridData = newRandomGrid(wHD).toGridData(wHD.second)
-                    LD.userGrid = UserGrid(LD.gridData)
+                    LD.userGrid = UserGrid(LD.gridData, autoFill = true, resetComplete = PreferenceManager.getDefaultSharedPreferences(this@GameActivity).getBoolean("resetComplete", true))
                     nonocrossGridView.updateNonoGrid()
                     gameView.refreshLayout()
                     rowNumsView.invalidate()

@@ -147,7 +147,7 @@ class MainActivity : AppCompatActivity() {
                             newUniqueRandomGrid(getRandomGridPrefs(this@MainActivity))) {
                             is Some -> {
                                 LevelDetails.gridData = temp.value
-                                LevelDetails.userGrid = UserGrid(LevelDetails.gridData)
+                                LevelDetails.userGrid = UserGrid(LevelDetails.gridData, autoFill = true, resetComplete = preferences.getBoolean("resetComplete", true))
                                 val intent = Intent(this@MainActivity, GameActivity::class.java)
                                 startActivity(intent)
                             }
@@ -162,7 +162,7 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     val wHD = getRandomGridPrefs(this)
                     LevelDetails.gridData = newRandomGrid(wHD).toGridData(wHD.second)
-                    LevelDetails.userGrid = UserGrid(LevelDetails.gridData)
+                    LevelDetails.userGrid = UserGrid(LevelDetails.gridData, autoFill = true, resetComplete = preferences.getBoolean("resetComplete", true))
                     val intent = Intent(this, GameActivity::class.java)
                     startActivity(intent)
                 }

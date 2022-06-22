@@ -41,7 +41,7 @@ class UserGridView(width: Int, height: Int, cellLength: Int, paintEmpty: Paint, 
 }
 
 /** UserGrid is a 1D list encoding a 2D array (the grid) */
-class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArrayOf(), private val autoFill: Boolean = true) {
+class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArrayOf(), private val autoFill: Boolean,  resetComplete: Boolean) {
 
     var complete: Boolean
     var timeElapsed: UInt
@@ -75,14 +75,20 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
                 0b0.toByte() -> false
                 else -> false
             }
-            grid = initialState.drop(6).dropLast(1).map {
-                when (it) {
-                    0b00.toByte() -> CellShade.EMPTY
-                    0b01.toByte() -> CellShade.SHADE
-                    0b10.toByte() -> CellShade.CROSS
-                    else -> CellShade.EMPTY
-                }
-            }.toPersistentList()
+            if(resetComplete && complete) {
+                complete = false
+                grid = List(size) { CellShade.EMPTY }.toPersistentList()
+                timeElapsed = 0u
+            } else {
+                grid = initialState.drop(6).dropLast(1).map {
+                    when (it) {
+                        0b00.toByte() -> CellShade.EMPTY
+                        0b01.toByte() -> CellShade.SHADE
+                        0b10.toByte() -> CellShade.CROSS
+                        else -> CellShade.EMPTY
+                    }
+                }.toPersistentList()
+            }
             /** Version 1 saves */
         } else {
             timeElapsed = 0u//There is an overflow bug initialState.first().toUInt()
