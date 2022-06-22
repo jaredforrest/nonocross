@@ -10,8 +10,8 @@ android {
         minSdkVersion 21
         targetSdkVersion 32
         multiDexEnabled true
-        versionCode 8
-        versionName "1.3.2"
+        versionCode 9
+        versionName "1.3.3"
 
         vectorDrawables.useSupportLibrary true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -83,12 +83,12 @@ dependencies {
     implementation 'androidx.compose.ui:ui:1.1.1'
     implementation 'androidx.compose.material:material:1.1.1'
     // Do not update
-    implementation 'com.google.zxing:core:3.4.1'
-    implementation 'io.arrow-kt:arrow-core:0.13.2'
+    implementation 'com.google.zxing:core:3.5.0'
+    implementation 'io.arrow-kt:arrow-core:1.1.3-alpha.22'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     annotationProcessor 'androidx.room:room-compiler:2.4.2'
     coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.1.5'
-    implementation 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.4'
+    implementation 'org.jetbrains.kotlinx:kotlinx-collections-immutable:0.3.5'
 }
