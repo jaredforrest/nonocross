@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <string name="app_name">Nonocross</string>
+    <string name="default_levels">Livelli</string>
+    <string name="random_grid">Griglia casuale</string>
+    <string name="play">Gioca</string>
+    <string name="height_x_width">%1$d x %2$d</string>
+    <string name="level_complete">Livello completato\n\nTempo impiegato: %1$s</string>
+    <string name="level_complete_no_time">Livello completato</string>
+    <string name="menu">Menù</string>
+    <string name="reset">Ricomincia</string>
+    <string name="difficulty">Difficoltà</string>
+    <string name="rows">Righe</string>
+    <string name="columns">Colonne</string>
+    <string name="grid_size">Dimensione della griglia</string>
+    <string name="finished">Finito</string>
+
+    <!-- Preferenze -->
+    <string name="preferences">Preferenze</string>
+    <string name="usability_header">Usabilità</string>
+    <string name="vibrate_title">Vibrazione</string>
+    <string name="fat_finger_title">Modalità riempimento singola linea</string>
+    <string name="fat_finger_summary">Attiva se è difficile premere i singoli quadrati</string>
+    <string name="vibrate_summary">Vibra quando vengono compiute certe azioni</string>
+    <string name="appearance_header">Aspetto</string>
+    <string name="show_blue_hints">Mostra suggerimenti in blu</string>
+    <string name="import_level">Importa livello</string>
+    <string name="custom_level">Livelli salvati</string>
+    <string name="remove_level">Rimuovi</string>
+    <string name="level_name">Nome livello</string>
+    <string name="enter_level_name">Inserisci il nome del livello</string>
+    <string name="import_from_file">Importa da file</string>
+    <string name="import_from_qr">Importa da codice QR</string>
+    <string name="qr_code">Codice QR</string>
+    <string name="untitled_level">Livello senza nome</string>
+    <string name="online">Online</string>
+    <string name="reset_complete">Azzera livelli completati</string>
+    <string name="unique_level">Livelli unici</string>
+    <string name="unique_level_summary">Genera livelli casuali con una sola soluzione.\nNota: Griglie grosse possono richiedere un maggiore tempo di caricamento</string>
+    <string name="show_timer">Mostra il timer</string>
+    <string name="show_timer_summary">Mostra un timer nella parte alta della griglia</string>
+    <string name="track_time">Traccia il tempo</string>
+    <string name="track_time_summary">Tieni traccia di quanto ci si impiega a completare un livello</string>
+    <string name="reset_complete_summary">Azzera un livello completato quando viene riaperto.</string>
+    <string name="overwrite_cell_mode">Modalità sovrascrittura cella</string>
+    <string name="dark_mode">Tema scuro</string>
+    <string name="show_save_warning_summary">Mostra un avvertimento quando il livello viene abbandonato con progressi non salvati</string>
+    <string name="show_save_warning">Mostra avvertimento di salvataggio</string>
+    <string-array name="fill_mode_entries">
+        <item>Predefinito</item>
+        <item>Lasso</item>
+        <item>Stretto</item>
+    </string-array>
+    <string-array name="dark_mode_entries">
+        <item>Sistema</item>
+        <item>Scuro</item>
+        <item>Chiaro</item>
+    </string-array>
+
+</resources>
