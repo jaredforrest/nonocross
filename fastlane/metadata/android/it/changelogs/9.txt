@@ -1,0 +1,3 @@
+- Sistemato l'aspetto del menù principale
+- Sistemati i problemi dei consigli blu
+- Sistemati errori del timer
