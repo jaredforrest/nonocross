@@ -34,6 +34,18 @@
     <string name="qr_code">QR-Code</string>
     <string name="untitled_level">Level ohne Titel</string>
     <string name="online">online</string>
+    <string name="reset_complete">Setze beendete Level zurück</string>
+    <string name="unique_level">Einzigartige Level</string>
+    <string name="unique_level_summary">Erstelle zufällige Level mit nur einer Lösung\nHinweis: Größere Level haben längere Ladezeiten</string>
+    <string name="show_timer">Zeige Timer</string>
+    <string name="show_timer_summary">Zeige einen Timer überhalb der Level</string>
+    <string name="track_time">Zeit aufzeichnen</string>
+    <string name="track_time_summary">Zeichne auf, wie lange du für einen Level brauchst</string>
+    <string name="reset_complete_summary">Setze beendete Level zurück, wenn sie erneut geöffnet werden</string>
+    <string name="overwrite_cell_mode">Modus beim Zellen überschreiben</string>
+    <string name="dark_mode">Dunkles Thema</string>
+    <string name="show_save_warning_summary">Zeige Warnung, wenn ein Level mit ungespeichertem Fortschritt verlassen wird</string>
+    <string name="show_save_warning">Zeige Speichern-Warnung</string>
     <string-array name="fill_mode_entries">
         <item>Standard</item>
         <item>Lax</item>
