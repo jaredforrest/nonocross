@@ -1,0 +1,12 @@
+Cos'è Nonocross?
+
+Nonocross è un semplice gioco di puzzle di numeri. Il gioco è noto con altri nomi come Nonograms, Picross, Griddlers, Pic-a-Pix, Hanjie e molti altri.
+
+- Modalità
+Ci sono due modalità di gioco. Puoi esercitarti con delle griglie predefinite o puoi giocare con una griglia casualmente generata usando parametri scelti.
+
+- Come giocare
+Il gioco è relativamente semplice: il numero in ogni riga/colonna corrisponde al numero di celle colorate in quella riga/colonna. Perciò, '3 5' su una colonna significa che ci sono due blocchi, uno di 3 celle e uno di 5 celle in quella colonna le quali non si toccano. Una volta che hai una griglia di fronte sarà tutto più chiaro.
+
+- Note
+Nonogram è anche noto con altri nomi, tra cui Paint by Numbers, Griddlers, Pic-a-Pix, Picross, Picma, PrismaPixels, Pixel Puzzles, Crucipixel, Edel, FigurePic, Hanjie, HeroGlyphix, Illust-Logic, Japanese Crosswords, Japanese Puzzles, Kare Karala!, Logic Art, Logic Square, Logicolor, Logik-Puzzles, Logimage, Oekaki Logic, Oekaki-Mate, Paint Logic, Picture Logic, Tsunamii, Paint by Sudoku e Binary Coloring Books

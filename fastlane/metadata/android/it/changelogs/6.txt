@@ -1,0 +1,4 @@
+- Aggiungi puzzle unici casuali
+- Aggiunta possibilità di zoomare
+- Aggiunta possibilità di aggiungere file locali
+- Aggiunta possibilità di condividere griglie via codice QR

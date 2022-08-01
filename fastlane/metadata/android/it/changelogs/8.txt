@@ -1,0 +1,5 @@
+- Sistemato livello 4
+- Cambiato stile dei bottoni
+- Aggiunto avviso per salvare in caso di interruzione del livello
+- Sistemato timer e aggiunta possibilità di disabilitarlo
+- Altri bug minori sistemati
