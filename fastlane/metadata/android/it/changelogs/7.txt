@@ -1,0 +1,1 @@
+- Sistemati bug della versione precedente

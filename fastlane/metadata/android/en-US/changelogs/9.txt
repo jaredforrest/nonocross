@@ -1,0 +1,3 @@
+- Adjust main menu layout
+- Fix blue hints issues
+- Fix timer issues
