@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.picross.nonocross.LevelDetails
 import com.picross.nonocross.LevelType
 import com.picross.nonocross.R
+import com.picross.nonocross.util.getLevelName
 import com.picross.nonocross.util.usergrid.GridData
 import com.picross.nonocross.util.usergrid.UserGrid
 import kotlinx.collections.immutable.PersistentList
@@ -83,7 +84,7 @@ class CustomLevelSelectAdapter(
         runBlocking {
             val levelName = startGame.levels[position].first //levels[position]
             val level = startGame.levels[position].second //startGame.openGrid(levelName)
-            holder.itemView.findViewById<TextView>(R.id.level_name).text = levelName
+            holder.itemView.findViewById<TextView>(R.id.level_name).text = if(startGame.isCustom) levelName else context.getLevelName(levelName.toIntOrNull() ?: 0)
             holder.itemView.findViewById<TextView>(R.id.gridData).text = context.getString(
                 R.string.height_x_width,
                 level.height,

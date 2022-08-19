@@ -27,6 +27,7 @@ import android.widget.Toast
 import androidx.preference.PreferenceManager
 import arrow.core.*
 import com.picross.nonocross.LevelType
+import com.picross.nonocross.R
 import com.picross.nonocross.util.usergrid.GridData
 import com.picross.nonocross.util.usergrid.UserGrid
 import com.picross.nonocross.util.usergrid.checkUnique
@@ -108,12 +109,12 @@ tailrec fun addCustomLevel(
     userGrid: UserGrid? = null,
     copy: UInt = 0u
 ): String {
-    val filename = if(_filename == "")
-        "Untitled Level"
+    val filename = (if(_filename.filterNot { it.isWhitespace() } == "")
+        context.getString(R.string.untitled_level)
     else
-        _filename
+        _filename) + if(copy != 0u) " ($copy)" else ""
     if(File(context.getDir("levels", Context.MODE_PRIVATE), filename).isFile){
-        return addCustomLevel("$filename - copy",fileContents,context,userGrid,copy.inc())
+        return addCustomLevel(_filename,fileContents,context,userGrid,copy.inc())
     }
     FileOutputStream(File(context.getDir("levels", Context.MODE_PRIVATE), filename)).use {
         it.write(fileContents.toByteArray())
@@ -209,3 +210,7 @@ fun vibrate(context: Context) {
     }
 }
 
+fun Context.getLevelName(index: Int): String {
+    return if(index <= 3) getString(R.string.easy, index + 1)
+    else getString(R.string.level, index - 3)
+}
