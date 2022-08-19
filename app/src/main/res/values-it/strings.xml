@@ -4,7 +4,7 @@
     <string name="default_levels">Livelli</string>
     <string name="random_grid">Griglia casuale</string>
     <string name="play">Gioca</string>
-    <string name="height_x_width">%1$d x %2$d</string>
+    <string name="height_x_width">%1$d × %2$d</string>
     <string name="level_complete">Livello completato\n\nTempo impiegato: %1$s</string>
     <string name="level_complete_no_time">Livello completato</string>
     <string name="menu">Menù</string>
@@ -46,6 +46,12 @@
     <string name="dark_mode">Tema scuro</string>
     <string name="show_save_warning_summary">Mostra un avvertimento quando il livello viene abbandonato con progressi non salvati</string>
     <string name="show_save_warning">Mostra avvertimento di salvataggio</string>
+    <string name="confirm_exit">Sei sicuro di voler uscire?</string>
+    <string name="lose_unsaved_data">Qualsiasi mossa non salvata sarà persa.</string>
+    <string name="save">Salva</string>
+    <string name="not_save">Non salvare</string>
+    <string name="easy">Facile %1$d</string>
+    <string name="level">Livello %1$d</string>
     <string-array name="fill_mode_entries">
         <item>Predefinito</item>
         <item>Lasso</item>
