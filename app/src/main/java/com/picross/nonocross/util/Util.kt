@@ -41,13 +41,12 @@ import java.io.IOException
 import kotlin.random.Random
 
 /* wHD is triple(width, height, difficulty) */
-/*tailrec */suspend fun newUniqueRandomGrid(
+suspend fun newUniqueRandomGrid(
     wHD: Triple<Int, Int, Int>,
     random: Random = Random
 ): Option<GridData> {
-//    return if(!Thread.interrupted()) {
-    var rec: List<CellShade>//newRandomGrid(wHD, random)
-    var ret = none<GridData>()// = rec.checkUnique(wHD.second)
+    var rec: List<CellShade>
+    var ret = none<GridData>()
     coroutineScope {
         while (isActive && ret is None) {
             rec = newRandomGrid(wHD, random)
@@ -55,13 +54,6 @@ import kotlin.random.Random
         }
     }
     return ret
-    /*return if(isActive) {
-        val rec = newRandomGrid(wHD, random)
-        when (val ret = rec.checkUnique(wHD.second)) {
-            is None -> newUniqueRandomGrid(wHD, random)
-            is Some -> Some(ret.value)
-        }
-    } else none()*/
 }
 
 fun newRandomGrid(wHD: Triple<Int, Int, Int>, random: Random = Random) =
@@ -80,7 +72,11 @@ fun getRandomGridPrefs(context: Context): Triple<Int, Int, Int> {
 
 fun readTextFromUri(uri: Uri, context: Context): String {
     return try {
-        context.contentResolver.openInputStream(uri)?.readBytes()?.let { String(it) } ?: ""
+        val stream = context.contentResolver.openInputStream(uri)
+        val ret = stream?.readBytes()?.let { String(it) } ?: ""
+        stream?.close()
+        ret
+
     } catch (e: IOException) {
         ""
     }
