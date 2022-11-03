@@ -53,7 +53,6 @@ class ColNumsView(context: Context) : View(context) {
         .apply { color = colorRed }
         .apply { isAntiAlias = true }
         .apply { textAlign = Paint.Align.CENTER }
-        //.apply { textSize = 30F }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)

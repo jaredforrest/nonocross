@@ -52,8 +52,7 @@ class RowNumsView(context: Context) : View(context) {
     private val redPaint = Paint()
         .apply { color = colorRed }
         .apply { isAntiAlias = true }
-        .apply { textAlign = Paint.Align.CENTER }
-        //.apply { textSize = 30F }
+        .apply { textAlign = Paint.Align.RIGHT }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)

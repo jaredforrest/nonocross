@@ -46,10 +46,10 @@
     <string name="dark_mode">Mode Sombre</string>
     <string name="show_save_warning_summary">Afficher une alerte lorsque le niveau n\'est pas enregistré</string>
     <string name="show_save_warning">Alerte de partie non sauvée</string>
-    <string name="confirm_exit">Are you sure you want to exit?</string>
-    <string name="lose_unsaved_data">Any unsaved data will be lost.</string>
-    <string name="save">Sauvegarder</string>
-    <string name="not_save">Abandonner</string>
+    <string name="confirm_exit">Voulez-vous vraiment quitter ?</string>
+    <string name="lose_unsaved_data">Toute données non sauvegardées seront perdues.</string>
+    <string name="save">Sauver</string>
+    <string name="not_save">Suppr</string>
     <string name="easy">Facile %1$d</string>
     <string name="level">Niveau %1$d</string>
     <string-array name="fill_mode_entries">
@@ -58,9 +58,9 @@
         <item>Strict</item>
     </string-array>
     <string-array name="dark_mode_entries">
-        <item>System</item>
-        <item>Dark</item>
-        <item>Light</item>
+        <item>Système</item>
+        <item>Sombre</item>
+        <item>Lumineux</item>
     </string-array>
 
 </resources>
