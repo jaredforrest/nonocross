@@ -40,12 +40,17 @@ class ColNumsView(context: Context) : View(context) {
     var cellLength = 0
     private val colorNumber = ResourcesCompat.getColor(context.resources, R.color.colorText, null)
     private val colorBlue = ResourcesCompat.getColor(context.resources, R.color.colorShade, null)
+    private val colorRed = ResourcesCompat.getColor(context.resources, R.color.colorCross, null)
     private val blackPaint = Paint()
         .apply { color = colorNumber }
         .apply { isAntiAlias = true }
         .apply { textAlign = Paint.Align.CENTER }
     private val bluePaint = Paint()
         .apply { color = colorBlue }
+        .apply { isAntiAlias = true }
+        .apply { textAlign = Paint.Align.CENTER }
+    private val redPaint = Paint()
+        .apply { color = colorRed }
         .apply { isAntiAlias = true }
         .apply { textAlign = Paint.Align.CENTER }
 
@@ -55,6 +60,7 @@ class ColNumsView(context: Context) : View(context) {
             mHeight = height
             blackPaint.apply { textSize = cellLength * 0.5F }
             bluePaint.apply { textSize = cellLength * 0.5F }
+            redPaint.apply { textSize = cellLength * 0.5F }
         }
     }
 
@@ -85,6 +91,7 @@ class ColNumsView(context: Context) : View(context) {
 
     private lateinit var blackTemplate: MutableList<Picture>
     private lateinit var blueTemplate: MutableList<Picture>
+    private lateinit var redTemplate: MutableList<Picture>
     var refreshTemplates = true
 
     override fun onDraw(canvas: Canvas) {
@@ -95,6 +102,7 @@ class ColNumsView(context: Context) : View(context) {
         if (refreshTemplates) {
             blackTemplate = getTemplate(width, height, blackPaint)
             blueTemplate = getTemplate(width, height, bluePaint)
+            redTemplate = getTemplate(width, height, redPaint)
             refreshTemplates = false
         }
 
@@ -107,7 +115,14 @@ class ColNumsView(context: Context) : View(context) {
                             .getOrElse(j) { 0 } == num
                     ) {
                         canvas.drawPicture(blueTemplate[counter])
-                    } else {
+                    }
+                    else if (
+                        LD.userGrid.colNums.getOrElse(i) { listOf(0) }.reversed()
+                            .getOrElse(j) { 0 } > num
+                    ) {
+                        canvas.drawPicture(redTemplate[counter])
+                    }
+                    else {
                         canvas.drawPicture(blackTemplate[counter])
                     }
                     counter++

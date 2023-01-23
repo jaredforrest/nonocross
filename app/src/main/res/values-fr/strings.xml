@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+    <string name="app_name">Nonocross</string>
+    <string name="default_levels">Niveaux pré-créés</string>
+    <string name="random_grid">Niveau aléatoire</string>
+    <string name="play">Jouer</string>
+    <string name="height_x_width">%1$d x %2$d</string>
+    <string name="level_complete">Niveau Accompli\n\nTemps écoulé: %1$s</string>
+    <string name="level_complete_no_time">Niveau Accompli</string>
+    <string name="menu">Menu</string>
+    <string name="reset">Recommencer</string>
+    <string name="difficulty">Difficulté</string>
+    <string name="rows">Lignes</string>
+    <string name="columns">Colonnes</string>
+    <string name="grid_size">Taille de la grille</string>
+    <string name="finished">Terminé</string>
+
+    <!-- Preferences -->
+    <string name="preferences">Préférences</string>
+    <string name="usability_header">Usabilité</string>
+    <string name="vibrate_title">Vibration</string>
+    <string name="fat_finger_title">Mode Ligne seule</string>
+    <string name="fat_finger_summary">Activer s\'il est trop difficile de sélectionner les carrés</string>
+    <string name="vibrate_summary">Vibrer pour certaines actions</string>
+    <string name="appearance_header">Apparence</string>
+    <string name="show_blue_hints">Afficher l\'aide bleu/rouge sur le coté</string>
+    <string name="import_level">Importer Niveau</string>
+    <string name="custom_level">Niveaux Sauvegardés</string>
+    <string name="remove_level">Supprimer</string>
+    <string name="level_name">Nom du niveau</string>
+    <string name="enter_level_name">Enter le nom du niveau</string>
+    <string name="import_from_file">Importer depuis un fichier</string>
+    <string name="import_from_qr">Importer depuis un QRCode</string>
+    <string name="qr_code">QRcode</string>
+    <string name="untitled_level">Niveau sans nom</string>
+    <string name="online">En ligne</string>
+    <string name="reset_complete">Réinitialiser les niveaux complétés</string>
+    <string name="unique_level">Niveaux Uniques</string>
+    <string name="unique_level_summary">Générer Niveau Aléatoire\nNote: Des niveaux compliqués peuvent mettre du temps à charger</string>
+    <string name="show_timer">Chronomètre</string>
+    <string name="show_timer_summary">Afficher la temps passé pendant la partie</string>
+    <string name="track_time">Durée d\'achèvement</string>
+    <string name="track_time_summary">Afficher le temps écoulé à la fin</string>
+    <string name="reset_complete_summary">Recommencer le niveau à zero à la ré-ouverture</string>
+    <string name="overwrite_cell_mode">Mode de Permutation de Cellule</string>
+    <string name="dark_mode">Mode Sombre</string>
+    <string name="show_save_warning_summary">Afficher une alerte lorsque le niveau n\'est pas enregistré</string>
+    <string name="show_save_warning">Alerte de partie non sauvée</string>
+    <string name="confirm_exit">Voulez-vous vraiment quitter ?</string>
+    <string name="lose_unsaved_data">Toute données non sauvegardées seront perdues.</string>
+    <string name="save">Sauver</string>
+    <string name="not_save">Suppr</string>
+    <string name="easy">Facile %1$d</string>
+    <string name="level">Niveau %1$d</string>
+    <string-array name="fill_mode_entries">
+        <item>Default</item>
+        <item>Lax</item>
+        <item>Strict</item>
+    </string-array>
+    <string-array name="dark_mode_entries">
+        <item>System</item>
+        <item>Dark</item>
+        <item>Light</item>
+    </string-array>
+
+</resources>
