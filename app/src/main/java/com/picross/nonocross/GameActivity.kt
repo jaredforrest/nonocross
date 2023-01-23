@@ -30,7 +30,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
-import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -121,22 +120,22 @@ class GameActivity : AppCompatActivity() {
 
         undo.setOnClickListener {
             when (nonocrossGridView.undo()) {
-                is Either.Right -> {
+                is None -> {
                     nonocrossGridView.invalidate()
                     rowNumsView.invalidate()
                     colNumsView.invalidate()
                 }
-                is Either.Left -> Toast.makeText(this, "Nothing to undo", Toast.LENGTH_SHORT).show()
+                is Some -> Toast.makeText(this, "Nothing to undo", Toast.LENGTH_SHORT).show()
             }
         }
         redo.setOnClickListener {
             when (nonocrossGridView.redo()) {
-                is Either.Right -> {
+                is None -> {
                     nonocrossGridView.invalidate()
                     rowNumsView.invalidate()
                     colNumsView.invalidate()
                 }
-                is Either.Left -> Toast.makeText(this, "Nothing to redo", Toast.LENGTH_SHORT).show()
+                is Some -> Toast.makeText(this, "Nothing to redo", Toast.LENGTH_SHORT).show()
             }
         }
         clear.setOnClickListener {
@@ -284,7 +283,7 @@ class GameActivity : AppCompatActivity() {
                     //myThread?.start()
                 } else {
                     val wHD = getRandomGridPrefs(this)
-                    LD.gridData = newRandomGrid(wHD).toGridData(wHD.second)
+                    LD.gridData = newRandomGrid(wHD).toGridData(wHD.first, wHD.second)
                     LD.userGrid = UserGrid(LD.gridData, autoFill = true, resetComplete = PreferenceManager.getDefaultSharedPreferences(this@GameActivity).getBoolean("resetComplete", true))
                     nonocrossGridView.updateNonoGrid()
                     gameView.refreshLayout()
@@ -340,10 +339,10 @@ class GameActivity : AppCompatActivity() {
                 LD.userGrid.countSecond()
                 timeView.text = secondsToTime(LD.userGrid.timeElapsed)
 
-                handler.postDelayed(countSecond, 1000)
+                handler.postDelayed(countSecond, 250)
             }
 
-            handler.postDelayed(countSecond, 1000)
+            handler.postDelayed(countSecond, 250)
             running = true
         }
     }
@@ -388,14 +387,14 @@ class GameActivity : AppCompatActivity() {
             // dialog message view
 
             AlertDialog.Builder(this@GameActivity)
-                .setTitle("Are you sure you want to exit?")
-                .setMessage("Any unsaved data will be lost.")
+                .setTitle(R.string.confirm_exit)
+                .setMessage(R.string.lose_unsaved_data)
                 .setNeutralButton(
-                    "Don't Save"
+                    R.string.not_save
                 ) { _, _ ->
                     finish()
                 }
-                .setPositiveButton("Save")
+                .setPositiveButton(R.string.save)
                 { _, _ ->
                     saveGrid(true)
                 }

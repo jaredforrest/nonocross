@@ -1,6 +1,9 @@
 package com.picross.nonocross.util.usergrid
 
-import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.none
 import com.picross.nonocross.util.CellShade
 import com.picross.nonocross.util.click
 import kotlinx.collections.immutable.PersistentList
@@ -18,8 +21,8 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
 
     var grid: PersistentList<CellShade>
 
-    var rowNums : List<List<Int>>//get() = data.getRowNums(gridData.height)
-    var colNums : List<List<Int>>//get() = data.getColNums(gridData.height)
+    var rowNums : List<List<Int>>
+    var colNums : List<List<Int>>
 
     init {
         /** No save */
@@ -68,13 +71,13 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
                 }
             }.toPersistentList()
         }
-        rowNums = grid.getRowNums(gridData.height)
-        colNums = grid.getColNums(gridData.height)
+        rowNums = grid.getRowNums(gridData.width, gridData.height)
+        colNums = grid.getColNums(gridData.width, gridData.height)
     }
 
-    val currentState: List<Byte>
+    fun toBytes() =
         /** First Byte is version code (2), 2-5 time elapsed, 6 whether complete, 7+ the grid, last byte also version code */
-        get() = listOf(
+        listOf(
             2,
             (timeElapsed / 256u / 256u / 256u).toUByte().toByte(),
             (timeElapsed / 256u / 256u).toUByte().toByte(),
@@ -90,9 +93,7 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
                     }
                 } + listOf(2)
 
-    fun checkDone(): Boolean {
-        return rowNums == gridData.rowNums && colNums == gridData.colNums
-    }
+    fun checkDone() = rowNums == gridData.rowNums && colNums == gridData.colNums
 
     fun clear() {
         grid = List(size) { CellShade.EMPTY }.toPersistentList()
@@ -101,8 +102,8 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
             autoFill()
         }
         undoAddStack()
-        rowNums = grid.getRowNums(gridData.height)
-        colNums = grid.getColNums(gridData.height)
+        rowNums = grid.getRowNums(gridData.width, gridData.height)
+        colNums = grid.getColNums(gridData.width, gridData.height)
     }
 
     fun superClear() {
@@ -114,26 +115,26 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
 
     private val undoList = UndoList(mutableListOf(), grid, mutableListOf())
 
-    fun undo(): Either<UndoListException.NoMoreUndo, Unit> {
+    fun undo(): Option<UndoListException.NoMoreUndo> {
         return when (val _undoList = undoList.undo()) {
-            is Either.Left -> _undoList
-            is Either.Right -> {
+            is Some -> _undoList
+            is None -> {
                 grid = undoList.data
-                rowNums = grid.getRowNums(gridData.height)
-                colNums = grid.getColNums(gridData.height)
-                Either.Right(Unit)
+                rowNums = grid.getRowNums(gridData.width, gridData.height)
+                colNums = grid.getColNums(gridData.width, gridData.height)
+                none()
             }
         }
     }
 
-    fun redo(): Either<UndoListException.NoMoreRedo, Unit> {
+    fun redo(): Option<UndoListException.NoMoreRedo> {
         return when (val _undoList = undoList.redo()) {
-            is Either.Left -> _undoList
-            is Either.Right -> {
+            is Some -> _undoList
+            is None -> {
                 grid = undoList.data
-                rowNums = grid.getRowNums(gridData.height)
-                colNums = grid.getColNums(gridData.height)
-                Either.Right(Unit)
+                rowNums = grid.getRowNums(gridData.width, gridData.height)
+                colNums = grid.getColNums(gridData.width, gridData.height)
+                none()
             }
         }
     }
@@ -201,8 +202,8 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
                 grid = grid.set(index, if (grid[index] == initShade) cellShade else grid[index])
             }
         }
-        rowNums = grid.getRowNums(gridData.height)
-        colNums = grid.getColNums(gridData.height)
+        rowNums = grid.getRowNums(gridData.width, gridData.height)
+        colNums = grid.getColNums(gridData.width, gridData.height)
     }
 
     private fun autoFill() {
@@ -218,8 +219,8 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
 
     fun click(index: Int, toggleCross: Boolean) {
         grid = grid.set(index,grid[index].click(toggleCross))
-        rowNums = grid.getRowNums(gridData.height)
-        colNums = grid.getColNums(gridData.height)
+        rowNums = grid.getRowNums(gridData.width, gridData.height)
+        colNums = grid.getColNums(gridData.width, gridData.height)
     }
 
     fun countSecond() {
@@ -231,11 +232,9 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
 
     fun copyShade(fromIndex: Int, toIndex: Int) {
         grid = grid.set(toIndex, grid[fromIndex])
-        rowNums = grid.getRowNums(gridData.height)
-        colNums = grid.getColNums(gridData.height)
+        rowNums = grid.getRowNums(gridData.width, gridData.height)
+        colNums = grid.getColNums(gridData.width, gridData.height)
     }
 
     fun sameRow(index1: Int, index2: Int) = (index1 / width == index2 / width)
-
-
 }

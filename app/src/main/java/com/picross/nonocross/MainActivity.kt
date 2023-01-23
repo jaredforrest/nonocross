@@ -161,7 +161,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 } else {
                     val wHD = getRandomGridPrefs(this)
-                    LevelDetails.gridData = newRandomGrid(wHD).toGridData(wHD.second)
+                    LevelDetails.gridData = newRandomGrid(wHD).toGridData(wHD.first, wHD.second)
                     LevelDetails.userGrid = UserGrid(LevelDetails.gridData, autoFill = true, resetComplete = preferences.getBoolean("resetComplete", true))
                     val intent = Intent(this, GameActivity::class.java)
                     startActivity(intent)

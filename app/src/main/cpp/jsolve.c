@@ -4,31 +4,19 @@
  * email: zhesyr@sampo.ru.
  * License: GPL2. */
 
-//#include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 #include <malloc.h>
 #include <jni.h>
 #include <android/log.h>
+#include <stdbool.h>
 
-typedef char bool;
-#define true 1
-#define false 0
+#include <string.h>
 
-//bool xpm = false; // -x
-bool all = false; // -a
-//bool hp = false;
-//bool qt = false;  // -q
-//bool vb = false;  // -v
-int to = 0;      // -n
-//int  mo1 =0;       // -m
-int mo = 0;       // -m
-
-const unsigned char pusto = 2;
+const unsigned char empty = 2;
 const unsigned char yes = 1;
 const unsigned char no = 0;
-//const unsigned char board = 4;
-//const unsigned char mas[3]={'X',' ','*'};
+const unsigned char mas[3]={'X',' ','*'};
 
 struct active {
     int cis, netu, m1, m2;
@@ -47,7 +35,6 @@ struct passive {
 
 struct field {
     struct active *element[2];
-
     struct passive start[2], finish[2];
     bool notchoise;
 };
@@ -63,31 +50,26 @@ struct kluch {
     struct kluch *prev;
 };
 
-unsigned char **jpn, m3;
-int height, width, k, i, j;
+unsigned char **jpn;
+int height, width;
 #ifdef DEBUG
 int test2=0;
 #endif
-int **stro, **sto, **lev, **prav, **verh, **niz;
-int *kolstr, *kolsto, /*m1, m2,*/ *m12, *m22;
+int **rowNums, **colNums, **lev, **prav, **verh, **niz;
+int *rowNumCount, *colNumCount, *m12, *m22;
 bool er, **kluchlev, **kluchprav, **kluchverh, **kluchniz, *kluch12, *kluch22, perebor = false;
-int netu, netu4, netu5, netu6, netu7, sumstr, sumsto,/*k0,*/kolic, kol = 0;
+int netu, netu4, netu5, netu6, netu7, sumstr, sumsto,kolic, kol = 0;
 int *kolic1;
-clock_t time1, time2;
-const char *name;
-char *file;
-double sec;
+clock_t time1;
 
 struct field **jpn4;
-struct passive passivenewstart, passivenewfinish, passivedelstart, passivedelfinish, *passivenew, *passivedel;
-struct active activenewstart, activenewfinish, activedelstart, activedelfinish, *activenew, *activedel, start, finish, start1, finish1;
+struct passive passivenewstart, passivenewfinish, passivedelstart, passivedelfinish, *passivenew0, *passivedel0;
+struct active activenewstart, activenewfinish, activedelstart, activedelfinish, *activenew0, *activedel0, start, finish, start1, finish1;
 
-struct levpravverhniz ***lev2, ***prav2, ***verh2, ***niz2, lev2newstart, lev2newfinish, lev2delstart, lev2delfinish, *lev2new, *lev2del;
+struct levpravverhniz ***lev2, ***prav2, ***verh2, ***niz2, lev2newstart, lev2newfinish, lev2delstart, lev2delfinish, *lev2new0, *lev2del0;
 
 struct kluch kluchlevstart, kluchlevfinish, kluchverhstart, kluchverhfinish, kluchpravstart, kluchpravfinish, kluchnizstart, kluchnizfinish, kluchstart3, kluchfinish3, kluchstart4, kluchfinish4 = {
         0, 0, NULL};
-
-int parse();
 
 void allocate();
 
@@ -96,10 +78,6 @@ void deallocate();
 void kluchFree(struct kluch);
 
 void vved(void);
-
-//void postroenie(unsigned char **jpn);
-
-//void postroenie1(unsigned char **jpn);
 
 void resheniee();
 
@@ -112,24 +90,11 @@ int main2() {
     er = true;
     resheniee();
     if (er == false) {
-        //time2 = clock() - time1;
-        //printf("Finish\n");
-        //sec = (double) time2/(double) CLOCKS_PER_SEC;
-        //printf("%s%.2f%s","time = ",sec," second\n");
         printf("No solutions\n");
         return 0;
     }
     if (netu == 0) {
         kol = kol + 1;
-        //time2 = clock() - time1;
-        //printf("Finish\n");
-        //sec = (double)time2/(double)CLOCKS_PER_SEC;
-        //printf("%s%.2f%s","time = ",sec," second\n");
-        /*if (xpm)
-			postroenie1(jpn);
-		else
-			postroenie(jpn);
-		printf("%d%s",kol," solution\n");*/
         return 0;
 
     }
@@ -153,94 +118,94 @@ int main2() {
         int mi, mj;
         struct active *a;
 
-        activenew = (struct active *) malloc(sizeof(struct active));
-        (*activenew).cis = 0;
-        activedel = (struct active *) malloc(sizeof(struct active));
-        (*activedel).cis = 0;
+        activenew0 = (struct active *) malloc(sizeof(struct active));
+        (*activenew0).cis = 0;
+        activedel0 = (struct active *) malloc(sizeof(struct active));
+        (*activedel0).cis = 0;
 
-        for (int ii = 0; ii <= 1; ii++) {
-            (*activenew).prev[ii] = &activenewstart;
-            (*activenew).next[ii] = &activenewfinish;
-            activenewstart.next[ii] = activenew;
-            activenewfinish.prev[ii] = activenew;
+        for (int i = 0; i <= 1; i++) {
+            (*activenew0).prev[i] = &activenewstart;
+            (*activenew0).next[i] = &activenewfinish;
+            activenewstart.next[i] = activenew0;
+            activenewfinish.prev[i] = activenew0;
 
-            (*activedel).prev[ii] = &activedelstart;
-            (*activedel).next[ii] = &activedelfinish;
-            activedelstart.next[ii] = activedel;
-            activedelfinish.prev[ii] = activedel;
+            (*activedel0).prev[i] = &activedelstart;
+            (*activedel0).next[i] = &activedelfinish;
+            activedelstart.next[i] = activedel0;
+            activedelfinish.prev[i] = activedel0;
         }
 
 
-        passivenew = (struct passive *) malloc(sizeof(struct passive));
-        (*passivenew).cis = 0;
-        passivedel = (struct passive *) malloc(sizeof(struct passive));
-        (*passivedel).cis = 0;
+        passivenew0 = (struct passive *) malloc(sizeof(struct passive));
+        (*passivenew0).cis = 0;
+        passivedel0 = (struct passive *) malloc(sizeof(struct passive));
+        (*passivedel0).cis = 0;
 
         for (int ii = 0; ii <= 2; ii++) {
-            (*passivenew).prev[ii] = &passivenewstart;
-            (*passivenew).next[ii] = &passivenewfinish;
-            passivenewstart.next[ii] = passivenew;
-            passivenewfinish.prev[ii] = passivenew;
+            (*passivenew0).prev[ii] = &passivenewstart;
+            (*passivenew0).next[ii] = &passivenewfinish;
+            passivenewstart.next[ii] = passivenew0;
+            passivenewfinish.prev[ii] = passivenew0;
 
-            (*passivedel).prev[ii] = &passivedelstart;
-            (*passivedel).next[ii] = &passivedelfinish;
-            passivedelstart.next[ii] = passivedel;
-            passivedelfinish.prev[ii] = passivedel;
+            (*passivedel0).prev[ii] = &passivedelstart;
+            (*passivedel0).next[ii] = &passivedelfinish;
+            passivedelstart.next[ii] = passivedel0;
+            passivedelfinish.prev[ii] = passivedel0;
         }
 
 
         jpn4 = (struct field **) malloc((height + 2) * sizeof(struct field *));
 
-        for (int ii = 2; ii <= height + 1; ii++) {
-            jpn4[ii] = (struct field *) malloc((width + 2) * sizeof(struct field));
+        for (int i = 2; i <= height + 1; i++) {
+            jpn4[i] = (struct field *) malloc((width + 2) * sizeof(struct field));
 
-            for (int jj = 2; jj <= width + 1; jj++)
-                if (jpn[ii][jj] == pusto) {
+            for (int j = 2; j <= width + 1; j++)
+                if (jpn[i][j] == empty) {
 
-                    jpn4[ii][jj].start[0].next[1] = &(jpn4[ii][jj].finish[0]);
-                    jpn4[ii][jj].start[1].next[1] = &(jpn4[ii][jj].finish[1]);
-                    jpn4[ii][jj].start[0].next[2] = &(jpn4[ii][jj].finish[0]);
-                    jpn4[ii][jj].start[1].next[2] = &(jpn4[ii][jj].finish[1]);
+                    jpn4[i][j].start[0].next[1] = &(jpn4[i][j].finish[0]);
+                    jpn4[i][j].start[1].next[1] = &(jpn4[i][j].finish[1]);
+                    jpn4[i][j].start[0].next[2] = &(jpn4[i][j].finish[0]);
+                    jpn4[i][j].start[1].next[2] = &(jpn4[i][j].finish[1]);
 
-                    jpn4[ii][jj].finish[0].prev[1] = &(jpn4[ii][jj].start[0]);
-                    jpn4[ii][jj].finish[1].prev[1] = &(jpn4[ii][jj].start[1]);
-                    jpn4[ii][jj].finish[0].prev[2] = &(jpn4[ii][jj].start[0]);
-                    jpn4[ii][jj].finish[1].prev[2] = &(jpn4[ii][jj].start[1]);
-                    jpn4[ii][jj].notchoise = true;
+                    jpn4[i][j].finish[0].prev[1] = &(jpn4[i][j].start[0]);
+                    jpn4[i][j].finish[1].prev[1] = &(jpn4[i][j].start[1]);
+                    jpn4[i][j].finish[0].prev[2] = &(jpn4[i][j].start[0]);
+                    jpn4[i][j].finish[1].prev[2] = &(jpn4[i][j].start[1]);
+                    jpn4[i][j].notchoise = true;
 
                     a = (struct active *) malloc(sizeof(struct active));
                     (*a).cis = 1;
-                    (*a).m1 = ii;
-                    (*a).m2 = jj;
+                    (*a).m1 = i;
+                    (*a).m2 = j;
                     (*a).m3 = yes;
                     (*a).netu = 0;
                     (*a).notchoise = false;
-                    (*a).next[0] = activenew;
-                    (*a).prev[0] = (*activenew).prev[0];
-                    (*(*activenew).prev[0]).next[0] = a;
-                    (*activenew).prev[0] = a;
+                    (*a).next[0] = activenew0;
+                    (*a).prev[0] = (*activenew0).prev[0];
+                    (*(*activenew0).prev[0]).next[0] = a;
+                    (*activenew0).prev[0] = a;
                     (*a).next[1] = &finish;
                     (*a).prev[1] = finish.prev[1];
                     (*finish.prev[1]).next[1] = a;
                     finish.prev[1] = a;
-                    jpn4[ii][jj].element[1] = a;
+                    jpn4[i][j].element[1] = a;
 
                     a = (struct active *) malloc(sizeof(struct active));
                     (*a).cis = 1;
-                    (*a).m1 = ii;
-                    (*a).m2 = jj;
+                    (*a).m1 = i;
+                    (*a).m2 = j;
                     (*a).m3 = no;
                     (*a).netu = 0;
                     (*a).notchoise = false;
-                    (*a).next[0] = activenew;
-                    (*a).prev[0] = (*activenew).prev[0];
-                    (*(*activenew).prev[0]).next[0] = a;
-                    (*activenew).prev[0] = a;
+                    (*a).next[0] = activenew0;
+                    (*a).prev[0] = (*activenew0).prev[0];
+                    (*(*activenew0).prev[0]).next[0] = a;
+                    (*activenew0).prev[0] = a;
                     (*a).next[1] = &finish;
                     (*a).prev[1] = finish.prev[1];
                     (*finish.prev[1]).next[1] = a;
                     finish.prev[1] = a;
-                    jpn4[ii][jj].element[0] = a;
+                    jpn4[i][j].element[0] = a;
 
 
                 }
@@ -250,72 +215,63 @@ int main2() {
     {
         struct levpravverhniz *a;
 
-        lev2new = (struct levpravverhniz *) malloc(sizeof(struct levpravverhniz));
-        (*lev2new).cis = 0;
-        lev2del = (struct levpravverhniz *) malloc(sizeof(struct levpravverhniz));
-        (*lev2del).cis = 0;
+        lev2new0 = (struct levpravverhniz *) malloc(sizeof(struct levpravverhniz));
+        (*lev2new0).cis = 0;
+        lev2del0 = (struct levpravverhniz *) malloc(sizeof(struct levpravverhniz));
+        (*lev2del0).cis = 0;
 
-        for (int ii = 0; ii <= 1; ii++) {
-            (*lev2new).prev[ii] = &lev2newstart;
-            (*lev2new).next[ii] = &lev2newfinish;
-            lev2newstart.next[ii] = lev2new;
-            lev2newfinish.prev[ii] = lev2new;
+        for (int i = 0; i <= 1; i++) {
+            (*lev2new0).prev[i] = &lev2newstart;
+            (*lev2new0).next[i] = &lev2newfinish;
+            lev2newstart.next[i] = lev2new0;
+            lev2newfinish.prev[i] = lev2new0;
 
-            (*lev2del).prev[ii] = &lev2delstart;
-            (*lev2del).next[ii] = &lev2delfinish;
-            lev2delstart.next[ii] = lev2del;
-            lev2delfinish.prev[ii] = lev2del;
+            (*lev2del0).prev[i] = &lev2delstart;
+            (*lev2del0).next[i] = &lev2delfinish;
+            lev2delstart.next[i] = lev2del0;
+            lev2delfinish.prev[i] = lev2del0;
         }
 
         lev2 = (struct levpravverhniz ***) malloc((height + 2) * sizeof(struct levpravverhniz **));
         prav2 = (struct levpravverhniz ***) malloc((height + 2) * sizeof(struct levpravverhniz **));
-        for (int ii = 2; ii <= height + 1; ii++) {
-            lev2[ii] = (struct levpravverhniz **) malloc(
-                    (kolstr[ii] + 2) * sizeof(struct levpravverhniz *));
-            prav2[ii] = (struct levpravverhniz **) malloc(
-                    (kolstr[ii] + 2) * sizeof(struct levpravverhniz *));
+        for (int i = 2; i <= height + 1; i++) {
+            lev2[i] = (struct levpravverhniz **) malloc(
+                    (rowNumCount[i] + 2) * sizeof(struct levpravverhniz *));
+            prav2[i] = (struct levpravverhniz **) malloc(
+                    (rowNumCount[i] + 2) * sizeof(struct levpravverhniz *));
 
-            for (int jj = 0; jj <= kolstr[ii] + 1; jj++) {
+            for (int j = 0; j <= rowNumCount[i] + 1; j++) {
                 a = (struct levpravverhniz *) malloc(sizeof(struct levpravverhniz));
                 (*a).cis = 1;
-                (*a).i = ii;
-                (*a).j = jj;
+                (*a).i = i;
+                (*a).j = j;
                 (*a).vid = 1;
-                (*a).znach = lev[ii][jj];
-                (*a).next[0] = lev2new;
-                (*a).prev[0] = (*lev2new).prev[0];
-                (*(*lev2new).prev[0]).next[0] = a;
-                (*lev2new).prev[0] = a;
-//			(*a).next[1]=lev2new;
-//			(*a).prev[1]=(*lev2new).prev[1];
-//			(*(*lev2new).prev[1]).next[1]=a;
-//			(*lev2new).prev[1]=a;
+                (*a).znach = lev[i][j];
+                (*a).next[0] = lev2new0;
+                (*a).prev[0] = (*lev2new0).prev[0];
+                (*(*lev2new0).prev[0]).next[0] = a;
+                (*lev2new0).prev[0] = a;
 
                 (*a).next[1] = NULL;
                 (*a).prev[1] = NULL;
 
-                lev2[ii][jj] = a;
+                lev2[i][j] = a;
 
                 a = (struct levpravverhniz *) malloc(sizeof(struct levpravverhniz));
                 (*a).cis = 1;
-                (*a).i = ii;
-                (*a).j = jj;
+                (*a).i = i;
+                (*a).j = j;
                 (*a).vid = 2;
-                (*a).znach = prav[ii][jj];
-                (*a).next[0] = lev2new;
-                (*a).prev[0] = (*lev2new).prev[0];
-                (*(*lev2new).prev[0]).next[0] = a;
-                (*lev2new).prev[0] = a;
-
-//			(*a).next[1]=lev2new;
-//			(*a).prev[1]=(*lev2new).prev[1];
-//			(*(*lev2new).prev[1]).next[1]=a;
-//			(*lev2new).prev[1]=a;
+                (*a).znach = prav[i][j];
+                (*a).next[0] = lev2new0;
+                (*a).prev[0] = (*lev2new0).prev[0];
+                (*(*lev2new0).prev[0]).next[0] = a;
+                (*lev2new0).prev[0] = a;
 
                 (*a).next[1] = NULL;
                 (*a).prev[1] = NULL;
 
-                prav2[ii][jj] = a;
+                prav2[i][j] = a;
 
             }
 
@@ -327,25 +283,21 @@ int main2() {
 
         for (int ii = 2; ii <= width + 1; ii++) {
             verh2[ii] = (struct levpravverhniz **) malloc(
-                    (kolsto[ii] + 2) * sizeof(struct levpravverhniz *));
+                    (colNumCount[ii] + 2) * sizeof(struct levpravverhniz *));
             niz2[ii] = (struct levpravverhniz **) malloc(
-                    (kolsto[ii] + 2) * sizeof(struct levpravverhniz *));
+                    (colNumCount[ii] + 2) * sizeof(struct levpravverhniz *));
 
-            for (int jj = 0; jj <= kolsto[ii] + 1; jj++) {
+            for (int jj = 0; jj <= colNumCount[ii] + 1; jj++) {
                 a = (struct levpravverhniz *) malloc(sizeof(struct levpravverhniz));
                 (*a).cis = 1;
                 (*a).i = ii;
                 (*a).j = jj;
                 (*a).vid = 3;
                 (*a).znach = verh[ii][jj];
-                (*a).next[0] = lev2new;
-                (*a).prev[0] = (*lev2new).prev[0];
-                (*(*lev2new).prev[0]).next[0] = a;
-                (*lev2new).prev[0] = a;
-//			(*a).next[1]=lev2new;
-//			(*a).prev[1]=(*lev2new).prev[1];
-//			(*(*lev2new).prev[1]).next[1]=a;
-//			(*lev2new).prev[1]=a;
+                (*a).next[0] = lev2new0;
+                (*a).prev[0] = (*lev2new0).prev[0];
+                (*(*lev2new0).prev[0]).next[0] = a;
+                (*lev2new0).prev[0] = a;
 
                 (*a).next[1] = NULL;
                 (*a).prev[1] = NULL;
@@ -358,14 +310,10 @@ int main2() {
                 (*a).j = jj;
                 (*a).vid = 4;
                 (*a).znach = niz[ii][jj];
-                (*a).next[0] = lev2new;
-                (*a).prev[0] = (*lev2new).prev[0];
-                (*(*lev2new).prev[0]).next[0] = a;
-                (*lev2new).prev[0] = a;
-//			(*a).next[1]=lev2new;
-//			(*a).prev[1]=(*lev2new).prev[1];
-//			(*(*lev2new).prev[1]).next[1]=a;
-//			(*lev2new).prev[1]=a;
+                (*a).next[0] = lev2new0;
+                (*a).prev[0] = (*lev2new0).prev[0];
+                (*(*lev2new0).prev[0]).next[0] = a;
+                (*lev2new0).prev[0] = a;
 
                 (*a).next[1] = NULL;
                 (*a).prev[1] = NULL;
@@ -380,46 +328,7 @@ int main2() {
     }
 
 
-    podgon(1, activenew, activedel, passivenew, passivedel, lev2new, lev2del);
-
-    /*if (all==false)
-	{
-		if (er)
-		{
-			//time2 = clock() - time1;
-			if (xpm)
-				postroenie1(jpn);
-			else
-				postroenie(jpn);
-			printf("Finish\n");
-			//sec = (double)time2/(double)CLOCKS_PER_SEC;
-			//printf("%s%.2f%s","time = ",sec," second\n");
-#ifdef DEBUG
-			printf("%s%d%s","test2= ",test2,"\n");
-#endif
-
-			return 0;
-		}
-		else
-		{
-			//time2 = clock() - time1;
-			//printf("Finish\n");
-			//sec = (double)time2/(double)CLOCKS_PER_SEC;
-			//printf("%s%.2f%s","time = ",sec," second\n");
-			if (to==0)
-				printf("No solutions\n");
-			else
-				printf("%d%s",kol," solution\n");
-
-			return 0;
-
-		}
-	}*/
-    //time2 = clock() - time1;
-    //printf("Finish\n");
-    //sec = (double)time2/(double)CLOCKS_PER_SEC;
-    //printf("%s%.2f%s","time = ",sec," second\n");
-    //printf("%d%s",kol," solution\n");
+    podgon(1, activenew0, activedel0, passivenew0, passivedel0, lev2new0, lev2del0);
 
     return 0;
 
@@ -427,212 +336,17 @@ int main2() {
 }
 
 int mainy() {
-    if (parse() == 1) {
-        //printf("scaf has error");
-        return 1;
-    }
-    //printf("Start\n");
-    time1 = clock();
 
     main2();
 
     return 0;
 }
 
-int parse() {
-    all = true;
-    /*int i,j,k;
-	char c;
-	bool jump=false;
-	i=1;
-	while (argv[i][0]=='-')
-	{
-		j=1;
-		while (argv[i][j]!='\0')
-		{
-			if (argv[i][j]=='x')
-				xpm=true;
-			else
-			if (argv[i][j]=='a')
-				all=true;
-			else
-			if (argv[i][j]=='q')
-				qt=true;
-			else
-			if (argv[i][j]=='v')
-				vb=true;
-			else
-			if (argv[i][j]=='n')
-			{
-				jump=true;
-				k=0;
-				to=0;
-				while (argv[i+1][k]!='\0')
-				{
-					c=argv[i+1][k];
-					if (c<'0' || c>'9')
-					{
-						help();
-						return;
-					}
-					to = 10*to+(c-'0');
-					k++;
-				}
-			}
-			else
-			if (argv[i][j]=='m')
-			{
-				jump=true;
-				k=0;
-				mo=0;
-				while (argv[i+1][k]!='\0')
-				{
-					c=argv[i+1][k];
-					if (c<'0' || c>'9')
-					{
-						help();
-						return;
-					}
-					mo = 10*mo+(c-'0');
-					k++;
-				}
-			}
-
-
-			else
-			{
-				help();
-				return;
-			}
-			j=j+1;
-
-		}
-		if (jump)
-		{
-			jump=false;
-			i=i+1;
-		}
-
-		i=i+1;
-	}
-	if (i==argc-1)
-		name=argv[i];
-	else
-	{
-		help();
-		return;
-	}*/
-//	char name[20];
-//	std::cout << "Введите название файла\n";
-//	std::cin >> name;
-
-
-    char *stroka;
-    height = 0;
-
-    stroka = (char *) name;
-    while (*stroka != '#') {
-        while (*stroka != '\n') {
-            stroka++;
-        }
-        height++;
-        stroka++;
-    }
-    while (*stroka != '\n') {
-        stroka++;
-    }
-    width = 0;
-    stroka++;
-    while (*stroka != '#') {
-        while (*stroka != '\n') {
-            stroka++;
-        }
-        width++;
-        stroka++;
-    }
-    stro = (int **) malloc((height + 2) * sizeof(int *));
-    sto = (int **) malloc((width + 2) * sizeof(int *));
-    kolstr = (int *) malloc((height + 2) * sizeof(int));
-    kolsto = (int *) malloc((width + 2) * sizeof(int));
-    stroka = (char *) name;
-    int movePos;
-    for (i = 1; i < height + 1; i++) {
-        j = 0;
-        do {
-            if (sscanf(stroka, "%d%n", &k, &movePos) != 1)
-                return 1;
-            stroka += movePos;
-            if (k != 0) {
-                j++;
-            }
-
-        } while (k != 0);
-        kolstr[i + 1] = j;
-        stro[i + 1] = (int *) malloc((j + 2) * sizeof(int));
-    }
-    do
-        if (*(stroka + 1) == 0)
-            return 1;
-    while (*stroka++ != '\n');
-    do
-        if (*(stroka + 1) == 0)
-            return 1;
-    while (*stroka++ != '\n');
-
-    for (i = 1; i < width + 1; i++) {
-        j = 0;
-        do {
-            if (sscanf(stroka, "%d%n", &k, &movePos) != 1)
-                return 1;
-            stroka += movePos;
-            if (k != 0) {
-                j++;
-            }
-
-        } while (k != 0);
-        kolsto[i + 1] = j;
-        sto[i + 1] = (int *) malloc((j + 2) * sizeof(int));
-    }
-    stroka = (char *) name;
-    for (i = 1; i < height + 1; i++) {
-        for (j = 1; j < kolstr[i + 1] + 1; j++) {
-            if (sscanf(stroka, "%d%n", &k, &movePos) != 1)
-                return 1;
-            stroka += movePos;
-            stro[i + 1][j] = k;
-        }
-        if (sscanf(stroka, "%d%n", &k, &movePos) != 1)
-            return 1;
-        stroka += movePos;
-    }
-    do
-        if (*(stroka + 1) == 0)
-            return 1;
-    while (*stroka++ != '\n');
-    do
-        if (*(stroka + 1) == 0)
-            return 1;
-    while (*stroka++ != '\n');
-    for (i = 1; i < width + 1; i++) {
-        for (j = 1; j < kolsto[i + 1] + 1; j++) {
-            if (sscanf(stroka, "%d%n", &k, &movePos) != 1)
-                return 1;
-            stroka += movePos;
-            sto[i + 1][j] = k;
-        }
-        if (sscanf(stroka, "%d%n", &k, &movePos) != 1)
-            return 1;
-        stroka += movePos;
-
-    }
-    return 0;
-}
-
 void allocate() {
     jpn = (unsigned char **) malloc((height + 4) * sizeof(unsigned char *));
 
-    for (int ii = 0; ii < height + 4; ii++) {
-        jpn[ii] = (unsigned char *) malloc((width + 4) * sizeof(unsigned char));
+    for (int i = 0; i < height + 4; i++) {
+        jpn[i] = (unsigned char *) malloc((width + 4) * sizeof(unsigned char));
     }
 
     lev = (int **) malloc((height + 2) * sizeof(int *));
@@ -641,13 +355,12 @@ void allocate() {
     kluchprav = (bool **) malloc((height + 2) * sizeof(bool *));
     kluch12 = (bool *) malloc((height + 2) * sizeof(bool));
 
-    for (int ii = 2; ii < height + 2; ii++) {
-        lev[ii] = (int *) malloc((kolstr[ii] + 2) * sizeof(int));
-        prav[ii] = (int *) malloc((kolstr[ii] + 2) * sizeof(int));
-        kluchlev[ii] = (bool *) malloc((kolstr[ii] + 2) * sizeof(bool));
-        kluchprav[ii] = (bool *) malloc((kolstr[ii] + 2) * sizeof(bool));
+    for (int i = 2; i < height + 2; i++) {
+        lev[i] = (int *) malloc((rowNumCount[i] + 2) * sizeof(int));
+        prav[i] = (int *) malloc((rowNumCount[i] + 2) * sizeof(int));
+        kluchlev[i] = (bool *) malloc((rowNumCount[i] + 2) * sizeof(bool));
+        kluchprav[i] = (bool *) malloc((rowNumCount[i] + 2) * sizeof(bool));
 
-//		kluch12[ii] = (bool*) malloc((kolstr[ii]+2)*sizeof(bool));
 
     }
 
@@ -657,13 +370,12 @@ void allocate() {
     kluchniz = (bool **) malloc((width + 2) * sizeof(bool *));
     kluch22 = (bool *) malloc((width + 2) * sizeof(bool));
 
-    for (int ii = 2; ii < width + 2; ii++) {
-        verh[ii] = (int *) malloc((kolsto[ii] + 2) * sizeof(int));
-        niz[ii] = (int *) malloc((kolsto[ii] + 2) * sizeof(int));
-        kluchverh[ii] = (bool *) malloc((kolsto[ii] + 2) * sizeof(bool));
-        kluchniz[ii] = (bool *) malloc((kolsto[ii] + 2) * sizeof(bool));
+    for (int i = 2; i < width + 2; i++) {
+        verh[i] = (int *) malloc((colNumCount[i] + 2) * sizeof(int));
+        niz[i] = (int *) malloc((colNumCount[i] + 2) * sizeof(int));
+        kluchverh[i] = (bool *) malloc((colNumCount[i] + 2) * sizeof(bool));
+        kluchniz[i] = (bool *) malloc((colNumCount[i] + 2) * sizeof(bool));
 
-//		kluch22[ii] = (bool*) malloc((kolsto[ii]+2)*sizeof(bool));
 
     }
 
@@ -679,25 +391,24 @@ void allocate() {
 }
 
 void deallocate() {
-    for (int ii = 0; ii < height + 4; ii++) {
-        free(jpn[ii]);
-        jpn[ii] = NULL;
+    for (int i = 0; i < height + 4; i++) {
+        free(jpn[i]);
+        jpn[i] = NULL;
     }
 
     free(jpn);
     jpn = NULL;
 
 
-    for (int ii = 2; ii < height + 2; ii++) {
-        free(lev[ii]);
-        lev[ii] = NULL;
-        free(prav[ii]);
-        prav[ii] = NULL;
-        free(kluchlev[ii]);
-        kluchlev[ii] = NULL;
-        free(kluchprav[ii]);
-        kluchprav[ii] = NULL;
-//		kluch12[ii] = (bool*) malloc((kolstr[ii]+2)*sizeof(bool));
+    for (int i = 2; i < height + 2; i++) {
+        free(lev[i]);
+        lev[i] = NULL;
+        free(prav[i]);
+        prav[i] = NULL;
+        free(kluchlev[i]);
+        kluchlev[i] = NULL;
+        free(kluchprav[i]);
+        kluchprav[i] = NULL;
     }
 
     free(lev);
@@ -711,17 +422,16 @@ void deallocate() {
     free(kluch12);
     kluch12 = NULL;
 
-    for (int ii = 2; ii < width + 2; ii++) {
-        free(verh[ii]);
-        verh[ii] = NULL;
-        free(niz[ii]);
-        niz[ii] = NULL;
-        free(kluchverh[ii]);
-        kluchverh[ii] = NULL;
-        free(kluchniz[ii]);
-        kluchniz[ii] = NULL;
+    for (int i = 2; i < width + 2; i++) {
+        free(verh[i]);
+        verh[i] = NULL;
+        free(niz[i]);
+        niz[i] = NULL;
+        free(kluchverh[i]);
+        kluchverh[i] = NULL;
+        free(kluchniz[i]);
+        kluchniz[i] = NULL;
 
-//		kluch22[ii] = (bool*) malloc((kolsto[ii]+2)*sizeof(bool));
 
     }
 
@@ -736,23 +446,23 @@ void deallocate() {
     free(kluch22);
     kluch22 = NULL;
 
-    for (int ii = 1; ii < height + 1; ii++) {
-        free(stro[ii + 1]);
-        stro[ii + 1] = NULL;
+    for (int i = 1; i < height + 1; i++) {
+        free(rowNums[i + 1]);
+        rowNums[i + 1] = NULL;
     }
-    for (int ii = 1; ii < width + 1; ii++) {
-        free(sto[ii + 1]);
-        sto[ii + 1] = NULL;
+    for (int i = 1; i < width + 1; i++) {
+        free(colNums[i + 1]);
+        colNums[i + 1] = NULL;
     }
 
-    free(stro);
-    stro = NULL;
-    free(sto);
-    sto = NULL;
-    free(kolstr);
-    kolstr = NULL;
-    free(kolsto);
-    kolsto = NULL;
+    free(rowNums);
+    rowNums = NULL;
+    free(colNums);
+    colNums = NULL;
+    free(rowNumCount);
+    rowNumCount = NULL;
+    free(colNumCount);
+    colNumCount = NULL;
 
     kluchFree(kluchpravfinish);
     kluchFree(kluchfinish4);
@@ -764,93 +474,88 @@ void deallocate() {
 }
 
 void vved() {
-    int i, j, k, s, j1;
     struct kluch *g;
     allocate();
 
 
-//	kluch1[1]=kluch2[1]=kluch12[1]=kluch22[1]=false;
+    for (int i = 2; i < height + 2; i++)
+        for (int j = 2; j < width + 2; j++)
+            jpn[i][j] = empty;
 
-    for (int ii = 2; ii < height + 2; ii++)
-        for (j = 2; j < width + 2; j++)
-            jpn[ii][j] = pusto;
-
-    for (int ii = 2; ii < height + 2; ii++) {
-//         	kluch1[ii]=false;
-        kluch12[ii] = false;
-        jpn[ii][1] = no;
-        jpn[ii][width + 2] = no;
-        jpn[ii][0] = yes;
-        jpn[ii][width + 3] = yes;
+    for (int i = 2; i < height + 2; i++) {
+        kluch12[i] = false;
+        jpn[i][1] = no;
+        jpn[i][width + 2] = no;
+        jpn[i][0] = yes;
+        jpn[i][width + 3] = yes;
 
     }
 
-    for (int ii = 2; ii < width + 2; ii++) {
-        //       	kluch2[ii]=false;
-        kluch22[ii] = false;
-        jpn[1][ii] = no;
-        jpn[height + 2][ii] = no;
-        jpn[0][ii] = yes;
-        jpn[height + 3][ii] = yes;
+    for (int i = 2; i < width + 2; i++) {
+        kluch22[i] = false;
+        jpn[1][i] = no;
+        jpn[height + 2][i] = no;
+        jpn[0][i] = yes;
+        jpn[height + 3][i] = yes;
 
     }
     netu = height * width;
     sumstr = 0;
     sumsto = 0;
-    for (int ii = 2; ii < height + 2; ii++) {
-        lev[ii][0] = 0;
-        prav[ii][0] = 0;
-        stro[ii][0] = 1;
-        k = kolstr[ii];
-        lev[ii][k + 1] = width + 3;
-        prav[ii][k + 1] = width + 3;
-        stro[ii][k + 1] = 1;
-        for (int jj = 1; jj < k + 1; jj++)
-            sumstr = sumstr + stro[ii][jj];
-        for (int jj = 1; jj < k + 1; jj++) {
-            kluchlev[ii][jj] = false;
-            lev[ii][jj] = lev[ii][jj - 1] + stro[ii][jj - 1] + 1;
+    for (int i = 2; i < height + 2; i++) {
+        lev[i][0] = 0;
+        prav[i][0] = 0;
+        rowNums[i][0] = 1;
+        int k = rowNumCount[i];
+        lev[i][k + 1] = width + 3;
+        prav[i][k + 1] = width + 3;
+        rowNums[i][k + 1] = 1;
+        for (int j = 1; j < k + 1; j++)
+            sumstr = sumstr + rowNums[i][j];
+        for (int j = 1; j < k + 1; j++) {
+            kluchlev[i][j] = false;
+            lev[i][j] = lev[i][j - 1] + rowNums[i][j - 1] + 1;
 
         }
-        for (int jj = k; jj > 0; jj--) {
-            kluchprav[ii][jj] = false;
-            prav[ii][jj] = prav[ii][jj + 1] - stro[ii][jj + 1] - 1;
+        for (int j = k; j > 0; j--) {
+            kluchprav[i][j] = false;
+            prav[i][j] = prav[i][j + 1] - rowNums[i][j + 1] - 1;
         }
     }
 
-    for (int ii = 2; ii < width + 2; ii++) {
-        verh[ii][0] = 0;
-        niz[ii][0] = 0;
-        sto[ii][0] = 1;
-        k = kolsto[ii];
-        verh[ii][k + 1] = height + 3;
-        niz[ii][k + 1] = height + 3;
-        sto[ii][k + 1] = 1;
-        for (int jj = 1; jj < k + 1; jj++)
-            sumsto = sumsto + sto[ii][jj];
-        for (int jj = 1; jj < k + 1; jj++) {
-            kluchverh[ii][jj] = false;
-            verh[ii][jj] = verh[ii][jj - 1] + sto[ii][jj - 1] + 1;
+    for (int i = 2; i < width + 2; i++) {
+        verh[i][0] = 0;
+        niz[i][0] = 0;
+        colNums[i][0] = 1;
+        int k = colNumCount[i];
+        verh[i][k + 1] = height + 3;
+        niz[i][k + 1] = height + 3;
+        colNums[i][k + 1] = 1;
+        for (int j = 1; j < k + 1; j++)
+            sumsto = sumsto + colNums[i][j];
+        for (int j = 1; j < k + 1; j++) {
+            kluchverh[i][j] = false;
+            verh[i][j] = verh[i][j - 1] + colNums[i][j - 1] + 1;
 
         }
 
-        for (int jj = k; jj > 0; jj--) {
-            kluchniz[ii][jj] = false;
-            niz[ii][jj] = niz[ii][jj + 1] - sto[ii][jj + 1] - 1;
+        for (int j = k; j > 0; j--) {
+            kluchniz[i][j] = false;
+            niz[i][j] = niz[i][j + 1] - colNums[i][j + 1] - 1;
         }
 
 
     }
 
-    for (int ii = 2; ii < height + 2; ii++) {
-        k = kolstr[ii];
-        for (int jj = 1; jj < k + 1; jj++)
-            if ((prav[ii][jj] - lev[ii][jj] + 1) < (2 * stro[ii][jj]))
-                for (s = (prav[ii][jj] - stro[ii][jj] + 1); s < (lev[ii][jj] + stro[ii][jj]); s++)
-                    if (jpn[ii][s] == pusto) {
-                        jpn[ii][s] = yes;
-                        j1 = 0;
-                        while (ii >= verh[s][j1])
+    for (int i = 2; i < height + 2; i++) {
+        int k = rowNumCount[i];
+        for (int j = 1; j < k + 1; j++)
+            if ((prav[i][j] - lev[i][j] + 1) < (2 * rowNums[i][j]))
+                for (int s = (prav[i][j] - rowNums[i][j] + 1); s < (lev[i][j] + rowNums[i][j]); s++)
+                    if (jpn[i][s] == empty) {
+                        jpn[i][s] = yes;
+                        int j1 = 0;
+                        while (i >= verh[s][j1])
                             j1++;
                         j1--;
                         if ((j1 > 0) && (kluchverh[s][j1] == false)) {
@@ -862,11 +567,11 @@ void vved() {
                             (*g).prev = kluchverhfinish.prev;
                             kluchverhfinish.prev = g;
                         }
-                        j1 = kolsto[s] + 1;
-                        while (ii <= niz[s][j1])
+                        j1 = colNumCount[s] + 1;
+                        while (i <= niz[s][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolsto[s] + 1) && (kluchniz[s][j1] == false)) {
+                        if ((j1 < colNumCount[s] + 1) && (kluchniz[s][j1] == false)) {
                             kluchniz[s][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = s;
@@ -886,13 +591,13 @@ void vved() {
 
                         netu--;
                     }
-        for (int jj = 1; jj <= k + 1; jj++)
-            if ((lev[ii][jj] - prav[ii][jj - 1] - 1) > 0)
-                for (s = (prav[ii][jj - 1] + 1); s < (lev[ii][jj]); s++)
-                    if (jpn[ii][s] == pusto) {
-                        jpn[ii][s] = no;
-                        j1 = 0;
-                        while (ii >= verh[s][j1])
+        for (int j = 1; j <= k + 1; j++)
+            if ((lev[i][j] - prav[i][j - 1] - 1) > 0)
+                for (int s = (prav[i][j - 1] + 1); s < (lev[i][j]); s++)
+                    if (jpn[i][s] == empty) {
+                        jpn[i][s] = no;
+                        int j1 = 0;
+                        while (i >= verh[s][j1])
                             j1++;
                         j1--;
                         if ((j1 > 0) && (kluchverh[s][j1] == false)) {
@@ -904,11 +609,11 @@ void vved() {
                             (*g).prev = kluchverhfinish.prev;
                             kluchverhfinish.prev = g;
                         }
-                        j1 = kolsto[s] + 1;
-                        while (ii <= niz[s][j1])
+                        j1 = colNumCount[s] + 1;
+                        while (i <= niz[s][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolsto[s] + 1) && (kluchniz[s][j1] == false)) {
+                        if ((j1 < colNumCount[s] + 1) && (kluchniz[s][j1] == false)) {
                             kluchniz[s][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = s;
@@ -931,15 +636,15 @@ void vved() {
 
     }
 
-    for (int ii = 2; ii < width + 2; ii++) {
-        k = kolsto[ii];
-        for (int jj = 1; jj < k + 1; jj++)
-            if ((niz[ii][jj] - verh[ii][jj] + 1) < (2 * sto[ii][jj]))
-                for (s = (niz[ii][jj] - sto[ii][jj] + 1); s < (verh[ii][jj] + sto[ii][jj]); s++)
-                    if (jpn[s][ii] == pusto) {
-                        jpn[s][ii] = yes;
-                        j1 = 0;
-                        while (ii >= lev[s][j1])
+    for (int i = 2; i < width + 2; i++) {
+        int k = colNumCount[i];
+        for (int j = 1; j < k + 1; j++)
+            if ((niz[i][j] - verh[i][j] + 1) < (2 * colNums[i][j]))
+                for (int s = (niz[i][j] - colNums[i][j] + 1); s < (verh[i][j] + colNums[i][j]); s++)
+                    if (jpn[s][i] == empty) {
+                        jpn[s][i] = yes;
+                        int j1 = 0;
+                        while (i >= lev[s][j1])
                             j1++;
                         j1--;
                         if ((j1 > 0) && (kluchlev[s][j1] == false)) {
@@ -951,11 +656,11 @@ void vved() {
                             (*g).prev = kluchlevfinish.prev;
                             kluchlevfinish.prev = g;
                         }
-                        j1 = kolstr[s] + 1;
-                        while (ii <= prav[s][j1])
+                        j1 = rowNumCount[s] + 1;
+                        while (i <= prav[s][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolstr[s] + 1) && (kluchprav[s][j1] == false)) {
+                        if ((j1 < rowNumCount[s] + 1) && (kluchprav[s][j1] == false)) {
                             kluchprav[s][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = s;
@@ -975,13 +680,13 @@ void vved() {
 
                         netu--;
                     }
-        for (int jj = 1; jj <= k + 1; jj++)
-            if ((verh[ii][jj] - niz[ii][jj - 1] - 1) > 0)
-                for (s = (niz[ii][jj - 1] + 1); s < (verh[ii][jj]); s++)
-                    if (jpn[s][ii] == pusto) {
-                        jpn[s][ii] = no;
-                        j1 = 0;
-                        while (ii >= lev[s][j1])
+        for (int j = 1; j <= k + 1; j++)
+            if ((verh[i][j] - niz[i][j - 1] - 1) > 0)
+                for (int s = (niz[i][j - 1] + 1); s < (verh[i][j]); s++)
+                    if (jpn[s][i] == empty) {
+                        jpn[s][i] = no;
+                        int j1 = 0;
+                        while (i >= lev[s][j1])
                             j1++;
                         j1--;
                         if ((j1 > 0) && (kluchlev[s][j1] == false)) {
@@ -993,11 +698,11 @@ void vved() {
                             (*g).prev = kluchlevfinish.prev;
                             kluchlevfinish.prev = g;
                         }
-                        j1 = kolstr[s] + 1;
-                        while (ii <= prav[s][j1])
+                        j1 = rowNumCount[s] + 1;
+                        while (i <= prav[s][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolstr[s] + 1) && (kluchprav[s][j1] == false)) {
+                        if ((j1 < rowNumCount[s] + 1) && (kluchprav[s][j1] == false)) {
                             kluchprav[s][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = s;
@@ -1021,67 +726,53 @@ void vved() {
 
 }
 
-/*void postroenie(unsigned char **jpn)
+void postroenie(unsigned char **jpn)
 {
-	if (qt==false)
-	{
-		int i,j;
-		//printf("   ");
-		for (i=1;i<width+1;i++)
-		{
-			if ((i%10)==0)
-				printf("%d",(i/10)%10);
-			else
-				printf(" ");
-		}
-		printf("\n   ");
-		for (i=1;i<width+1;i++)
-			printf("%d",i%10);
-		printf("\n  ");
-		for (i=0;i<width+2;i++)
-			printf("*");
-		printf("\n");
+/*    char str[40];
+    char strr[4000];
 
-		for (i=2;i<height+2;i++)
-		{
-			printf("%d%d%s",(((i-1)/10)%10),((i-1)%10),"*");
-			for (j=2;j<width+2;j++)
-			{
-				printf("%c",mas[jpn[i][j]]);
-			}
-			printf("*\n");
-		}
-		printf("  ");
-		for (i=0;i<width+2;i++)
-			printf("*");
-		printf("\n");
+    sprintf(str, "%s", "\n");
+    strcat(strr, str);
+
+    for (int i=2; i < height + 2; i++){
+        for (int j=2; j < width + 2; j++){
+            sprintf(str, "%c",mas[jpn[i][j]]);
+            strcat(strr, str);
+        }
+        sprintf(str, "%s", "\n");
+        strcat(strr, str);
 	}
+//    sprintf(str, "%s", "  ");
+//    strcat(strr, str);
+    sprintf(str, "%s", "\n");
+    strcat(strr, str);
+    __android_log_write(ANDROID_LOG_DEBUG, "Solutions", strr);*/
 }
 
-void postroenie1(unsigned char **jpn)
+/*void postroenie1(unsigned char **jpn)
 {
-	int i,j,s,t;
+	int i_0,j_0,s,t;
 	unsigned int j0;
-	const int k=1;
+	const int k_0=1;
 	char name2[200];
 	FILE *outfile;
 	sprintf(name2,"%s%s%d.xpm",name,"_",kol);
 	outfile = fopen(name2,"w");
 	//fprintf(outfile,"/%s/\n","* XPM *");
 	//fprintf(outfile,"static char *test_xpm[] = {\n");
-	//fprintf(outfile,"%s%d%s%d%s","\"",width*k," ",height*k," 2 1\",\n");
+	//fprintf(outfile,"%s%d%s%d%s","\"",width*k_0," ",height*k_0," 2 1\",\n");
 	//fprintf(outfile,"\"X c white\",\n");
 	//fprintf(outfile,"\" c black\",\n");
-	for (i=2;i<height+2;i++)
+	for (i_0=2;i_0<height+2;i_0++)
 	{
-		for (s=1;s<k+1;s++)
+		for (s=1;s<k_0+1;s++)
 		{
 			//fprintf(outfile,"\"");
-			for (j=2;j<width+2;j++)
+			for (j_0=2;j_0<width+2;j_0++)
 			{
-				for (t=1;t<k+1;t++)
+				for (t=1;t<k_0+1;t++)
 				{
-					fprintf(outfile,"%c",mas[jpn[i][j]]);
+					fprintf(outfile,"%c",mas[jpn[i_0][j_0]]);
 				}
 			}
 			fprintf(outfile,"\n");
@@ -1093,107 +784,110 @@ void postroenie1(unsigned char **jpn)
 }*/
 
 void reshstr1(int i, int j) {
-    int s, p, q, t, a, b, c, j1, teklev = lev[i][j], teklev2 = lev[i][j + 1];
-    bool sdvig = false, sdvig2 = false;
+    int j1;
+    int currentlev = lev[i][j];
+    int currentlev2 = lev[i][j + 1];
+    bool shift = false;
+    bool shift2 = false;
     struct kluch *g, *g1;
-    s = teklev;
-    p = s - 1;
-    q = s - 2;
+    int s = currentlev;
+    int p = s - 1;
+    int q = s - 2;
     label:
-    while ((s < teklev + stro[i][j]) && (s <= prav[i][j])) {
+    while ((s < currentlev + rowNums[i][j]) && (s <= prav[i][j])) {
         if (jpn[i][s] == no) {
 
             while (jpn[i][s] == no)
                 s++;
-            if ((prav[i][j] - s + 1) < (stro[i][j])) {
+            if ((prav[i][j] - s + 1) < (rowNums[i][j])) {
                 er = false;
                 return;
             }
 
-            teklev = s;
-            sdvig = true;
+            currentlev = s;
+            shift = true;
 
             p = s - 1;
         }
 
         if (jpn[i][s] == yes) {
-            t = 0;
+            int t = 0;
             q = s;
             while ((jpn[i][s] == yes) && (s <= prav[i][j])) {
                 s++;
                 t++;
             }
-            if (t > stro[i][j]) {
-                if ((prav[i][j] - s + 1) < (stro[i][j])) {
+            if (t > rowNums[i][j]) {
+                if ((prav[i][j] - s + 1) < (rowNums[i][j])) {
                     er = false;
                     return;
                 }
 
-                teklev = s;
-                sdvig = true;
+                currentlev = s;
+                shift = true;
 
 
-            } else if (teklev < s - stro[i][j]) {
-                if ((prav[i][j] - (s - stro[i][j]) + 1) < (stro[i][j])) {
+            } else if (currentlev < s - rowNums[i][j]) {
+                if ((prav[i][j] - (s - rowNums[i][j]) + 1) < (rowNums[i][j])) {
                     er = false;
                     return;
                 }
 
-                teklev = s - stro[i][j];
-                sdvig = true;
+                currentlev = s - rowNums[i][j];
+                shift = true;
 
 
             }
         }
 
-        while ((jpn[i][s] == pusto) && (s <= teklev + stro[i][j]) && (s <= prav[i][j]))
+        while ((jpn[i][s] == empty) && (s <= currentlev + rowNums[i][j]) && (s <= prav[i][j]))
             s++;
 
     }
 
-    if (teklev2 < teklev + stro[i][j] + 1) {
-        if ((prav[i][j + 1] - (teklev + stro[i][j] + 1) + 1) < (stro[i][j + 1])) {
+    if (currentlev2 < currentlev + rowNums[i][j] + 1) {
+        if ((prav[i][j + 1] - (currentlev + rowNums[i][j] + 1) + 1) < (rowNums[i][j + 1])) {
             er = false;
             return;
         }
 
-        teklev2 = teklev + stro[i][j] + 1;
-        sdvig2 = true;
+        currentlev2 = currentlev + rowNums[i][j] + 1;
+        shift2 = true;
 
     }
 
-    while ((s < teklev2) && (s <= prav[i][j])) {
+    while ((s < currentlev2) && (s <= prav[i][j])) {
 
         if (jpn[i][s] == yes) {
-            t = 0;
+            int t = 0;
             q = s;
             while ((jpn[i][s] == yes) && (s <= prav[i][j])) {
                 s++;
                 t++;
             }
 
-            if (t > stro[i][j]) {
-                if ((prav[i][j] - s + 1) < (stro[i][j])) {
+            if (t > rowNums[i][j]) {
+                if ((prav[i][j] - s + 1) < (rowNums[i][j])) {
                     er = false;
                     return;
                 }
 
-                teklev = s;
-                sdvig = true;
+                currentlev = s;
+                shift = true;
                 goto label;
             }
 
-            if (teklev < s - stro[i][j]) {
+            if (currentlev < s - rowNums[i][j]) {
 
-                if ((prav[i][j] - (s - stro[i][j]) + 1) < (stro[i][j])) {
+                if ((prav[i][j] - (s - rowNums[i][j]) + 1) < (rowNums[i][j])) {
                     er = false;
                     return;
                 }
 
 
-                teklev = s - stro[i][j];
-                sdvig = true;
-                s = teklev;
+                currentlev = s - rowNums[i][j];
+                shift = true;
+                s = currentlev;
                 p = s - 1;
                 q = s - 2;
                 goto label;
@@ -1201,31 +895,31 @@ void reshstr1(int i, int j) {
 
             }
 
-            if (teklev2 < teklev + stro[i][j] + 1) {
-                if ((prav[i][j + 1] - (teklev + stro[i][j] + 1) + 1) < (stro[i][j + 1])) {
+            if (currentlev2 < currentlev + rowNums[i][j] + 1) {
+                if ((prav[i][j + 1] - (currentlev + rowNums[i][j] + 1) + 1) < (rowNums[i][j + 1])) {
                     er = false;
                     return;
                 }
 
-                teklev2 = teklev + stro[i][j] + 1;
-                sdvig2 = true;
+                currentlev2 = currentlev + rowNums[i][j] + 1;
+                shift2 = true;
 
             }
         }
 
         if (jpn[i][s] == no) {
-            if (s - p - 1 < stro[i][j]) {
+            if (s - p - 1 < rowNums[i][j]) {
                 if (q > p) {
                     while ((jpn[i][s] == no) && (s <= prav[i][j]))
                         s++;
-                    if ((prav[i][j] - s + 1) < (stro[i][j])) {
+                    if ((prav[i][j] - s + 1) < (rowNums[i][j])) {
                         er = false;
                         return;
                     }
 
 
-                    teklev = s;
-                    sdvig = true;
+                    currentlev = s;
+                    shift = true;
 
                     p = s - 1;
                     goto label;
@@ -1238,27 +932,27 @@ void reshstr1(int i, int j) {
                 s++;
             p = s - 1;
         }
-        while ((jpn[i][s] == pusto) && (s < teklev2) && (s <= prav[i][j]))
+        while ((jpn[i][s] == empty) && (s < currentlev2) && (s <= prav[i][j]))
             s++;
     }
 
-    if ((lev[i][kolstr[i] + 1] != (width + 3))) {
+    if ((lev[i][rowNumCount[i] + 1] != (width + 3))) {
         er = false;
         return;
     }
 
-    if (sdvig) {
-        if ((prav[i][j] - teklev + 1) < (stro[i][j])) {
+    if (shift) {
+        if ((prav[i][j] - currentlev + 1) < (rowNums[i][j])) {
             er = false;
             return;
         }
-        if ((prav[i][j] - teklev + 1) < (2 * stro[i][j])) {
-            for (s = (prav[i][j] - stro[i][j] + 1); s < (teklev + stro[i][j]); s++) {
+        if ((prav[i][j] - currentlev + 1) < (2 * rowNums[i][j])) {
+            for (s = (prav[i][j] - rowNums[i][j] + 1); s < (currentlev + rowNums[i][j]); s++) {
                 if (jpn[i][s] == no) {
                     er = false;
                     return;
                 }
-                if (jpn[i][s] == pusto) {
+                if (jpn[i][s] == empty) {
                     jpn[i][s] = yes;
                     j1 = 0;
                     while (s >= lev[i][j1])
@@ -1272,11 +966,11 @@ void reshstr1(int i, int j) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[i] + 1;
+                    j1 = rowNumCount[i] + 1;
                     while (s <= prav[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[i] + 1) && (kluchprav[i][j1] == false)) {
+                    if ((j1 < rowNumCount[i] + 1) && (kluchprav[i][j1] == false)) {
                         kluchprav[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -1305,11 +999,11 @@ void reshstr1(int i, int j) {
                         (*g).prev = kluchverhfinish.prev;
                         kluchverhfinish.prev = g;
                     }
-                    j1 = kolsto[s] + 1;
+                    j1 = colNumCount[s] + 1;
                     while (i <= niz[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[s] + 1) && (kluchniz[s][j1] == false)) {
+                    if ((j1 < colNumCount[s] + 1) && (kluchniz[s][j1] == false)) {
                         kluchniz[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -1338,14 +1032,14 @@ void reshstr1(int i, int j) {
             }
         }
 
-        if (teklev - prav[i][j - 1] > 1)
-            for (s = prav[i][j - 1] + 1; s < teklev; s++) {
+        if (currentlev - prav[i][j - 1] > 1)
+            for (s = prav[i][j - 1] + 1; s < currentlev; s++) {
                 if (jpn[i][s] == yes) {
 
                     er = false;
                     return;
                 }
-                if (jpn[i][s] == pusto) {
+                if (jpn[i][s] == empty) {
 
                     jpn[i][s] = no;
                     j1 = 0;
@@ -1360,11 +1054,11 @@ void reshstr1(int i, int j) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[i] + 1;
+                    j1 = rowNumCount[i] + 1;
                     while (s <= prav[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[i] + 1) && (kluchprav[i][j1] == false)) {
+                    if ((j1 < rowNumCount[i] + 1) && (kluchprav[i][j1] == false)) {
                         kluchprav[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -1393,11 +1087,11 @@ void reshstr1(int i, int j) {
                         (*g).prev = kluchverhfinish.prev;
                         kluchverhfinish.prev = g;
                     }
-                    j1 = kolsto[s] + 1;
+                    j1 = colNumCount[s] + 1;
                     while (i <= niz[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[s] + 1) && (kluchniz[s][j1] == false)) {
+                    if ((j1 < colNumCount[s] + 1) && (kluchniz[s][j1] == false)) {
                         kluchniz[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -1428,18 +1122,18 @@ void reshstr1(int i, int j) {
 
 
     }
-    if (sdvig2) {
-        if ((prav[i][j + 1] - teklev2 + 1) < (stro[i][j + 1])) {
+    if (shift2) {
+        if ((prav[i][j + 1] - currentlev2 + 1) < (rowNums[i][j + 1])) {
             er = false;
             return;
         }
-        if ((prav[i][j + 1] - teklev2 + 1) < (2 * stro[i][j + 1])) {
-            for (s = (prav[i][j + 1] - stro[i][j + 1] + 1); s < (teklev2 + stro[i][j + 1]); s++) {
+        if ((prav[i][j + 1] - currentlev2 + 1) < (2 * rowNums[i][j + 1])) {
+            for (s = (prav[i][j + 1] - rowNums[i][j + 1] + 1); s < (currentlev2 + rowNums[i][j + 1]); s++) {
                 if (jpn[i][s] == no) {
                     er = false;
                     return;
                 }
-                if (jpn[i][s] == pusto) {
+                if (jpn[i][s] == empty) {
                     jpn[i][s] = yes;
                     j1 = 0;
                     while (s >= lev[i][j1])
@@ -1453,11 +1147,11 @@ void reshstr1(int i, int j) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[i] + 1;
+                    j1 = rowNumCount[i] + 1;
                     while (s <= prav[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[i] + 1) && (kluchprav[i][j1] == false)) {
+                    if ((j1 < rowNumCount[i] + 1) && (kluchprav[i][j1] == false)) {
                         kluchprav[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -1486,11 +1180,11 @@ void reshstr1(int i, int j) {
                         (*g).prev = kluchverhfinish.prev;
                         kluchverhfinish.prev = g;
                     }
-                    j1 = kolsto[s] + 1;
+                    j1 = colNumCount[s] + 1;
                     while (i <= niz[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[s] + 1) && (kluchniz[s][j1] == false)) {
+                    if ((j1 < colNumCount[s] + 1) && (kluchniz[s][j1] == false)) {
                         kluchniz[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -1518,13 +1212,13 @@ void reshstr1(int i, int j) {
                 }
             }
         }
-        if (teklev2 - prav[i][j] > 1)
-            for (s = prav[i][j] + 1; s < teklev2; s++) {
+        if (currentlev2 - prav[i][j] > 1)
+            for (s = prav[i][j] + 1; s < currentlev2; s++) {
                 if (jpn[i][s] == yes) {
                     er = false;
                     return;
                 }
-                if (jpn[i][s] == pusto) {
+                if (jpn[i][s] == empty) {
 
                     jpn[i][s] = no;
                     j1 = 0;
@@ -1539,11 +1233,11 @@ void reshstr1(int i, int j) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[i] + 1;
+                    j1 = rowNumCount[i] + 1;
                     while (s <= prav[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[i] + 1) && (kluchprav[i][j1] == false)) {
+                    if ((j1 < rowNumCount[i] + 1) && (kluchprav[i][j1] == false)) {
                         kluchprav[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -1572,11 +1266,11 @@ void reshstr1(int i, int j) {
                         (*g).prev = kluchverhfinish.prev;
                         kluchverhfinish.prev = g;
                     }
-                    j1 = kolsto[s] + 1;
+                    j1 = colNumCount[s] + 1;
                     while (i <= niz[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[s] + 1) && (kluchniz[s][j1] == false)) {
+                    if ((j1 < colNumCount[s] + 1) && (kluchniz[s][j1] == false)) {
                         kluchniz[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -1605,8 +1299,8 @@ void reshstr1(int i, int j) {
             }
 
     }
-    if (sdvig) {
-        lev[i][j] = teklev;
+    if (shift) {
+        lev[i][j] = currentlev;
         if ((j > 1) && (kluchlev[i][j - 1] == false)) {
             kluchlev[i][j - 1] = true;
             g = (struct kluch *) malloc(sizeof(struct kluch));
@@ -1630,8 +1324,8 @@ void reshstr1(int i, int j) {
         }
 
     }
-    if (sdvig2) {
-        lev[i][j + 1] = teklev2;
+    if (shift2) {
+        lev[i][j + 1] = currentlev2;
         if (kluchlev[i][j + 1] == false) {
             kluchlev[i][j + 1] = true;
             g = (struct kluch *) malloc(sizeof(struct kluch));
@@ -1661,25 +1355,28 @@ void reshstr1(int i, int j) {
 }
 
 void reshstr2(int i, int j) {
-    int s, p, q, t, c, a, b, j1, tekprav = prav[i][j], tekprav2 = prav[i][j - 1];
-    bool sdvig = false, sdvig2 = false;
+    int s, p, q, t, c, a, b, j1;
+    int currentprav = prav[i][j];
+    int currentprav2 = prav[i][j - 1];
+    bool shift = false;
+    bool shift2 = false;
     struct kluch *g;
-    s = tekprav;
+    s = currentprav;
     p = s + 1;
     q = s + 2;
     label:
-    while ((s > tekprav - stro[i][j]) && (s >= lev[i][j])) {
+    while ((s > currentprav - rowNums[i][j]) && (s >= lev[i][j])) {
 
         if (jpn[i][s] == no) {
             while (jpn[i][s] == no)
                 s--;
-            if ((s - lev[i][j] + 1) < (stro[i][j])) {
+            if ((s - lev[i][j] + 1) < (rowNums[i][j])) {
                 er = false;
                 return;
             }
 
-            tekprav = s;
-            sdvig = true;
+            currentprav = s;
+            shift = true;
 
             p = s + 1;
         }
@@ -1691,44 +1388,44 @@ void reshstr2(int i, int j) {
                 s--;
                 t++;
             }
-            if (t > stro[i][j]) {
-                if ((s - lev[i][j] + 1) < (stro[i][j])) {
+            if (t > rowNums[i][j]) {
+                if ((s - lev[i][j] + 1) < (rowNums[i][j])) {
                     er = false;
                     return;
                 }
 
-                tekprav = s;
-                sdvig = true;
+                currentprav = s;
+                shift = true;
 
 
-            } else if (tekprav > s + stro[i][j]) {
-                if (((s + stro[i][j]) - lev[i][j] + 1) < (stro[i][j])) {
+            } else if (currentprav > s + rowNums[i][j]) {
+                if (((s + rowNums[i][j]) - lev[i][j] + 1) < (rowNums[i][j])) {
                     er = false;
                     return;
                 }
 
-                tekprav = s + stro[i][j];
-                sdvig = true;
+                currentprav = s + rowNums[i][j];
+                shift = true;
 
             }
 
         }
-        while ((jpn[i][s] == pusto) && (s >= tekprav - stro[i][j]) && (s >= lev[i][j]))
+        while ((jpn[i][s] == empty) && (s >= currentprav - rowNums[i][j]) && (s >= lev[i][j]))
             s--;
     }
 
-    if (tekprav2 > tekprav - stro[i][j] - 1) {
-        if (((tekprav - stro[i][j] - 1) - lev[i][j - 1] + 1) < (stro[i][j - 1])) {
+    if (currentprav2 > currentprav - rowNums[i][j] - 1) {
+        if (((currentprav - rowNums[i][j] - 1) - lev[i][j - 1] + 1) < (rowNums[i][j - 1])) {
             er = false;
             return;
         }
 
-        tekprav2 = tekprav - stro[i][j] - 1;
-        sdvig2 = true;
+        currentprav2 = currentprav - rowNums[i][j] - 1;
+        shift2 = true;
 
     }
 
-    while ((s > tekprav2) && (s >= lev[i][j])) {
+    while ((s > currentprav2) && (s >= lev[i][j])) {
         if (jpn[i][s] == yes) {
             t = 0;
             q = s;
@@ -1736,26 +1433,26 @@ void reshstr2(int i, int j) {
                 s--;
                 t++;
             }
-            if (t > stro[i][j]) {
-                if ((s - lev[i][j] + 1) < (stro[i][j])) {
+            if (t > rowNums[i][j]) {
+                if ((s - lev[i][j] + 1) < (rowNums[i][j])) {
                     er = false;
                     return;
                 }
 
-                tekprav = s;
-                sdvig = true;
+                currentprav = s;
+                shift = true;
 
                 goto label;
             }
-            if (tekprav > s + stro[i][j]) {
-                if (((s + stro[i][j]) - lev[i][j] + 1) < (stro[i][j])) {
+            if (currentprav > s + rowNums[i][j]) {
+                if (((s + rowNums[i][j]) - lev[i][j] + 1) < (rowNums[i][j])) {
                     er = false;
                     return;
                 }
 
-                tekprav = s + stro[i][j];
-                sdvig = true;
-                s = tekprav;
+                currentprav = s + rowNums[i][j];
+                shift = true;
+                s = currentprav;
                 p = s + 1;
                 q = s + 2;
 
@@ -1763,30 +1460,30 @@ void reshstr2(int i, int j) {
 
 
             }
-            if (tekprav2 > tekprav - stro[i][j] - 1) {
-                if (((tekprav - stro[i][j] - 1) - lev[i][j - 1] + 1) < (stro[i][j - 1])) {
+            if (currentprav2 > currentprav - rowNums[i][j] - 1) {
+                if (((currentprav - rowNums[i][j] - 1) - lev[i][j - 1] + 1) < (rowNums[i][j - 1])) {
                     er = false;
                     return;
                 }
 
-                tekprav2 = tekprav - stro[i][j] - 1;
-                sdvig2 = true;
+                currentprav2 = currentprav - rowNums[i][j] - 1;
+                shift2 = true;
 
             }
         }
 
         if (jpn[i][s] == no) {
-            if (p - s - 1 < stro[i][j]) {
+            if (p - s - 1 < rowNums[i][j]) {
                 if (q < p) {
                     while ((jpn[i][s] == no) && (s >= lev[i][j]))
                         s--;
-                    if ((s - lev[i][j] + 1) < (stro[i][j])) {
+                    if ((s - lev[i][j] + 1) < (rowNums[i][j])) {
                         er = false;
                         return;
                     }
 
-                    tekprav = s;
-                    sdvig = true;
+                    currentprav = s;
+                    shift = true;
 
                     p = s + 1;
                     goto label;
@@ -1801,7 +1498,7 @@ void reshstr2(int i, int j) {
             p = s + 1;
         }
 
-        while ((jpn[i][s] == pusto) && (s > tekprav2) && (s >= lev[i][j]))
+        while ((jpn[i][s] == empty) && (s > currentprav2) && (s >= lev[i][j]))
             s--;
     }
     if ((prav[i][0] != 0)) {
@@ -1809,18 +1506,18 @@ void reshstr2(int i, int j) {
         return;
     }
 
-    if (sdvig) {
-        if ((tekprav - lev[i][j] + 1) < (stro[i][j])) {
+    if (shift) {
+        if ((currentprav - lev[i][j] + 1) < (rowNums[i][j])) {
             er = false;
             return;
         }
-        if ((tekprav - lev[i][j] + 1) < (2 * stro[i][j])) {
-            for (s = (tekprav - stro[i][j] + 1); s < (lev[i][j] + stro[i][j]); s++) {
+        if ((currentprav - lev[i][j] + 1) < (2 * rowNums[i][j])) {
+            for (s = (currentprav - rowNums[i][j] + 1); s < (lev[i][j] + rowNums[i][j]); s++) {
                 if (jpn[i][s] == no) {
                     er = false;
                     return;
                 }
-                if (jpn[i][s] == pusto) {
+                if (jpn[i][s] == empty) {
                     jpn[i][s] = yes;
                     j1 = 0;
                     while (s >= lev[i][j1])
@@ -1834,11 +1531,11 @@ void reshstr2(int i, int j) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[i] + 1;
+                    j1 = rowNumCount[i] + 1;
                     while (s <= prav[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[i] + 1) && (kluchprav[i][j1] == false)) {
+                    if ((j1 < rowNumCount[i] + 1) && (kluchprav[i][j1] == false)) {
                         kluchprav[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -1867,11 +1564,11 @@ void reshstr2(int i, int j) {
                         (*g).prev = kluchverhfinish.prev;
                         kluchverhfinish.prev = g;
                     }
-                    j1 = kolsto[s] + 1;
+                    j1 = colNumCount[s] + 1;
                     while (i <= niz[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[s] + 1) && (kluchniz[s][j1] == false)) {
+                    if ((j1 < colNumCount[s] + 1) && (kluchniz[s][j1] == false)) {
                         kluchniz[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -1901,13 +1598,13 @@ void reshstr2(int i, int j) {
             }
         }
 
-        if (lev[i][j + 1] - tekprav > 1)
-            for (s = tekprav + 1; s < lev[i][j + 1]; s++) {
+        if (lev[i][j + 1] - currentprav > 1)
+            for (s = currentprav + 1; s < lev[i][j + 1]; s++) {
                 if (jpn[i][s] == yes) {
                     er = false;
                     return;
                 }
-                if (jpn[i][s] == pusto) {
+                if (jpn[i][s] == empty) {
 
                     jpn[i][s] = no;
                     j1 = 0;
@@ -1922,11 +1619,11 @@ void reshstr2(int i, int j) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[i] + 1;
+                    j1 = rowNumCount[i] + 1;
                     while (s <= prav[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[i] + 1) && (kluchprav[i][j1] == false)) {
+                    if ((j1 < rowNumCount[i] + 1) && (kluchprav[i][j1] == false)) {
                         kluchprav[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -1955,11 +1652,11 @@ void reshstr2(int i, int j) {
                         (*g).prev = kluchverhfinish.prev;
                         kluchverhfinish.prev = g;
                     }
-                    j1 = kolsto[s] + 1;
+                    j1 = colNumCount[s] + 1;
                     while (i <= niz[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[s] + 1) && (kluchniz[s][j1] == false)) {
+                    if ((j1 < colNumCount[s] + 1) && (kluchniz[s][j1] == false)) {
                         kluchniz[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -1990,18 +1687,18 @@ void reshstr2(int i, int j) {
 
 
     }
-    if (sdvig2) {
-        if ((tekprav2 - lev[i][j - 1] + 1) < (stro[i][j - 1])) {
+    if (shift2) {
+        if ((currentprav2 - lev[i][j - 1] + 1) < (rowNums[i][j - 1])) {
             er = false;
             return;
         }
-        if ((tekprav2 - lev[i][j - 1] + 1) < (2 * stro[i][j - 1])) {
-            for (s = (tekprav2 - stro[i][j - 1] + 1); s < (lev[i][j - 1] + stro[i][j - 1]); s++) {
+        if ((currentprav2 - lev[i][j - 1] + 1) < (2 * rowNums[i][j - 1])) {
+            for (s = (currentprav2 - rowNums[i][j - 1] + 1); s < (lev[i][j - 1] + rowNums[i][j - 1]); s++) {
                 if (jpn[i][s] == no) {
                     er = false;
                     return;
                 }
-                if (jpn[i][s] == pusto) {
+                if (jpn[i][s] == empty) {
                     jpn[i][s] = yes;
                     j1 = 0;
                     while (s >= lev[i][j1])
@@ -2015,11 +1712,11 @@ void reshstr2(int i, int j) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[i] + 1;
+                    j1 = rowNumCount[i] + 1;
                     while (s <= prav[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[i] + 1) && (kluchprav[i][j1] == false)) {
+                    if ((j1 < rowNumCount[i] + 1) && (kluchprav[i][j1] == false)) {
                         kluchprav[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -2048,11 +1745,11 @@ void reshstr2(int i, int j) {
                         (*g).prev = kluchverhfinish.prev;
                         kluchverhfinish.prev = g;
                     }
-                    j1 = kolsto[s] + 1;
+                    j1 = colNumCount[s] + 1;
                     while (i <= niz[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[s] + 1) && (kluchniz[s][j1] == false)) {
+                    if ((j1 < colNumCount[s] + 1) && (kluchniz[s][j1] == false)) {
                         kluchniz[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -2081,13 +1778,13 @@ void reshstr2(int i, int j) {
                 }
             }
         }
-        if (lev[i][j] - tekprav2 > 1)
-            for (s = tekprav2 + 1; s < lev[i][j]; s++) {
+        if (lev[i][j] - currentprav2 > 1)
+            for (s = currentprav2 + 1; s < lev[i][j]; s++) {
                 if (jpn[i][s] == yes) {
                     er = false;
                     return;
                 }
-                if (jpn[i][s] == pusto) {
+                if (jpn[i][s] == empty) {
 
                     jpn[i][s] = no;
                     j1 = 0;
@@ -2102,11 +1799,11 @@ void reshstr2(int i, int j) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[i] + 1;
+                    j1 = rowNumCount[i] + 1;
                     while (s <= prav[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[i] + 1) && (kluchprav[i][j1] == false)) {
+                    if ((j1 < rowNumCount[i] + 1) && (kluchprav[i][j1] == false)) {
                         kluchprav[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -2135,11 +1832,11 @@ void reshstr2(int i, int j) {
                         (*g).prev = kluchverhfinish.prev;
                         kluchverhfinish.prev = g;
                     }
-                    j1 = kolsto[s] + 1;
+                    j1 = colNumCount[s] + 1;
                     while (i <= niz[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[s] + 1) && (kluchniz[s][j1] == false)) {
+                    if ((j1 < colNumCount[s] + 1) && (kluchniz[s][j1] == false)) {
                         kluchniz[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -2168,9 +1865,9 @@ void reshstr2(int i, int j) {
             }
 
     }
-    if (sdvig) {
-        prav[i][j] = tekprav;
-        if ((j < kolstr[i]) && (kluchprav[i][j + 1] == false)) {
+    if (shift) {
+        prav[i][j] = currentprav;
+        if ((j < rowNumCount[i]) && (kluchprav[i][j + 1] == false)) {
             kluchprav[i][j + 1] = true;
             g = (struct kluch *) malloc(sizeof(struct kluch));
             (*g).i = i;
@@ -2194,8 +1891,8 @@ void reshstr2(int i, int j) {
             prav2[i][j] = NULL;
         }
     }
-    if (sdvig2) {
-        prav[i][j - 1] = tekprav2;
+    if (shift2) {
+        prav[i][j - 1] = currentprav2;
         if (kluchprav[i][j - 1] == false) {
             kluchprav[i][j - 1] = true;
             g = (struct kluch *) malloc(sizeof(struct kluch));
@@ -2224,100 +1921,103 @@ void reshstr2(int i, int j) {
 
 
 void reshsto1(int i, int j) {
-    int s, p, q, t, a, b, c, j1, tekverh = verh[i][j], tekverh2 = verh[i][j + 1];
-    bool sdvig = false, sdvig2 = false;
+    int j1;
+    int currentverh = verh[i][j];
+    int currentverh2 = verh[i][j + 1];
+    bool shift = false;
+    bool shift2 = false;
     struct kluch *g;
-    s = tekverh;
-    p = s - 1;
-    q = s - 2;
+    int s = currentverh;
+    int p = s - 1;
+    int q = s - 2;
     label:
-    while ((s < tekverh + sto[i][j]) && (s <= niz[i][j])) {
+    while ((s < currentverh + colNums[i][j]) && (s <= niz[i][j])) {
         if (jpn[s][i] == no) {
 
             while (jpn[s][i] == no)
                 s++;
 
-            if ((niz[i][j] - s + 1) < (sto[i][j])) {
+            if ((niz[i][j] - s + 1) < (colNums[i][j])) {
                 er = false;
                 return;
             }
 
-            tekverh = s;
-            sdvig = true;
+            currentverh = s;
+            shift = true;
 
             p = s - 1;
         }
 
         if (jpn[s][i] == yes) {
-            t = 0;
+            int t = 0;
             q = s;
             while ((jpn[s][i] == yes) && (s <= niz[i][j])) {
                 s++;
                 t++;
             }
-            if (t > sto[i][j]) {
-                if ((niz[i][j] - s + 1) < (sto[i][j])) {
+            if (t > colNums[i][j]) {
+                if ((niz[i][j] - s + 1) < (colNums[i][j])) {
                     er = false;
                     return;
                 }
 
-                tekverh = s;
-                sdvig = true;
+                currentverh = s;
+                shift = true;
 
-            } else if (tekverh < s - sto[i][j]) {
-                if ((niz[i][j] - (s - sto[i][j]) + 1) < (sto[i][j])) {
+            } else if (currentverh < s - colNums[i][j]) {
+                if ((niz[i][j] - (s - colNums[i][j]) + 1) < (colNums[i][j])) {
                     er = false;
                     return;
                 }
 
-                tekverh = s - sto[i][j];
-                sdvig = true;
+                currentverh = s - colNums[i][j];
+                shift = true;
 
             }
         }
-        while ((jpn[s][i] == pusto) && (s <= tekverh + sto[i][j]) && (s <= niz[i][j]))
+        while ((jpn[s][i] == empty) && (s <= currentverh + colNums[i][j]) && (s <= niz[i][j]))
             s++;
     }
 
-    if (tekverh2 < tekverh + sto[i][j] + 1) {
-        if ((niz[i][j + 1] - (tekverh + sto[i][j] + 1) + 1) < (sto[i][j + 1])) {
+    if (currentverh2 < currentverh + colNums[i][j] + 1) {
+        if ((niz[i][j + 1] - (currentverh + colNums[i][j] + 1) + 1) < (colNums[i][j + 1])) {
             er = false;
             return;
         }
-        tekverh2 = tekverh + sto[i][j] + 1;
-        sdvig2 = true;
+        currentverh2 = currentverh + colNums[i][j] + 1;
+        shift2 = true;
     }
 
-    while ((s < tekverh2) && (s <= niz[i][j])) {
+    while ((s < currentverh2) && (s <= niz[i][j])) {
         if (jpn[s][i] == yes) {
-            t = 0;
+            int t = 0;
             q = s;
             while ((jpn[s][i] == yes) && (s <= niz[i][j])) {
                 s++;
                 t++;
             }
 
-            if (t > sto[i][j]) {
-                if ((niz[i][j] - s + 1) < (sto[i][j])) {
+            if (t > colNums[i][j]) {
+                if ((niz[i][j] - s + 1) < (colNums[i][j])) {
                     er = false;
                     return;
                 }
 
-                tekverh = s;
-                sdvig = true;
+                currentverh = s;
+                shift = true;
 
                 goto label;
             }
 
-            if (tekverh < s - sto[i][j]) {
-                if ((niz[i][j] - (s - sto[i][j]) + 1) < (sto[i][j])) {
+            if (currentverh < s - colNums[i][j]) {
+                if ((niz[i][j] - (s - colNums[i][j]) + 1) < (colNums[i][j])) {
                     er = false;
                     return;
                 }
 
-                tekverh = s - sto[i][j];
-                sdvig = true;
-                s = tekverh;
+                currentverh = s - colNums[i][j];
+                shift = true;
+                s = currentverh;
                 p = s - 1;
                 q = s - 2;
 
@@ -2325,29 +2025,29 @@ void reshsto1(int i, int j) {
 
             }
 
-            if (tekverh2 < tekverh + sto[i][j] + 1) {
-                if ((niz[i][j + 1] - (tekverh + sto[i][j] + 1) + 1) < (sto[i][j + 1])) {
+            if (currentverh2 < currentverh + colNums[i][j] + 1) {
+                if ((niz[i][j + 1] - (currentverh + colNums[i][j] + 1) + 1) < (colNums[i][j + 1])) {
                     er = false;
                     return;
                 }
 
-                tekverh2 = tekverh + sto[i][j] + 1;
-                sdvig2 = true;
+                currentverh2 = currentverh + colNums[i][j] + 1;
+                shift2 = true;
             }
         }
 
         if (jpn[s][i] == no) {
-            if (s - p - 1 < sto[i][j]) {
+            if (s - p - 1 < colNums[i][j]) {
                 if (q > p) {
                     while ((jpn[s][i] == no) && (s <= niz[i][j]))
                         s++;
-                    if ((niz[i][j] - s + 1) < (sto[i][j])) {
+                    if ((niz[i][j] - s + 1) < (colNums[i][j])) {
                         er = false;
                         return;
                     }
 
-                    tekverh = s;
-                    sdvig = true;
+                    currentverh = s;
+                    shift = true;
                     p = s - 1;
                     goto label;
                 }
@@ -2359,27 +2059,27 @@ void reshsto1(int i, int j) {
                 s++;
             p = s - 1;
         }
-        while ((jpn[s][i] == pusto) && (s < tekverh2) && (s <= niz[i][j]))
+        while ((jpn[s][i] == empty) && (s < currentverh2) && (s <= niz[i][j]))
             s++;
     }
 
-    if ((verh[i][kolsto[i] + 1] != (height + 3))) {
+    if ((verh[i][colNumCount[i] + 1] != (height + 3))) {
         er = false;
         return;
     }
 
-    if (sdvig) {
-        if ((niz[i][j] - tekverh + 1) < (sto[i][j])) {
+    if (shift) {
+        if ((niz[i][j] - currentverh + 1) < (colNums[i][j])) {
             er = false;
             return;
         }
-        if ((niz[i][j] - tekverh + 1) < (2 * sto[i][j])) {
-            for (s = (niz[i][j] - sto[i][j] + 1); s < (tekverh + sto[i][j]); s++) {
+        if ((niz[i][j] - currentverh + 1) < (2 * colNums[i][j])) {
+            for (s = (niz[i][j] - colNums[i][j] + 1); s < (currentverh + colNums[i][j]); s++) {
                 if (jpn[s][i] == no) {
                     er = false;
                     return;
                 }
-                if (jpn[s][i] == pusto) {
+                if (jpn[s][i] == empty) {
                     jpn[s][i] = yes;
                     j1 = 0;
                     while (s >= verh[i][j1])
@@ -2393,11 +2093,11 @@ void reshsto1(int i, int j) {
                         (*g).prev = kluchverhfinish.prev;
                         kluchverhfinish.prev = g;
                     }
-                    j1 = kolsto[i] + 1;
+                    j1 = colNumCount[i] + 1;
                     while (s <= niz[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[i] + 1) && (kluchniz[i][j1] == false)) {
+                    if ((j1 < colNumCount[i] + 1) && (kluchniz[i][j1] == false)) {
                         kluchniz[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -2426,11 +2126,11 @@ void reshsto1(int i, int j) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[s] + 1;
+                    j1 = rowNumCount[s] + 1;
                     while (i <= prav[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[s] + 1) && (kluchprav[s][j1] == false)) {
+                    if ((j1 < rowNumCount[s] + 1) && (kluchprav[s][j1] == false)) {
                         kluchprav[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -2460,13 +2160,13 @@ void reshsto1(int i, int j) {
             }
         }
 
-        if (tekverh - niz[i][j - 1] > 1)
-            for (s = niz[i][j - 1] + 1; s < tekverh; s++) {
+        if (currentverh - niz[i][j - 1] > 1)
+            for (s = niz[i][j - 1] + 1; s < currentverh; s++) {
                 if (jpn[s][i] == yes) {
                     er = false;
                     return;
                 }
-                if (jpn[s][i] == pusto) {
+                if (jpn[s][i] == empty) {
 
                     jpn[s][i] = no;
 
@@ -2482,11 +2182,11 @@ void reshsto1(int i, int j) {
                         (*g).prev = kluchverhfinish.prev;
                         kluchverhfinish.prev = g;
                     }
-                    j1 = kolsto[i] + 1;
+                    j1 = colNumCount[i] + 1;
                     while (s <= niz[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[i] + 1) && (kluchniz[i][j1] == false)) {
+                    if ((j1 < colNumCount[i] + 1) && (kluchniz[i][j1] == false)) {
                         kluchniz[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -2515,11 +2215,11 @@ void reshsto1(int i, int j) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[s] + 1;
+                    j1 = rowNumCount[s] + 1;
                     while (i <= prav[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[s] + 1) && (kluchprav[s][j1] == false)) {
+                    if ((j1 < rowNumCount[s] + 1) && (kluchprav[s][j1] == false)) {
                         kluchprav[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -2550,18 +2250,18 @@ void reshsto1(int i, int j) {
 
 
     }
-    if (sdvig2) {
-        if ((niz[i][j + 1] - tekverh2 + 1) < (sto[i][j + 1])) {
+    if (shift2) {
+        if ((niz[i][j + 1] - currentverh2 + 1) < (colNums[i][j + 1])) {
             er = false;
             return;
         }
-        if ((niz[i][j + 1] - tekverh2 + 1) < (2 * sto[i][j + 1])) {
-            for (s = (niz[i][j + 1] - sto[i][j + 1] + 1); s < (tekverh2 + sto[i][j + 1]); s++) {
+        if ((niz[i][j + 1] - currentverh2 + 1) < (2 * colNums[i][j + 1])) {
+            for (s = (niz[i][j + 1] - colNums[i][j + 1] + 1); s < (currentverh2 + colNums[i][j + 1]); s++) {
                 if (jpn[s][i] == no) {
                     er = false;
                     return;
                 }
-                if (jpn[s][i] == pusto) {
+                if (jpn[s][i] == empty) {
                     jpn[s][i] = yes;
                     j1 = 0;
                     while (s >= verh[i][j1])
@@ -2575,11 +2275,11 @@ void reshsto1(int i, int j) {
                         (*g).prev = kluchverhfinish.prev;
                         kluchverhfinish.prev = g;
                     }
-                    j1 = kolsto[i] + 1;
+                    j1 = colNumCount[i] + 1;
                     while (s <= niz[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[i] + 1) && (kluchniz[i][j1] == false)) {
+                    if ((j1 < colNumCount[i] + 1) && (kluchniz[i][j1] == false)) {
                         kluchniz[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -2608,11 +2308,11 @@ void reshsto1(int i, int j) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[s] + 1;
+                    j1 = rowNumCount[s] + 1;
                     while (i <= prav[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[s] + 1) && (kluchprav[s][j1] == false)) {
+                    if ((j1 < rowNumCount[s] + 1) && (kluchprav[s][j1] == false)) {
                         kluchprav[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -2641,13 +2341,13 @@ void reshsto1(int i, int j) {
                 }
             }
         }
-        if (tekverh2 - niz[i][j] > 1)
-            for (s = niz[i][j] + 1; s < tekverh2; s++) {
+        if (currentverh2 - niz[i][j] > 1)
+            for (s = niz[i][j] + 1; s < currentverh2; s++) {
                 if (jpn[s][i] == yes) {
                     er = false;
                     return;
                 }
-                if (jpn[s][i] == pusto) {
+                if (jpn[s][i] == empty) {
 
                     jpn[s][i] = no;
 
@@ -2663,11 +2363,11 @@ void reshsto1(int i, int j) {
                         (*g).prev = kluchverhfinish.prev;
                         kluchverhfinish.prev = g;
                     }
-                    j1 = kolsto[i] + 1;
+                    j1 = colNumCount[i] + 1;
                     while (s <= niz[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[i] + 1) && (kluchniz[i][j1] == false)) {
+                    if ((j1 < colNumCount[i] + 1) && (kluchniz[i][j1] == false)) {
                         kluchniz[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -2696,11 +2396,11 @@ void reshsto1(int i, int j) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[s] + 1;
+                    j1 = rowNumCount[s] + 1;
                     while (i <= prav[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[s] + 1) && (kluchprav[s][j1] == false)) {
+                    if ((j1 < rowNumCount[s] + 1) && (kluchprav[s][j1] == false)) {
                         kluchprav[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -2729,8 +2429,8 @@ void reshsto1(int i, int j) {
             }
 
     }
-    if (sdvig) {
-        verh[i][j] = tekverh;
+    if (shift) {
+        verh[i][j] = currentverh;
         if ((j > 1) && (kluchverh[i][j - 1] == false)) {
             kluchverh[i][j - 1] = true;
             g = (struct kluch *) malloc(sizeof(struct kluch));
@@ -2755,8 +2455,8 @@ void reshsto1(int i, int j) {
             verh2[i][j] = NULL;
         }
     }
-    if (sdvig2) {
-        verh[i][j + 1] = tekverh2;
+    if (shift2) {
+        verh[i][j + 1] = currentverh2;
         if (kluchverh[i][j + 1] == false) {
             kluchverh[i][j + 1] = true;
             g = (struct kluch *) malloc(sizeof(struct kluch));
@@ -2784,102 +2484,105 @@ void reshsto1(int i, int j) {
 }
 
 void reshsto2(int i, int j) {
-    int s, p, q, t, c, a, b, j1, tekniz = niz[i][j], tekniz2 = niz[i][j - 1];
-    bool sdvig = false, sdvig2 = false;
+    int j1;
+    int currentniz = niz[i][j];
+    int currentniz2 = niz[i][j - 1];
+    bool shift = false;
+    bool shift2 = false;
     struct kluch *g, *g1;
-    s = tekniz;
-    p = s + 1;
-    q = s + 2;
+    int s = currentniz;
+    int p = s + 1;
+    int q = s + 2;
     label:
-    while ((s > tekniz - sto[i][j]) && (s >= verh[i][j])) {
+    while ((s > currentniz - colNums[i][j]) && (s >= verh[i][j])) {
         if (jpn[s][i] == no) {
             while (jpn[s][i] == no)
                 s--;
-            if ((s - verh[i][j] + 1) < (sto[i][j])) {
+            if ((s - verh[i][j] + 1) < (colNums[i][j])) {
                 er = false;
                 return;
             }
 
-            tekniz = s;
-            sdvig = true;
+            currentniz = s;
+            shift = true;
 
             p = s + 1;
         }
 
         if (jpn[s][i] == yes) {
-            t = 0;
+            int t = 0;
             q = s;
             while ((jpn[s][i] == yes) && (s >= verh[i][j])) {
                 s--;
                 t++;
             }
-            if (t > sto[i][j]) {
-                if ((s - verh[i][j] + 1) < (sto[i][j])) {
+            if (t > colNums[i][j]) {
+                if ((s - verh[i][j] + 1) < (colNums[i][j])) {
                     er = false;
                     return;
                 }
 
-                tekniz = s;
-                sdvig = true;
+                currentniz = s;
+                shift = true;
 
-            } else if (tekniz > s + sto[i][j]) {
-                if (((s + sto[i][j]) - verh[i][j] + 1) < (sto[i][j])) {
+            } else if (currentniz > s + colNums[i][j]) {
+                if (((s + colNums[i][j]) - verh[i][j] + 1) < (colNums[i][j])) {
                     er = false;
                     return;
                 }
 
-                tekniz = s + sto[i][j];
-                sdvig = true;
+                currentniz = s + colNums[i][j];
+                shift = true;
             }
         }
 
-        while ((jpn[s][i] == pusto) && (s >= tekniz - sto[i][j]) && (s >= verh[i][j]))
+        while ((jpn[s][i] == empty) && (s >= currentniz - colNums[i][j]) && (s >= verh[i][j]))
             s--;
 
     }
 
-    if (tekniz2 > tekniz - sto[i][j] - 1) {
+    if (currentniz2 > currentniz - colNums[i][j] - 1) {
 
-        if (((tekniz - sto[i][j] - 1) - verh[i][j - 1] + 1) < (sto[i][j - 1])) {
+        if (((currentniz - colNums[i][j] - 1) - verh[i][j - 1] + 1) < (colNums[i][j - 1])) {
             er = false;
             return;
         }
 
-        tekniz2 = tekniz - sto[i][j] - 1;
-        sdvig2 = true;
+        currentniz2 = currentniz - colNums[i][j] - 1;
+        shift2 = true;
 
     }
 
-    while ((s > tekniz2) && (s >= verh[i][j])) {
+    while ((s > currentniz2) && (s >= verh[i][j])) {
 
         if (jpn[s][i] == yes) {
-            t = 0;
+            int t = 0;
             q = s;
             while ((jpn[s][i] == yes) && (s >= verh[i][j])) {
                 s--;
                 t++;
             }
-            if (t > sto[i][j]) {
-                if ((s - verh[i][j] + 1) < (sto[i][j])) {
+            if (t > colNums[i][j]) {
+                if ((s - verh[i][j] + 1) < (colNums[i][j])) {
                     er = false;
                     return;
                 }
 
-                tekniz = s;
-                sdvig = true;
+                currentniz = s;
+                shift = true;
 
                 goto label;
             }
-            if (tekniz > s + sto[i][j]) {
-                if (((s + sto[i][j]) - verh[i][j] + 1) < (sto[i][j])) {
+            if (currentniz > s + colNums[i][j]) {
+                if (((s + colNums[i][j]) - verh[i][j] + 1) < (colNums[i][j])) {
                     er = false;
                     return;
                 }
 
-                tekniz = s + sto[i][j];
-                sdvig = true;
+                currentniz = s + colNums[i][j];
+                shift = true;
 
-                s = tekniz;
+                s = currentniz;
                 p = s + 1;
                 q = s + 2;
 
@@ -2887,30 +2590,30 @@ void reshsto2(int i, int j) {
 
 
             }
-            if (tekniz2 > tekniz - sto[i][j] - 1) {
-                if (((tekniz - sto[i][j] - 1) - verh[i][j - 1] + 1) < (sto[i][j - 1])) {
+            if (currentniz2 > currentniz - colNums[i][j] - 1) {
+                if (((currentniz - colNums[i][j] - 1) - verh[i][j - 1] + 1) < (colNums[i][j - 1])) {
                     er = false;
                     return;
                 }
 
-                tekniz2 = tekniz - sto[i][j] - 1;
-                sdvig2 = true;
+                currentniz2 = currentniz - colNums[i][j] - 1;
+                shift2 = true;
 
             }
         }
 
         if (jpn[s][i] == no) {
-            if (p - s - 1 < sto[i][j]) {
+            if (p - s - 1 < colNums[i][j]) {
                 if (q < p) {
                     while ((jpn[s][i] == no) && (s >= verh[i][j]))
                         s--;
-                    if ((s - verh[i][j] + 1) < (sto[i][j])) {
+                    if ((s - verh[i][j] + 1) < (colNums[i][j])) {
                         er = false;
                         return;
                     }
 
-                    tekniz = s;
-                    sdvig = true;
+                    currentniz = s;
+                    shift = true;
 
                     p = s + 1;
                     goto label;
@@ -2925,7 +2628,7 @@ void reshsto2(int i, int j) {
             p = s + 1;
         }
 
-        while ((jpn[s][i] == pusto) && (s > tekniz2) && (s >= verh[i][j]))
+        while ((jpn[s][i] == empty) && (s > currentniz2) && (s >= verh[i][j]))
             s--;
     }
     if ((niz[i][0] != 0)) {
@@ -2933,18 +2636,18 @@ void reshsto2(int i, int j) {
         return;
     }
 
-    if (sdvig) {
-        if ((tekniz - verh[i][j] + 1) < (sto[i][j])) {
+    if (shift) {
+        if ((currentniz - verh[i][j] + 1) < (colNums[i][j])) {
             er = false;
             return;
         }
-        if ((tekniz - verh[i][j] + 1) < (2 * sto[i][j])) {
-            for (s = (tekniz - sto[i][j] + 1); s < (verh[i][j] + sto[i][j]); s++) {
+        if ((currentniz - verh[i][j] + 1) < (2 * colNums[i][j])) {
+            for (s = (currentniz - colNums[i][j] + 1); s < (verh[i][j] + colNums[i][j]); s++) {
                 if (jpn[s][i] == no) {
                     er = false;
                     return;
                 }
-                if (jpn[s][i] == pusto) {
+                if (jpn[s][i] == empty) {
 
                     jpn[s][i] = yes;
                     j1 = 0;
@@ -2959,11 +2662,11 @@ void reshsto2(int i, int j) {
                         (*g).prev = kluchverhfinish.prev;
                         kluchverhfinish.prev = g;
                     }
-                    j1 = kolsto[i] + 1;
+                    j1 = colNumCount[i] + 1;
                     while (s <= niz[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[i] + 1) && (kluchniz[i][j1] == false)) {
+                    if ((j1 < colNumCount[i] + 1) && (kluchniz[i][j1] == false)) {
                         kluchniz[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -2992,11 +2695,11 @@ void reshsto2(int i, int j) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[s] + 1;
+                    j1 = rowNumCount[s] + 1;
                     while (i <= prav[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[s] + 1) && (kluchprav[s][j1] == false)) {
+                    if ((j1 < rowNumCount[s] + 1) && (kluchprav[s][j1] == false)) {
                         kluchprav[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -3026,13 +2729,13 @@ void reshsto2(int i, int j) {
             }
         }
 
-        if (verh[i][j + 1] - tekniz > 1)
-            for (s = tekniz + 1; s < verh[i][j + 1]; s++) {
+        if (verh[i][j + 1] - currentniz > 1)
+            for (s = currentniz + 1; s < verh[i][j + 1]; s++) {
                 if (jpn[s][i] == yes) {
                     er = false;
                     return;
                 }
-                if (jpn[s][i] == pusto) {
+                if (jpn[s][i] == empty) {
 
                     jpn[s][i] = no;
                     j1 = 0;
@@ -3047,11 +2750,11 @@ void reshsto2(int i, int j) {
                         (*g).prev = kluchverhfinish.prev;
                         kluchverhfinish.prev = g;
                     }
-                    j1 = kolsto[i] + 1;
+                    j1 = colNumCount[i] + 1;
                     while (s <= niz[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[i] + 1) && (kluchniz[i][j1] == false)) {
+                    if ((j1 < colNumCount[i] + 1) && (kluchniz[i][j1] == false)) {
                         kluchniz[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -3080,11 +2783,11 @@ void reshsto2(int i, int j) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[s] + 1;
+                    j1 = rowNumCount[s] + 1;
                     while (i <= prav[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[s] + 1) && (kluchprav[s][j1] == false)) {
+                    if ((j1 < rowNumCount[s] + 1) && (kluchprav[s][j1] == false)) {
                         kluchprav[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -3115,18 +2818,18 @@ void reshsto2(int i, int j) {
 
 
     }
-    if (sdvig2) {
-        if ((tekniz2 - verh[i][j - 1] + 1) < (sto[i][j - 1])) {
+    if (shift2) {
+        if ((currentniz2 - verh[i][j - 1] + 1) < (colNums[i][j - 1])) {
             er = false;
             return;
         }
-        if ((tekniz2 - verh[i][j - 1] + 1) < (2 * sto[i][j - 1])) {
-            for (s = (tekniz2 - sto[i][j - 1] + 1); s < (verh[i][j - 1] + sto[i][j - 1]); s++) {
+        if ((currentniz2 - verh[i][j - 1] + 1) < (2 * colNums[i][j - 1])) {
+            for (s = (currentniz2 - colNums[i][j - 1] + 1); s < (verh[i][j - 1] + colNums[i][j - 1]); s++) {
                 if (jpn[s][i] == no) {
                     er = false;
                     return;
                 }
-                if (jpn[s][i] == pusto) {
+                if (jpn[s][i] == empty) {
 
                     jpn[s][i] = yes;
                     j1 = 0;
@@ -3141,11 +2844,11 @@ void reshsto2(int i, int j) {
                         (*g).prev = kluchverhfinish.prev;
                         kluchverhfinish.prev = g;
                     }
-                    j1 = kolsto[i] + 1;
+                    j1 = colNumCount[i] + 1;
                     while (s <= niz[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[i] + 1) && (kluchniz[i][j1] == false)) {
+                    if ((j1 < colNumCount[i] + 1) && (kluchniz[i][j1] == false)) {
                         kluchniz[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -3174,11 +2877,11 @@ void reshsto2(int i, int j) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[s] + 1;
+                    j1 = rowNumCount[s] + 1;
                     while (i <= prav[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[s] + 1) && (kluchprav[s][j1] == false)) {
+                    if ((j1 < rowNumCount[s] + 1) && (kluchprav[s][j1] == false)) {
                         kluchprav[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -3207,13 +2910,13 @@ void reshsto2(int i, int j) {
                 }
             }
         }
-        if (verh[i][j] - tekniz2 > 1)
-            for (s = tekniz2 + 1; s < verh[i][j]; s++) {
+        if (verh[i][j] - currentniz2 > 1)
+            for (s = currentniz2 + 1; s < verh[i][j]; s++) {
                 if (jpn[s][i] == yes) {
                     er = false;
                     return;
                 }
-                if (jpn[s][i] == pusto) {
+                if (jpn[s][i] == empty) {
 
                     jpn[s][i] = no;
                     j1 = 0;
@@ -3228,11 +2931,11 @@ void reshsto2(int i, int j) {
                         (*g).prev = kluchverhfinish.prev;
                         kluchverhfinish.prev = g;
                     }
-                    j1 = kolsto[i] + 1;
+                    j1 = colNumCount[i] + 1;
                     while (s <= niz[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[i] + 1) && (kluchniz[i][j1] == false)) {
+                    if ((j1 < colNumCount[i] + 1) && (kluchniz[i][j1] == false)) {
                         kluchniz[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -3261,11 +2964,11 @@ void reshsto2(int i, int j) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[s] + 1;
+                    j1 = rowNumCount[s] + 1;
                     while (i <= prav[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[s] + 1) && (kluchprav[s][j1] == false)) {
+                    if ((j1 < rowNumCount[s] + 1) && (kluchprav[s][j1] == false)) {
                         kluchprav[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -3294,9 +2997,9 @@ void reshsto2(int i, int j) {
             }
 
     }
-    if (sdvig) {
-        niz[i][j] = tekniz;
-        if ((j < kolsto[i]) && (kluchniz[i][j + 1] == false)) {
+    if (shift) {
+        niz[i][j] = currentniz;
+        if ((j < colNumCount[i]) && (kluchniz[i][j + 1] == false)) {
             kluchniz[i][j + 1] = true;
             g = (struct kluch *) malloc(sizeof(struct kluch));
             (*g).i = i;
@@ -3320,8 +3023,8 @@ void reshsto2(int i, int j) {
             niz2[i][j] = NULL;
         }
     }
-    if (sdvig2) {
-        niz[i][j - 1] = tekniz2;
+    if (shift2) {
+        niz[i][j - 1] = currentniz2;
         if (kluchniz[i][j - 1] == false) {
             kluchniz[i][j - 1] = true;
             g = (struct kluch *) malloc(sizeof(struct kluch));
@@ -3360,9 +3063,9 @@ void reshstr3(int i, int j, int (*p), int (*q)) {
         if (jpn[i][s] == no) {
             if ((*q) < (*p)) {
                 a = j;
-                while ((prav[i][a] >= s - 1) && (stro[i][a] > (s - (*p) - 1)))
+                while ((prav[i][a] >= s - 1) && (rowNums[i][a] > (s - (*p) - 1)))
                     a--;
-                if ((prav[i][a] < s - 1) && (stro[i][a + 1] > (s - (*p) - 1)))
+                if ((prav[i][a] < s - 1) && (rowNums[i][a + 1] > (s - (*p) - 1)))
                     for (b = (*p) + 1; b < s; b++) {
                         jpn[i][b] = no;
                         j1 = 0;
@@ -3377,11 +3080,11 @@ void reshstr3(int i, int j, int (*p), int (*q)) {
                             (*g).prev = kluchlevfinish.prev;
                             kluchlevfinish.prev = g;
                         }
-                        j1 = kolstr[i] + 1;
+                        j1 = rowNumCount[i] + 1;
                         while (b <= prav[i][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolstr[i] + 1) && (kluchprav[i][j1] == false)) {
+                        if ((j1 < rowNumCount[i] + 1) && (kluchprav[i][j1] == false)) {
                             kluchprav[i][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = i;
@@ -3410,11 +3113,11 @@ void reshstr3(int i, int j, int (*p), int (*q)) {
                             (*g).prev = kluchverhfinish.prev;
                             kluchverhfinish.prev = g;
                         }
-                        j1 = kolsto[b] + 1;
+                        j1 = colNumCount[b] + 1;
                         while (i <= niz[b][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolsto[b] + 1) && (kluchniz[b][j1] == false)) {
+                        if ((j1 < colNumCount[b] + 1) && (kluchniz[b][j1] == false)) {
                             kluchniz[b][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = b;
@@ -3451,21 +3154,21 @@ void reshstr3(int i, int j, int (*p), int (*q)) {
                 (*q) = s;
                 while (jpn[i][s] == yes)
                     s++;
-                max = stro[i][j];
+                max = rowNums[i][j];
                 a = j - 1;
                 while (prav[i][a] >= s - 1) {
-                    if (stro[i][a] > max)
-                        max = stro[i][a];
+                    if (rowNums[i][a] > max)
+                        max = rowNums[i][a];
                     a--;
                 }
                 if (s - max - 2 - (*p) >= 0) {
                     min = 0;
                     if (prav[i][j - 1] >= (*q) - 2)
-                        min = stro[i][j - 1];
+                        min = rowNums[i][j - 1];
                     a = j - 2;
                     while (prav[i][a] > (*p)) {
-                        if ((stro[i][a] < min) && (stro[i][a + 1] >= s - (*q)))
-                            min = stro[i][a];
+                        if ((rowNums[i][a] < min) && (rowNums[i][a + 1] >= s - (*q)))
+                            min = rowNums[i][a];
                         a--;
                     }
                     if ((*q) - 2 - (*p) < min) {
@@ -3487,11 +3190,11 @@ void reshstr3(int i, int j, int (*p), int (*q)) {
                                 (*g).prev = kluchlevfinish.prev;
                                 kluchlevfinish.prev = g;
                             }
-                            j1 = kolstr[i] + 1;
+                            j1 = rowNumCount[i] + 1;
                             while (b <= prav[i][j1])
                                 j1--;
                             j1++;
-                            if ((j1 < kolstr[i] + 1) && (kluchprav[i][j1] == false)) {
+                            if ((j1 < rowNumCount[i] + 1) && (kluchprav[i][j1] == false)) {
                                 kluchprav[i][j1] = true;
                                 g = (struct kluch *) malloc(sizeof(struct kluch));
                                 (*g).i = i;
@@ -3520,11 +3223,11 @@ void reshstr3(int i, int j, int (*p), int (*q)) {
                                 (*g).prev = kluchverhfinish.prev;
                                 kluchverhfinish.prev = g;
                             }
-                            j1 = kolsto[b] + 1;
+                            j1 = colNumCount[b] + 1;
                             while (i <= niz[b][j1])
                                 j1--;
                             j1++;
-                            if ((j1 < kolsto[b] + 1) && (kluchniz[b][j1] == false)) {
+                            if ((j1 < colNumCount[b] + 1) && (kluchniz[b][j1] == false)) {
                                 kluchniz[b][j1] = true;
                                 g = (struct kluch *) malloc(sizeof(struct kluch));
                                 (*g).i = b;
@@ -3554,11 +3257,11 @@ void reshstr3(int i, int j, int (*p), int (*q)) {
                         (*p) = s - max - 1;
                     }
                 }
-                min = stro[i][j];
+                min = rowNums[i][j];
                 a = j - 1;
                 while (prav[i][a] >= s - 1) {
-                    if ((stro[i][a] < min) && (stro[i][a] >= s - (*q)))
-                        min = stro[i][a];
+                    if ((rowNums[i][a] < min) && (rowNums[i][a] >= s - (*q)))
+                        min = rowNums[i][a];
                     a--;
                 }
                 for (b = s; b < (*p) + min + 1; b++) {
@@ -3566,7 +3269,7 @@ void reshstr3(int i, int j, int (*p), int (*q)) {
                         er = false;
                         return;
                     }
-                    if (jpn[i][b] == pusto) {
+                    if (jpn[i][b] == empty) {
                         if (jpn[i][b] == no) {
                             er = false;
                             return;
@@ -3584,11 +3287,11 @@ void reshstr3(int i, int j, int (*p), int (*q)) {
                             (*g).prev = kluchlevfinish.prev;
                             kluchlevfinish.prev = g;
                         }
-                        j1 = kolstr[i] + 1;
+                        j1 = rowNumCount[i] + 1;
                         while (b <= prav[i][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolstr[i] + 1) && (kluchprav[i][j1] == false)) {
+                        if ((j1 < rowNumCount[i] + 1) && (kluchprav[i][j1] == false)) {
                             kluchprav[i][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = i;
@@ -3617,11 +3320,11 @@ void reshstr3(int i, int j, int (*p), int (*q)) {
                             (*g).prev = kluchverhfinish.prev;
                             kluchverhfinish.prev = g;
                         }
-                        j1 = kolsto[b] + 1;
+                        j1 = colNumCount[b] + 1;
                         while (i <= niz[b][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolsto[b] + 1) && (kluchniz[b][j1] == false)) {
+                        if ((j1 < colNumCount[b] + 1) && (kluchniz[b][j1] == false)) {
                             kluchniz[b][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = b;
@@ -3653,10 +3356,10 @@ void reshstr3(int i, int j, int (*p), int (*q)) {
                     s++;
             }
             if ((s < lev[i][j + 1]) && (s <= prav[i][j]) && (jpn[i][s] == yes) && ((*q) > (*p))) {
-                k = (*q);
+                int k = (*q);
                 while (jpn[i][k] == yes)
                     k++;
-                if ((k == s - 1) && (jpn[i][k] == pusto)) {
+                if ((k == s - 1) && (jpn[i][k] == empty)) {
                     k = s;
                     while (jpn[i][k] == yes)
                         k++;
@@ -3664,7 +3367,7 @@ void reshstr3(int i, int j, int (*p), int (*q)) {
                         a = j;
                     else
                         a = j - 1;
-                    while ((prav[i][a] >= (*q)) && ((*q) + stro[i][a] < k - 1))
+                    while ((prav[i][a] >= (*q)) && ((*q) + rowNums[i][a] < k - 1))
                         a--;
                     if (prav[i][a] < (*q)) {
                         if (jpn[i][s - 1] == yes) {
@@ -3685,11 +3388,11 @@ void reshstr3(int i, int j, int (*p), int (*q)) {
                             (*g).prev = kluchlevfinish.prev;
                             kluchlevfinish.prev = g;
                         }
-                        j1 = kolstr[i] + 1;
+                        j1 = rowNumCount[i] + 1;
                         while (s - 1 <= prav[i][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolstr[i] + 1) && (kluchprav[i][j1] == false)) {
+                        if ((j1 < rowNumCount[i] + 1) && (kluchprav[i][j1] == false)) {
                             kluchprav[i][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = i;
@@ -3718,11 +3421,11 @@ void reshstr3(int i, int j, int (*p), int (*q)) {
                             (*g).prev = kluchverhfinish.prev;
                             kluchverhfinish.prev = g;
                         }
-                        j1 = kolsto[s - 1] + 1;
+                        j1 = colNumCount[s - 1] + 1;
                         while (i <= niz[s - 1][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolsto[s - 1] + 1) && (kluchniz[s - 1][j1] == false)) {
+                        if ((j1 < colNumCount[s - 1] + 1) && (kluchniz[s - 1][j1] == false)) {
                             kluchniz[s - 1][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = s - 1;
@@ -3759,13 +3462,13 @@ void reshstr3(int i, int j, int (*p), int (*q)) {
                     s++;
             }
             t = s - (*q);
-            if ((t == stro[i][j]) && (jpn[i][s] == pusto)) {
+            if ((t == rowNums[i][j]) && (jpn[i][s] == empty)) {
                 a = j;
                 while ((prav[i][a] >= s - 1) &&
-                       ((stro[i][a] <= stro[i][j]) || (prav[i][a] == s - 1)))
+                       ((rowNums[i][a] <= rowNums[i][j]) || (prav[i][a] == s - 1)))
                     a--;
                 if ((prav[i][a] < s - 1) &&
-                    ((stro[i][a + 1] <= stro[i][j]) || (prav[i][a + 1] == s - 1))) {
+                    ((rowNums[i][a + 1] <= rowNums[i][j]) || (prav[i][a + 1] == s - 1))) {
                     jpn[i][s] = no;
                     j1 = 0;
                     while (s >= lev[i][j1])
@@ -3779,11 +3482,11 @@ void reshstr3(int i, int j, int (*p), int (*q)) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[i] + 1;
+                    j1 = rowNumCount[i] + 1;
                     while (s <= prav[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[i] + 1) && (kluchprav[i][j1] == false)) {
+                    if ((j1 < rowNumCount[i] + 1) && (kluchprav[i][j1] == false)) {
                         kluchprav[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -3812,11 +3515,11 @@ void reshstr3(int i, int j, int (*p), int (*q)) {
                         (*g).prev = kluchverhfinish.prev;
                         kluchverhfinish.prev = g;
                     }
-                    j1 = kolsto[s] + 1;
+                    j1 = colNumCount[s] + 1;
                     while (i <= niz[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[s] + 1) && (kluchniz[s][j1] == false)) {
+                    if ((j1 < colNumCount[s] + 1) && (kluchniz[s][j1] == false)) {
                         kluchniz[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -3845,7 +3548,7 @@ void reshstr3(int i, int j, int (*p), int (*q)) {
 
         }
 
-        while ((jpn[i][s] == pusto) && (s < lev[i][j + 1]) && (s <= prav[i][j]))
+        while ((jpn[i][s] == empty) && (s < lev[i][j + 1]) && (s <= prav[i][j]))
             s++;
 
     }
@@ -3862,9 +3565,9 @@ void reshstr4(int i, int j, int (*p), int (*q)) {
         if (jpn[i][s] == no) {
             if ((*q) > (*p)) {
                 a = j;
-                while ((lev[i][a] <= s + 1) && (stro[i][a] > ((*p) - s - 1)))
+                while ((lev[i][a] <= s + 1) && (rowNums[i][a] > ((*p) - s - 1)))
                     a++;
-                if ((lev[i][a] > s + 1) && (stro[i][a - 1] > ((*p) - s - 1)))
+                if ((lev[i][a] > s + 1) && (rowNums[i][a - 1] > ((*p) - s - 1)))
                     for (b = (*p) - 1; b > s; b--) {
                         jpn[i][b] = no;
                         j1 = 0;
@@ -3879,11 +3582,11 @@ void reshstr4(int i, int j, int (*p), int (*q)) {
                             (*g).prev = kluchlevfinish.prev;
                             kluchlevfinish.prev = g;
                         }
-                        j1 = kolstr[i] + 1;
+                        j1 = rowNumCount[i] + 1;
                         while (b <= prav[i][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolstr[i] + 1) && (kluchprav[i][j1] == false)) {
+                        if ((j1 < rowNumCount[i] + 1) && (kluchprav[i][j1] == false)) {
                             kluchprav[i][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = i;
@@ -3912,11 +3615,11 @@ void reshstr4(int i, int j, int (*p), int (*q)) {
                             (*g).prev = kluchverhfinish.prev;
                             kluchverhfinish.prev = g;
                         }
-                        j1 = kolsto[b] + 1;
+                        j1 = colNumCount[b] + 1;
                         while (i <= niz[b][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolsto[b] + 1) && (kluchniz[b][j1] == false)) {
+                        if ((j1 < colNumCount[b] + 1) && (kluchniz[b][j1] == false)) {
                             kluchniz[b][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = b;
@@ -3953,21 +3656,21 @@ void reshstr4(int i, int j, int (*p), int (*q)) {
                 (*q) = s;
                 while (jpn[i][s] == yes)
                     s--;
-                max = stro[i][j];
+                max = rowNums[i][j];
                 a = j + 1;
                 while (lev[i][a] <= s + 1) {
-                    if (stro[i][a] > max)
-                        max = stro[i][a];
+                    if (rowNums[i][a] > max)
+                        max = rowNums[i][a];
                     a++;
                 }
                 if ((*p) - s - max - 2 >= 0) {
                     min = 0;
                     if (lev[i][j + 1] <= (*q) + 2)
-                        min = stro[i][j + 1];
+                        min = rowNums[i][j + 1];
                     a = j + 2;
                     while (lev[i][a] < (*p)) {
-                        if ((stro[i][a] < min) && (stro[i][a - 1] >= (*q) - s))
-                            min = stro[i][a];
+                        if ((rowNums[i][a] < min) && (rowNums[i][a - 1] >= (*q) - s))
+                            min = rowNums[i][a];
                         a++;
                     }
                     if ((*p) - (*q) - 2 < min)
@@ -3989,11 +3692,11 @@ void reshstr4(int i, int j, int (*p), int (*q)) {
                                 (*g).prev = kluchlevfinish.prev;
                                 kluchlevfinish.prev = g;
                             }
-                            j1 = kolstr[i] + 1;
+                            j1 = rowNumCount[i] + 1;
                             while (b <= prav[i][j1])
                                 j1--;
                             j1++;
-                            if ((j1 < kolstr[i] + 1) && (kluchprav[i][j1] == false)) {
+                            if ((j1 < rowNumCount[i] + 1) && (kluchprav[i][j1] == false)) {
                                 kluchprav[i][j1] = true;
                                 g = (struct kluch *) malloc(sizeof(struct kluch));
                                 (*g).i = i;
@@ -4022,11 +3725,11 @@ void reshstr4(int i, int j, int (*p), int (*q)) {
                                 (*g).prev = kluchverhfinish.prev;
                                 kluchverhfinish.prev = g;
                             }
-                            j1 = kolsto[b] + 1;
+                            j1 = colNumCount[b] + 1;
                             while (i <= niz[b][j1])
                                 j1--;
                             j1++;
-                            if ((j1 < kolsto[b] + 1) && (kluchniz[b][j1] == false)) {
+                            if ((j1 < colNumCount[b] + 1) && (kluchniz[b][j1] == false)) {
                                 kluchniz[b][j1] = true;
                                 g = (struct kluch *) malloc(sizeof(struct kluch));
                                 (*g).i = b;
@@ -4053,11 +3756,11 @@ void reshstr4(int i, int j, int (*p), int (*q)) {
 
                         }
                 }
-                min = stro[i][j];
+                min = rowNums[i][j];
                 a = j + 1;
                 while (lev[i][a] <= s + 1) {
-                    if ((stro[i][a] < min) && (stro[i][a] >= (*q) - s))
-                        min = stro[i][a];
+                    if ((rowNums[i][a] < min) && (rowNums[i][a] >= (*q) - s))
+                        min = rowNums[i][a];
                     a++;
                 }
                 for (b = s; b > (*p) - min - 1; b--) {
@@ -4065,7 +3768,7 @@ void reshstr4(int i, int j, int (*p), int (*q)) {
                         er = false;
                         return;
                     }
-                    if (jpn[i][b] == pusto) {
+                    if (jpn[i][b] == empty) {
                         if (jpn[i][b] == no) {
                             er = false;
                             return;
@@ -4083,11 +3786,11 @@ void reshstr4(int i, int j, int (*p), int (*q)) {
                             (*g).prev = kluchlevfinish.prev;
                             kluchlevfinish.prev = g;
                         }
-                        j1 = kolstr[i] + 1;
+                        j1 = rowNumCount[i] + 1;
                         while (b <= prav[i][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolstr[i] + 1) && (kluchprav[i][j1] == false)) {
+                        if ((j1 < rowNumCount[i] + 1) && (kluchprav[i][j1] == false)) {
                             kluchprav[i][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = i;
@@ -4116,11 +3819,11 @@ void reshstr4(int i, int j, int (*p), int (*q)) {
                             (*g).prev = kluchverhfinish.prev;
                             kluchverhfinish.prev = g;
                         }
-                        j1 = kolsto[b] + 1;
+                        j1 = colNumCount[b] + 1;
                         while (i <= niz[b][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolsto[b] + 1) && (kluchniz[b][j1] == false)) {
+                        if ((j1 < colNumCount[b] + 1) && (kluchniz[b][j1] == false)) {
                             kluchniz[b][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = b;
@@ -4157,12 +3860,12 @@ void reshstr4(int i, int j, int (*p), int (*q)) {
                     s--;
             }
             t = (*q) - s;
-            if ((t == stro[i][j]) && (jpn[i][s] == pusto)) {
+            if ((t == rowNums[i][j]) && (jpn[i][s] == empty)) {
                 a = j;
-                while ((lev[i][a] <= s + 1) && ((stro[i][a] <= stro[i][j]) || (lev[i][a] == s + 1)))
+                while ((lev[i][a] <= s + 1) && ((rowNums[i][a] <= rowNums[i][j]) || (lev[i][a] == s + 1)))
                     a++;
                 if ((lev[i][a] > s + 1) &&
-                    ((stro[i][a - 1] <= stro[i][j]) || (lev[i][a - 1] == s + 1))) {
+                    ((rowNums[i][a - 1] <= rowNums[i][j]) || (lev[i][a - 1] == s + 1))) {
                     jpn[i][s] = no;
                     j1 = 0;
                     while (s >= lev[i][j1])
@@ -4176,11 +3879,11 @@ void reshstr4(int i, int j, int (*p), int (*q)) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[i] + 1;
+                    j1 = rowNumCount[i] + 1;
                     while (s <= prav[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[i] + 1) && (kluchprav[i][j1] == false)) {
+                    if ((j1 < rowNumCount[i] + 1) && (kluchprav[i][j1] == false)) {
                         kluchprav[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -4209,11 +3912,11 @@ void reshstr4(int i, int j, int (*p), int (*q)) {
                         (*g).prev = kluchverhfinish.prev;
                         kluchverhfinish.prev = g;
                     }
-                    j1 = kolsto[s] + 1;
+                    j1 = colNumCount[s] + 1;
                     while (i <= niz[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[s] + 1) && (kluchniz[s][j1] == false)) {
+                    if ((j1 < colNumCount[s] + 1) && (kluchniz[s][j1] == false)) {
                         kluchniz[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -4241,7 +3944,7 @@ void reshstr4(int i, int j, int (*p), int (*q)) {
             }
 
         }
-        while ((jpn[i][s] == pusto) && (s > prav[i][j - 1]) && (s >= lev[i][j]))
+        while ((jpn[i][s] == empty) && (s > prav[i][j - 1]) && (s >= lev[i][j]))
             s--;
     }
 }
@@ -4249,8 +3952,8 @@ void reshstr4(int i, int j, int (*p), int (*q)) {
 void reshstrdva(int i) {
     int j, p, q;
     q = 0;
-    for (j = 1; j < kolstr[i] + 1; j++) {
-        if ((prav[i][j] - lev[i][j] + 1) > (stro[i][j]))
+    for (j = 1; j < rowNumCount[i] + 1; j++) {
+        if ((prav[i][j] - lev[i][j] + 1) > (rowNums[i][j]))
             reshstr3(i, j, &p, &q);
         else
             q = lev[i][j];
@@ -4258,8 +3961,8 @@ void reshstrdva(int i) {
             return;
     }
     q = width + 3;
-    for (j = kolstr[i]; j > 0; j--) {
-        if ((prav[i][j] - lev[i][j] + 1) > (stro[i][j]))
+    for (j = rowNumCount[i]; j > 0; j--) {
+        if ((prav[i][j] - lev[i][j] + 1) > (rowNums[i][j]))
             reshstr4(i, j, &p, &q);
         else
             q = prav[i][j];
@@ -4280,9 +3983,9 @@ void reshsto3(int ri, int rj, int (*p), int (*q)) {
         if (jpn[s][ri] == no) {
             if ((*q) < (*p)) {
                 a = rj;
-                while ((niz[ri][a] >= s - 1) && (sto[ri][a] > (s - (*p) - 1)))
+                while ((niz[ri][a] >= s - 1) && (colNums[ri][a] > (s - (*p) - 1)))
                     a--;
-                if ((niz[ri][a] < s - 1) && (sto[ri][a + 1] > (s - (*p) - 1)))
+                if ((niz[ri][a] < s - 1) && (colNums[ri][a + 1] > (s - (*p) - 1)))
                     for (b = (*p) + 1; b < s; b++) {
                         jpn[b][ri] = no;
 
@@ -4299,11 +4002,11 @@ void reshsto3(int ri, int rj, int (*p), int (*q)) {
                             kluchverhfinish.prev = g;
                         }
 
-                        j1 = kolsto[ri] + 1;
+                        j1 = colNumCount[ri] + 1;
                         while (b <= niz[ri][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolsto[ri] + 1) && (kluchniz[ri][j1] == false)) {
+                        if ((j1 < colNumCount[ri] + 1) && (kluchniz[ri][j1] == false)) {
                             kluchniz[ri][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = ri;
@@ -4324,11 +4027,11 @@ void reshsto3(int ri, int rj, int (*p), int (*q)) {
                             (*g).prev = kluchlevfinish.prev;
                             kluchlevfinish.prev = g;
                         }
-                        j1 = kolstr[b] + 1;
+                        j1 = rowNumCount[b] + 1;
                         while (ri <= prav[b][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolstr[b] + 1) && (kluchprav[b][j1] == false)) {
+                        if ((j1 < rowNumCount[b] + 1) && (kluchprav[b][j1] == false)) {
                             kluchprav[b][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = b;
@@ -4376,22 +4079,22 @@ void reshsto3(int ri, int rj, int (*p), int (*q)) {
                 (*q) = s;
                 while (jpn[s][ri] == yes)
                     s++;
-                max = sto[ri][rj];
+                max = colNums[ri][rj];
                 a = rj - 1;
                 while (niz[ri][a] >= s - 1) {
-                    if (sto[ri][a] > max)
-                        max = sto[ri][a];
+                    if (colNums[ri][a] > max)
+                        max = colNums[ri][a];
                     a--;
                 }
                 if (s - max - 2 - (*p) >= 0) {
                     min = 0;
                     if (niz[ri][rj - 1] >= (*q) - 2)
-                        min = sto[ri][rj - 1];
+                        min = colNums[ri][rj - 1];
                     a = rj - 2;
                     /* Original no condition that a >= 0 but it causes a crash otherwise */
                     while (a >= 0 && niz[ri][a] > (*p)) {
-                        if ((sto[ri][a] < min) && (sto[ri][a + 1] >= s - (*q)))
-                            min = sto[ri][a];
+                        if ((colNums[ri][a] < min) && (colNums[ri][a + 1] >= s - (*q)))
+                            min = colNums[ri][a];
                         a--;
                     }
                     if ((*q) - 2 - (*p) < min) {
@@ -4414,11 +4117,11 @@ void reshsto3(int ri, int rj, int (*p), int (*q)) {
                                 kluchverhfinish.prev = g;
                             }
 
-                            j1 = kolsto[ri] + 1;
+                            j1 = colNumCount[ri] + 1;
                             while (b <= niz[ri][j1])
                                 j1--;
                             j1++;
-                            if ((j1 < kolsto[ri] + 1) && (kluchniz[ri][j1] == false)) {
+                            if ((j1 < colNumCount[ri] + 1) && (kluchniz[ri][j1] == false)) {
                                 kluchniz[ri][j1] = true;
                                 g = (struct kluch *) malloc(sizeof(struct kluch));
                                 (*g).i = ri;
@@ -4439,11 +4142,11 @@ void reshsto3(int ri, int rj, int (*p), int (*q)) {
                                 (*g).prev = kluchlevfinish.prev;
                                 kluchlevfinish.prev = g;
                             }
-                            j1 = kolstr[b] + 1;
+                            j1 = rowNumCount[b] + 1;
                             while (ri <= prav[b][j1])
                                 j1--;
                             j1++;
-                            if ((j1 < kolstr[b] + 1) && (kluchprav[b][j1] == false)) {
+                            if ((j1 < rowNumCount[b] + 1) && (kluchprav[b][j1] == false)) {
                                 kluchprav[b][j1] = true;
                                 g = (struct kluch *) malloc(sizeof(struct kluch));
                                 (*g).i = b;
@@ -4483,11 +4186,11 @@ void reshsto3(int ri, int rj, int (*p), int (*q)) {
                         (*p) = s - max - 1;
                     }
                 }
-                min = sto[ri][rj];
+                min = colNums[ri][rj];
                 a = rj - 1;
                 while (niz[ri][a] >= s - 1) {
-                    if ((sto[ri][a] < min) && (sto[ri][a] >= s - (*q)))
-                        min = sto[ri][a];
+                    if ((colNums[ri][a] < min) && (colNums[ri][a] >= s - (*q)))
+                        min = colNums[ri][a];
                     a--;
                 }
                 for (b = s; b < (*p) + min + 1; b++) {
@@ -4495,7 +4198,7 @@ void reshsto3(int ri, int rj, int (*p), int (*q)) {
                         er = false;
                         return;
                     }
-                    if (jpn[b][ri] == pusto) {
+                    if (jpn[b][ri] == empty) {
                         if (jpn[b][ri] == no) {
                             er = false;
                             return;
@@ -4515,11 +4218,11 @@ void reshsto3(int ri, int rj, int (*p), int (*q)) {
                             kluchverhfinish.prev = g;
                         }
 
-                        j1 = kolsto[ri] + 1;
+                        j1 = colNumCount[ri] + 1;
                         while (b <= niz[ri][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolsto[ri] + 1) && (kluchniz[ri][j1] == false)) {
+                        if ((j1 < colNumCount[ri] + 1) && (kluchniz[ri][j1] == false)) {
                             kluchniz[ri][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = ri;
@@ -4540,11 +4243,11 @@ void reshsto3(int ri, int rj, int (*p), int (*q)) {
                             (*g).prev = kluchlevfinish.prev;
                             kluchlevfinish.prev = g;
                         }
-                        j1 = kolstr[b] + 1;
+                        j1 = rowNumCount[b] + 1;
                         while (ri <= prav[b][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolstr[b] + 1) && (kluchprav[b][j1] == false)) {
+                        if ((j1 < rowNumCount[b] + 1) && (kluchprav[b][j1] == false)) {
                             kluchprav[b][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = b;
@@ -4587,10 +4290,10 @@ void reshsto3(int ri, int rj, int (*p), int (*q)) {
             }
             if ((s < verh[ri][rj + 1]) && (s <= niz[ri][rj]) && (jpn[s][ri] == yes) &&
                 ((*q) > (*p))) {
-                k = (*q);
+                int k = (*q);
                 while (jpn[k][ri] == yes)
                     k++;
-                if ((k == s - 1) && (jpn[k][ri] == pusto)) {
+                if ((k == s - 1) && (jpn[k][ri] == empty)) {
                     k = s;
                     while (jpn[k][ri] == yes)
                         k++;
@@ -4598,7 +4301,7 @@ void reshsto3(int ri, int rj, int (*p), int (*q)) {
                         a = rj;
                     else
                         a = rj - 1;
-                    while ((niz[ri][a] >= (*q)) && ((*q) + sto[ri][a] < k - 1))
+                    while ((niz[ri][a] >= (*q)) && ((*q) + colNums[ri][a] < k - 1))
                         a--;
                     if (niz[ri][a] < (*q)) {
                         if (jpn[s - 1][ri] == yes) {
@@ -4620,11 +4323,11 @@ void reshsto3(int ri, int rj, int (*p), int (*q)) {
                             kluchverhfinish.prev = g;
                         }
 
-                        j1 = kolsto[ri] + 1;
+                        j1 = colNumCount[ri] + 1;
                         while (s - 1 <= niz[ri][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolsto[ri] + 1) && (kluchniz[ri][j1] == false)) {
+                        if ((j1 < colNumCount[ri] + 1) && (kluchniz[ri][j1] == false)) {
                             kluchniz[ri][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = ri;
@@ -4645,11 +4348,11 @@ void reshsto3(int ri, int rj, int (*p), int (*q)) {
                             (*g).prev = kluchlevfinish.prev;
                             kluchlevfinish.prev = g;
                         }
-                        j1 = kolstr[s - 1] + 1;
+                        j1 = rowNumCount[s - 1] + 1;
                         while (ri <= prav[s - 1][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolstr[s - 1] + 1) && (kluchprav[s - 1][j1] == false)) {
+                        if ((j1 < rowNumCount[s - 1] + 1) && (kluchprav[s - 1][j1] == false)) {
                             kluchprav[s - 1][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = s - 1;
@@ -4695,13 +4398,13 @@ void reshsto3(int ri, int rj, int (*p), int (*q)) {
                     s++;
             }
             t = s - (*q);
-            if ((t == sto[ri][rj]) && (jpn[s][ri] == pusto)) {
+            if ((t == colNums[ri][rj]) && (jpn[s][ri] == empty)) {
                 a = rj;
                 while ((niz[ri][a] >= s - 1) &&
-                       ((sto[ri][a] <= sto[ri][rj]) || (niz[ri][a] == s - 1)))
+                       ((colNums[ri][a] <= colNums[ri][rj]) || (niz[ri][a] == s - 1)))
                     a--;
                 if ((niz[ri][a] < s - 1) &&
-                    ((sto[ri][a + 1] <= sto[ri][rj]) || (niz[ri][a + 1] == s - 1))) {
+                    ((colNums[ri][a + 1] <= colNums[ri][rj]) || (niz[ri][a + 1] == s - 1))) {
                     jpn[s][ri] = no;
 
                     j1 = 0;
@@ -4717,11 +4420,11 @@ void reshsto3(int ri, int rj, int (*p), int (*q)) {
                         kluchverhfinish.prev = g;
                     }
 
-                    j1 = kolsto[ri] + 1;
+                    j1 = colNumCount[ri] + 1;
                     while (s <= niz[ri][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[ri] + 1) && (kluchniz[ri][j1] == false)) {
+                    if ((j1 < colNumCount[ri] + 1) && (kluchniz[ri][j1] == false)) {
                         kluchniz[ri][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = ri;
@@ -4742,11 +4445,11 @@ void reshsto3(int ri, int rj, int (*p), int (*q)) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[s] + 1;
+                    j1 = rowNumCount[s] + 1;
                     while (ri <= prav[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[s] + 1) && (kluchprav[s][j1] == false)) {
+                    if ((j1 < rowNumCount[s] + 1) && (kluchprav[s][j1] == false)) {
                         kluchprav[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -4786,7 +4489,7 @@ void reshsto3(int ri, int rj, int (*p), int (*q)) {
 
         }
 
-        while ((jpn[s][ri] == pusto) && (s < verh[ri][rj + 1]) && (s <= niz[ri][rj]))
+        while ((jpn[s][ri] == empty) && (s < verh[ri][rj + 1]) && (s <= niz[ri][rj]))
             s++;
 
     }
@@ -4803,9 +4506,9 @@ void reshsto4(int i, int j, int (*p), int (*q)) {
         if (jpn[s][i] == no) {
             if ((*q) > (*p)) {
                 a = j;
-                while ((verh[i][a] <= s + 1) && (sto[i][a] > ((*p) - s - 1)))
+                while ((verh[i][a] <= s + 1) && (colNums[i][a] > ((*p) - s - 1)))
                     a++;
-                if ((verh[i][a] > s + 1) && (sto[i][a - 1] > ((*p) - s - 1)))
+                if ((verh[i][a] > s + 1) && (colNums[i][a - 1] > ((*p) - s - 1)))
                     for (b = (*p) - 1; b > s; b--) {
                         jpn[b][i] = no;
 
@@ -4822,11 +4525,11 @@ void reshsto4(int i, int j, int (*p), int (*q)) {
                             kluchverhfinish.prev = g;
                         }
 
-                        j1 = kolsto[i] + 1;
+                        j1 = colNumCount[i] + 1;
                         while (b <= niz[i][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolsto[i] + 1) && (kluchniz[i][j1] == false)) {
+                        if ((j1 < colNumCount[i] + 1) && (kluchniz[i][j1] == false)) {
                             kluchniz[i][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = i;
@@ -4847,11 +4550,11 @@ void reshsto4(int i, int j, int (*p), int (*q)) {
                             (*g).prev = kluchlevfinish.prev;
                             kluchlevfinish.prev = g;
                         }
-                        j1 = kolstr[b] + 1;
+                        j1 = rowNumCount[b] + 1;
                         while (i <= prav[b][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolstr[b] + 1) && (kluchprav[b][j1] == false)) {
+                        if ((j1 < rowNumCount[b] + 1) && (kluchprav[b][j1] == false)) {
                             kluchprav[b][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = b;
@@ -4898,27 +4601,27 @@ void reshsto4(int i, int j, int (*p), int (*q)) {
                 (*q) = s;
                 while (jpn[s][i] == yes)
                     s--;
-                max = sto[i][j];
+                max = colNums[i][j];
                 a = j + 1;
                 while (verh[i][a] <= s + 1) {
-                    if (sto[i][a] > max)
-                        max = sto[i][a];
+                    if (colNums[i][a] > max)
+                        max = colNums[i][a];
                     a++;
                 }
                 if ((*p) - s - max - 2 >= 0) {
                     min = 0;
                     if (verh[i][j + 1] <= (*q) + 2)
-                        min = sto[i][j + 1];
+                        min = colNums[i][j + 1];
                     a = j + 2;
                     //char asffd[100];
-                    //sprintf(asffd, "%p %d", &(verh[i][a]), a );
-                    //sprintf(asffd, "%d %d", a, kolsto[i] + 2);
+                    //sprintf(asffd, "%p %d", &(verh[i_0][a]), a );
+                    //sprintf(asffd, "%d %d", a, colNumCount[i_0] + 2);
                     //__android_log_write(ANDROID_LOG_DEBUG,"qwWer", asffd);
-                    //verh[i][kolsto[i]+1] = 22;
-                    /* Original no condition that a < kolsto[i] but it causes a crash otherwise */
-                    while (a < kolsto[i] + 2 && verh[i][a] < (*p)) {
-                        if ((sto[i][a] < min) && (sto[i][a - 1] >= (*q) - s))
-                            min = sto[i][a];
+                    //verh[i_0][colNumCount[i_0]+1] = 22;
+                    /* Original no condition that a < colNumCount[i_0] but it causes a crash otherwise */
+                    while (a < colNumCount[i] + 2 && verh[i][a] < (*p)) {
+                        if ((colNums[i][a] < min) && (colNums[i][a - 1] >= (*q) - s))
+                            min = colNums[i][a];
                         a++;
                     }
                     if ((*p) - (*q) - 2 < min)
@@ -4941,11 +4644,11 @@ void reshsto4(int i, int j, int (*p), int (*q)) {
                                 kluchverhfinish.prev = g;
                             }
 
-                            j1 = kolsto[i] + 1;
+                            j1 = colNumCount[i] + 1;
                             while (b <= niz[i][j1])
                                 j1--;
                             j1++;
-                            if ((j1 < kolsto[i] + 1) && (kluchniz[i][j1] == false)) {
+                            if ((j1 < colNumCount[i] + 1) && (kluchniz[i][j1] == false)) {
                                 kluchniz[i][j1] = true;
                                 g = (struct kluch *) malloc(sizeof(struct kluch));
                                 (*g).i = i;
@@ -4966,11 +4669,11 @@ void reshsto4(int i, int j, int (*p), int (*q)) {
                                 (*g).prev = kluchlevfinish.prev;
                                 kluchlevfinish.prev = g;
                             }
-                            j1 = kolstr[b] + 1;
+                            j1 = rowNumCount[b] + 1;
                             while (i <= prav[b][j1])
                                 j1--;
                             j1++;
-                            if ((j1 < kolstr[b] + 1) && (kluchprav[b][j1] == false)) {
+                            if ((j1 < rowNumCount[b] + 1) && (kluchprav[b][j1] == false)) {
                                 kluchprav[b][j1] = true;
                                 g = (struct kluch *) malloc(sizeof(struct kluch));
                                 (*g).i = b;
@@ -5008,11 +4711,11 @@ void reshsto4(int i, int j, int (*p), int (*q)) {
 
                         }
                 }
-                min = sto[i][j];
+                min = colNums[i][j];
                 a = j + 1;
                 while (verh[i][a] <= s + 1) {
-                    if ((sto[i][a] < min) && (sto[i][a] >= (*q) - s))
-                        min = sto[i][a];
+                    if ((colNums[i][a] < min) && (colNums[i][a] >= (*q) - s))
+                        min = colNums[i][a];
                     a++;
                 }
                 for (b = s; b > (*p) - min - 1; b--) {
@@ -5020,7 +4723,7 @@ void reshsto4(int i, int j, int (*p), int (*q)) {
                         er = false;
                         return;
                     }
-                    if (jpn[b][i] == pusto) {
+                    if (jpn[b][i] == empty) {
                         if (jpn[b][i] == no) {
                             er = false;
                             return;
@@ -5039,11 +4742,11 @@ void reshsto4(int i, int j, int (*p), int (*q)) {
                             kluchverhfinish.prev = g;
                         }
 
-                        j1 = kolsto[i] + 1;
+                        j1 = colNumCount[i] + 1;
                         while (b <= niz[i][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolsto[i] + 1) && (kluchniz[i][j1] == false)) {
+                        if ((j1 < colNumCount[i] + 1) && (kluchniz[i][j1] == false)) {
                             kluchniz[i][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = i;
@@ -5064,11 +4767,11 @@ void reshsto4(int i, int j, int (*p), int (*q)) {
                             (*g).prev = kluchlevfinish.prev;
                             kluchlevfinish.prev = g;
                         }
-                        j1 = kolstr[b] + 1;
+                        j1 = rowNumCount[b] + 1;
                         while (i <= prav[b][j1])
                             j1--;
                         j1++;
-                        if ((j1 < kolstr[b] + 1) && (kluchprav[b][j1] == false)) {
+                        if ((j1 < rowNumCount[b] + 1) && (kluchprav[b][j1] == false)) {
                             kluchprav[b][j1] = true;
                             g = (struct kluch *) malloc(sizeof(struct kluch));
                             (*g).i = b;
@@ -5115,12 +4818,12 @@ void reshsto4(int i, int j, int (*p), int (*q)) {
                     s--;
             }
             t = (*q) - s;
-            if ((t == sto[i][j]) && (jpn[s][i] == pusto)) {
+            if ((t == colNums[i][j]) && (jpn[s][i] == empty)) {
                 a = j;
-                while ((verh[i][a] <= s + 1) && ((sto[i][a] <= sto[i][j]) || (verh[i][a] == s + 1)))
+                while ((verh[i][a] <= s + 1) && ((colNums[i][a] <= colNums[i][j]) || (verh[i][a] == s + 1)))
                     a++;
                 if ((verh[i][a] > s + 1) &&
-                    ((sto[i][a - 1] <= sto[i][j]) || (verh[i][a - 1] == s + 1))) {
+                    ((colNums[i][a - 1] <= colNums[i][j]) || (verh[i][a - 1] == s + 1))) {
                     jpn[s][i] = no;
 
                     j1 = 0;
@@ -5136,11 +4839,11 @@ void reshsto4(int i, int j, int (*p), int (*q)) {
                         kluchverhfinish.prev = g;
                     }
 
-                    j1 = kolsto[i] + 1;
+                    j1 = colNumCount[i] + 1;
                     while (s <= niz[i][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolsto[i] + 1) && (kluchniz[i][j1] == false)) {
+                    if ((j1 < colNumCount[i] + 1) && (kluchniz[i][j1] == false)) {
                         kluchniz[i][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = i;
@@ -5161,11 +4864,11 @@ void reshsto4(int i, int j, int (*p), int (*q)) {
                         (*g).prev = kluchlevfinish.prev;
                         kluchlevfinish.prev = g;
                     }
-                    j1 = kolstr[s] + 1;
+                    j1 = rowNumCount[s] + 1;
                     while (i <= prav[s][j1])
                         j1--;
                     j1++;
-                    if ((j1 < kolstr[s] + 1) && (kluchprav[s][j1] == false)) {
+                    if ((j1 < rowNumCount[s] + 1) && (kluchprav[s][j1] == false)) {
                         kluchprav[s][j1] = true;
                         g = (struct kluch *) malloc(sizeof(struct kluch));
                         (*g).i = s;
@@ -5204,7 +4907,7 @@ void reshsto4(int i, int j, int (*p), int (*q)) {
             }
 
         }
-        while ((jpn[s][i] == pusto) && (s > niz[i][j - 1]) && (s >= verh[i][j]))
+        while ((jpn[s][i] == empty) && (s > niz[i][j - 1]) && (s >= verh[i][j]))
             s--;
     }
 }
@@ -5212,8 +4915,8 @@ void reshsto4(int i, int j, int (*p), int (*q)) {
 void reshstodva(int i) {
     int j, p, q;
     q = 0;
-    for (j = 1; j < kolsto[i] + 1; j++) {
-        if ((niz[i][j] - verh[i][j] + 1) > (sto[i][j]))
+    for (j = 1; j < colNumCount[i] + 1; j++) {
+        if ((niz[i][j] - verh[i][j] + 1) > (colNums[i][j]))
             reshsto3(i, j, &p, &q);
         else
             q = verh[i][j];
@@ -5221,8 +4924,8 @@ void reshstodva(int i) {
             return;
     }
     q = height + 3;
-    for (j = kolsto[i]; j > 0; j--) {
-        if ((niz[i][j] - verh[i][j] + 1) > (sto[i][j]))
+    for (j = colNumCount[i]; j > 0; j--) {
+        if ((niz[i][j] - verh[i][j] + 1) > (colNums[i][j]))
             reshsto4(i, j, &p, &q);
         else
             q = niz[i][j];
@@ -5452,7 +5155,7 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
             (*g).prev = kluchlevfinish.prev;
             kluchlevfinish.prev = g;
         }
-        j1 = kolstr[i0] + 1;
+        j1 = rowNumCount[i0] + 1;
         while (j0 <= prav[i0][j1])
             j1--;
         j1++;
@@ -5478,7 +5181,7 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
             (*g).prev = kluchverhfinish.prev;
             kluchverhfinish.prev = g;
         }
-        j1 = kolsto[j0] + 1;
+        j1 = colNumCount[j0] + 1;
         while (i0 <= niz[j0][j1])
             j1--;
         j1++;
@@ -5529,7 +5232,7 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
                 (*g).prev = kluchlevfinish.prev;
                 kluchlevfinish.prev = g;
             }
-            j1 = kolstr[(*c).m1] + 1;
+            j1 = rowNumCount[(*c).m1] + 1;
             while ((*c).m2 <= prav[(*c).m1][j1])
                 j1--;
             j1++;
@@ -5555,7 +5258,7 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
                 (*g).prev = kluchverhfinish.prev;
                 kluchverhfinish.prev = g;
             }
-            j1 = kolsto[(*c).m2] + 1;
+            j1 = colNumCount[(*c).m2] + 1;
             while ((*c).m1 <= niz[(*c).m2][j1])
                 j1--;
             j1++;
@@ -5595,24 +5298,12 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
 
         resheniee();
         if ((er) && (netu == 0)) {
-            if (all == false && to == 0)
-                return;
-            else {
-                kol = kol + 1;
-                if (to == kol)
-                    return;
-                /*if (xpm == false)
-					postroenie(jpn);
-				else
-					postroenie1(jpn);*/
-                er = false;
-
-            }
+            return;
         }
         if (er == false) {
 
             for (k = kolic1[cis - 1] + 1; k < kolic + 1; k++) {
-                jpn[m12[k]][m22[k]] = pusto;
+                jpn[m12[k]][m22[k]] = empty;
                 netu++;
             }
             e = lev2delfinish.prev[1];
@@ -5709,7 +5400,7 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
                 (*g).prev = kluchlevfinish.prev;
                 kluchlevfinish.prev = g;
             }
-            j1 = kolstr[i0] + 1;
+            j1 = rowNumCount[i0] + 1;
             while (j0 <= prav[i0][j1])
                 j1--;
             j1++;
@@ -5735,7 +5426,7 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
                 (*g).prev = kluchverhfinish.prev;
                 kluchverhfinish.prev = g;
             }
-            j1 = kolsto[j0] + 1;
+            j1 = colNumCount[j0] + 1;
             while (i0 <= niz[j0][j1])
                 j1--;
             j1++;
@@ -5770,16 +5461,6 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
             er = true;
             resheniee();
 
-            if ((er) && (netu == 0) && (all || to > 0)) {
-                kol = kol + 1;
-                if (to == kol)
-                    return;
-                /*if (xpm)
-					postroenie1(jpn);
-				else
-					postroenie(jpn);*/
-                er = false;
-            }
             if ((er == false) || (netu == 0)) {
                 e = lev2delfinish.prev[1];
                 while (e != lev2del) {
@@ -5890,28 +5571,6 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
                             (*(*d).prev[2]).next[2] = (*d).next[2];
                             (*(*d).next[2]).prev[2] = (*d).prev[2];
 
-                            if ((mo == 1) && (jpn4[(*d).m1][(*d).m2].start[(*d).m3].next[2] ==
-                                              &(jpn4[(*d).m1][(*d).m2].finish[(*d).m3])) &&
-                                (jpn[(*d).m1][(*d).m2] == pusto)) {
-                                b = (struct active *) malloc(sizeof(struct active));
-                                (*b).cis = cis;
-                                (*b).m1 = (*d).m1;
-                                (*b).m2 = (*d).m2;
-                                (*b).m3 = (*d).m3;
-                                (*b).netu = 0;
-                                (*b).notchoise = false;
-                                (*b).next[0] = activenew;
-                                (*b).prev[0] = (*activenew).prev[0];
-                                (*(*activenew).prev[0]).next[0] = b;
-                                (*activenew).prev[0] = b;
-                                (*b).next[1] = &finish;
-                                (*b).prev[1] = finish.prev[1];
-                                (*finish.prev[1]).next[1] = b;
-                                finish.prev[1] = b;
-                                jpn4[(*d).m1][(*d).m2].element[(*d).m3] = b;
-
-                            }
-
                             if ((*d).cis < cis) {
                                 (*d).prev[1] = (*passivedel).prev[1];
                                 (*d).next[1] = passivedel;
@@ -5934,71 +5593,67 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
                         jpn4[i0][j0].start[j].next[1] = &(jpn4[i0][j0].finish[j]);
                         jpn4[i0][j0].finish[j].prev[1] = &(jpn4[i0][j0].start[j]);
                     }
-                    if (mo == 0 || cond == false) {
+                    d = jpn4[i0][j0].start[j].next[2];
+                    while (d != &(jpn4[i0][j0].finish[j])) {
 
-                        d = jpn4[i0][j0].start[j].next[2];
-                        while (d != &(jpn4[i0][j0].finish[j])) {
-
-                            c = (*d).next[2];
-                            if (jpn[(*d).m12][(*d).m22] == pusto) {
-                                b = jpn4[(*d).m12][(*d).m22].element[(*d).m32];
-                                if ((*b).notchoise) {
-                                    (*b).notchoise = false;
-                                    (*(*b).prev[1]).next[1] = (*b).next[1];
-                                    (*(*b).next[1]).prev[1] = (*b).prev[1];
-                                    (*b).next[1] = &finish;
-                                    (*b).prev[1] = finish.prev[1];
-                                    (*finish.prev[1]).next[1] = b;
-                                    finish.prev[1] = b;
-                                }
+                        c = (*d).next[2];
+                        if (jpn[(*d).m12][(*d).m22] == empty) {
+                            b = jpn4[(*d).m12][(*d).m22].element[(*d).m32];
+                            if ((*b).notchoise) {
+                                (*b).notchoise = false;
+                                (*(*b).prev[1]).next[1] = (*b).next[1];
+                                (*(*b).next[1]).prev[1] = (*b).prev[1];
+                                (*b).next[1] = &finish;
+                                (*b).prev[1] = finish.prev[1];
+                                (*finish.prev[1]).next[1] = b;
+                                finish.prev[1] = b;
                             }
-                            (*(*d).prev[1]).next[1] = (*d).next[1];
-                            (*(*d).next[1]).prev[1] = (*d).prev[1];
-
-                            if ((*d).cis < cis) {
-                                (*d).prev[1] = (*passivedel).prev[1];
-                                (*d).next[1] = passivedel;
-                                (*(*passivedel).prev[1]).next[1] = d;
-                                (*passivedel).prev[1] = d;
-                                (*d).prev[2] = (*passivedel).prev[2];
-                                (*d).next[2] = passivedel;
-                                (*(*passivedel).prev[2]).next[2] = d;
-                                (*passivedel).prev[2] = d;
-
-                            } else {
-                                (*(*d).prev[0]).next[0] = (*d).next[0];
-                                (*(*d).next[0]).prev[0] = (*d).prev[0];
-                                free(d);
-                            }
-
-                            d = c;
-
                         }
-                        jpn4[i0][j0].start[j].next[2] = &(jpn4[i0][j0].finish[j]);
-                        jpn4[i0][j0].finish[j].prev[2] = &(jpn4[i0][j0].start[j]);
+                        (*(*d).prev[1]).next[1] = (*d).next[1];
+                        (*(*d).next[1]).prev[1] = (*d).prev[1];
+
+                        if ((*d).cis < cis) {
+                            (*d).prev[1] = (*passivedel).prev[1];
+                            (*d).next[1] = passivedel;
+                            (*(*passivedel).prev[1]).next[1] = d;
+                            (*passivedel).prev[1] = d;
+                            (*d).prev[2] = (*passivedel).prev[2];
+                            (*d).next[2] = passivedel;
+                            (*(*passivedel).prev[2]).next[2] = d;
+                            (*passivedel).prev[2] = d;
+
+                        } else {
+                            (*(*d).prev[0]).next[0] = (*d).next[0];
+                            (*(*d).next[0]).prev[0] = (*d).prev[0];
+                            free(d);
+                        }
+
+                        d = c;
 
                     }
+                    jpn4[i0][j0].start[j].next[2] = &(jpn4[i0][j0].finish[j]);
+                    jpn4[i0][j0].finish[j].prev[2] = &(jpn4[i0][j0].start[j]);
 
                 }
-                if (jpn[i0 + 1][j0] == pusto && jpn4[i0 + 1][j0].notchoise) {
+                if (jpn[i0 + 1][j0] == empty && jpn4[i0 + 1][j0].notchoise) {
                     jpn4[i0 + 1][j0].notchoise = false;
                     k++;
                     m12[k] = i0 + 1;
                     m22[k] = j0;
                 }
-                if (jpn[i0 - 1][j0] == pusto && jpn4[i0 - 1][j0].notchoise) {
+                if (jpn[i0 - 1][j0] == empty && jpn4[i0 - 1][j0].notchoise) {
                     jpn4[i0 - 1][j0].notchoise = false;
                     k++;
                     m12[k] = i0 - 1;
                     m22[k] = j0;
                 }
-                if (jpn[i0][j0 + 1] == pusto && jpn4[i0][j0 + 1].notchoise) {
+                if (jpn[i0][j0 + 1] == empty && jpn4[i0][j0 + 1].notchoise) {
                     jpn4[i0][j0 + 1].notchoise = false;
                     k++;
                     m12[k] = i0;
                     m22[k] = j0 + 1;
                 }
-                if (jpn[i0][j0 - 1] == pusto && jpn4[i0][j0 - 1].notchoise) {
+                if (jpn[i0][j0 - 1] == empty && jpn4[i0][j0 - 1].notchoise) {
                     jpn4[i0][j0 - 1].notchoise = false;
                     k++;
                     m12[k] = i0;
@@ -6026,25 +5681,22 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
                             finish.prev[1] = b;
                         }
                     }
-                    if (mo == 0 || cond == false) {
-
-                        d = jpn4[i0][j0].start[j].next[2];
-                        while (d != &(jpn4[i0][j0].finish[j])) {
+                    d = jpn4[i0][j0].start[j].next[2];
+                    while (d != &(jpn4[i0][j0].finish[j])) {
 
 
-                            b = jpn4[(*d).m12][(*d).m22].element[(*d).m32];
-                            if ((*b).notchoise) {
-                                (*b).notchoise = false;
-                                (*(*b).prev[1]).next[1] = (*b).next[1];
-                                (*(*b).next[1]).prev[1] = (*b).prev[1];
-                                (*b).next[1] = &finish;
-                                (*b).prev[1] = finish.prev[1];
-                                (*finish.prev[1]).next[1] = b;
-                                finish.prev[1] = b;
-                            }
-
-                            d = (*d).next[2];
+                        b = jpn4[(*d).m12][(*d).m22].element[(*d).m32];
+                        if ((*b).notchoise) {
+                            (*b).notchoise = false;
+                            (*(*b).prev[1]).next[1] = (*b).next[1];
+                            (*(*b).next[1]).prev[1] = (*b).prev[1];
+                            (*b).next[1] = &finish;
+                            (*b).prev[1] = finish.prev[1];
+                            (*finish.prev[1]).next[1] = b;
+                            finish.prev[1] = b;
                         }
+
+                        d = (*d).next[2];
                     }
 
                 }
@@ -6062,56 +5714,6 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
                 (*c).m12 = i0;
                 (*c).m22 = j0;
                 (*c).m32 = k0;
-
-                if (mo == 1 && jpn4[(*c).m1][(*c).m2].element[(*c).m3] != NULL) {
-                    b = jpn4[(*c).m1][(*c).m2].element[(*c).m3];
-
-
-                    (*(*b).prev[1]).next[1] = (*b).next[1];
-                    (*(*b).next[1]).prev[1] = (*b).prev[1];
-                    if ((*b).cis < cis) {
-                        (*b).prev[1] = (*activedel).prev[1];
-                        (*b).next[1] = activedel;
-                        (*(*activedel).prev[1]).next[1] = b;
-                        (*activedel).prev[1] = b;
-                    } else {
-                        (*(*b).prev[0]).next[0] = (*b).next[0];
-                        (*(*b).next[0]).prev[0] = (*b).prev[0];
-                        free(b);
-                        b = NULL;
-                    }
-                    jpn4[(*c).m1][(*c).m2].element[(*c).m3] = NULL;
-
-                    d = jpn4[(*c).m1][(*c).m2].start[(*c).m3].next[1];
-                    while (d != &(jpn4[(*c).m1][(*c).m2].finish[(*c).m3])) {
-
-                        (*(*d).prev[1]).next[1] = (*d).next[1];
-                        (*(*d).next[1]).prev[1] = (*d).prev[1];
-                        (*(*d).prev[2]).next[2] = (*d).next[2];
-                        (*(*d).next[2]).prev[2] = (*d).prev[2];
-
-                        if ((*d).cis < cis) {
-                            (*d).prev[1] = (*passivedel).prev[1];
-                            (*d).next[1] = passivedel;
-                            (*(*passivedel).prev[1]).next[1] = d;
-                            (*passivedel).prev[1] = d;
-                            (*d).prev[2] = (*passivedel).prev[2];
-                            (*d).next[2] = passivedel;
-                            (*(*passivedel).prev[2]).next[2] = d;
-                            (*passivedel).prev[2] = d;
-
-                        } else {
-                            (*(*d).prev[0]).next[0] = (*d).next[0];
-                            (*(*d).next[0]).prev[0] = (*d).prev[0];
-                            free(d);
-                        }
-
-                        d = jpn4[(*c).m1][(*c).m2].start[(*c).m3].next[1];
-
-                    }
-
-
-                }
 
                 (*c).next[0] = passivenew;
                 (*c).prev[0] = (*passivenew).prev[0];
@@ -6163,7 +5765,7 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
 
 
             for (k = kolic1[cis - 1] + 1; k < kolic + 1; k++) {
-                jpn[m12[k]][m22[k]] = pusto;
+                jpn[m12[k]][m22[k]] = empty;
                 netu++;
             }
             e = lev2delfinish.prev[1];
@@ -6194,51 +5796,36 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
         }
         a = start.next[1];
     }
-    if (mo == 1) {
-        netu4 = 0;
-        a = start1.next[1];
-        while (a != &finish1) {
-            if ((*a).netu > netu4) {
-                netu4 = (*a).netu;
-                m13 = (*a).m1;
-                m23 = (*a).m2;
-                m33 = (*a).m3;
-            }
-            a = (*a).next[1];
-        }
-    } else {
-        netu4 = 0;
-        netu5 = 0;
-        m13 = 0;
-        m23 = 0;
-        m33 = 0;
-        a = start1.next[1];
-        while (a != &finish1) {
-            if ((*a).m3 == 0) {
-                i0 = (*a).m1;
-                j0 = (*a).m2;
-                netu6 = (*a).netu;
-                netu7 = (*jpn4[i0][j0].element[1]).netu;
-                if ((netu6 > netu4 && netu7 > netu4) ||
-                    (netu6 >= netu4 && netu7 >= netu4 && netu6 + netu7 > netu4 + netu5)) {
-                    m13 = i0;
-                    m23 = j0;
-                    if (netu6 > netu7) {
-                        m33 = no;
-                        netu4 = netu7;
-                        netu5 = netu6;
-                    } else {
-                        m33 = yes;
-                        netu4 = netu6;
-                        netu5 = netu7;
+    netu4 = 0;
+    netu5 = 0;
+    m13 = 0;
+    m23 = 0;
+    m33 = 0;
+    a = start1.next[1];
+    while (a != &finish1) {
+        if ((*a).m3 == 0) {
+            i0 = (*a).m1;
+            j0 = (*a).m2;
+            netu6 = (*a).netu;
+            netu7 = (*jpn4[i0][j0].element[1]).netu;
+            if ((netu6 > netu4 && netu7 > netu4) ||
+                (netu6 >= netu4 && netu7 >= netu4 && netu6 + netu7 > netu4 + netu5)) {
+                m13 = i0;
+                m23 = j0;
+                if (netu6 > netu7) {
+                    m33 = no;
+                    netu4 = netu7;
+                    netu5 = netu6;
+                } else {
+                    m33 = yes;
+                    netu4 = netu6;
+                    netu5 = netu7;
 
-                    }
                 }
             }
-
-            a = (*a).next[1];
         }
 
+        a = (*a).next[1];
     }
 
     activenew2 = (struct active *) malloc(sizeof(struct active));
@@ -6312,7 +5899,7 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
         (*g).prev = kluchlevfinish.prev;
         kluchlevfinish.prev = g;
     }
-    j1 = kolstr[m13] + 1;
+    j1 = rowNumCount[m13] + 1;
     while (m23 <= prav[m13][j1])
         j1--;
     j1++;
@@ -6338,7 +5925,7 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
         (*g).prev = kluchverhfinish.prev;
         kluchverhfinish.prev = g;
     }
-    j1 = kolsto[m23] + 1;
+    j1 = colNumCount[m23] + 1;
     while (m13 <= niz[m23][j1])
         j1--;
     j1++;
@@ -6373,17 +5960,7 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
 
     if (er)
         if (netu == 0) {
-            if (all || to > 0) {
-                kol = kol + 1;
-                if (to == kol)
-                    return;
-                /*if (xpm)
-					postroenie1(jpn);
-				else
-					postroenie(jpn);*/
-                er = false;
-            } else
-                return;
+            return;
         }
     if (er == false) {
         e = lev2delfinish.prev[1];
@@ -6442,28 +6019,6 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
                         (*(*d).prev[2]).next[2] = (*d).next[2];
                         (*(*d).next[2]).prev[2] = (*d).prev[2];
 
-                        if ((mo == 1) && (jpn4[(*d).m1][(*d).m2].start[(*d).m3].next[2] ==
-                                          &(jpn4[(*d).m1][(*d).m2].finish[(*d).m3])) &&
-                            (jpn[(*d).m1][(*d).m2] == pusto)) {
-                            b = (struct active *) malloc(sizeof(struct active));
-                            (*b).cis = cis + 1;
-                            (*b).m1 = (*d).m1;
-                            (*b).m2 = (*d).m2;
-                            (*b).m3 = (*d).m3;
-                            (*b).netu = 0;
-                            (*b).notchoise = false;
-                            (*b).next[0] = activenew2;
-                            (*b).prev[0] = (*activenew2).prev[0];
-                            (*(*activenew2).prev[0]).next[0] = b;
-                            (*activenew2).prev[0] = b;
-                            (*b).next[1] = &finish;
-                            (*b).prev[1] = finish.prev[1];
-                            (*finish.prev[1]).next[1] = b;
-                            finish.prev[1] = b;
-                            jpn4[(*d).m1][(*d).m2].element[(*d).m3] = b;
-
-                        }
-
                         if ((*d).cis < cis + 1) {
                             (*d).prev[1] = (*passivedel2).prev[1];
                             (*d).next[1] = passivedel2;
@@ -6486,70 +6041,66 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
                     jpn4[i0][j0].start[j].next[1] = &(jpn4[i0][j0].finish[j]);
                     jpn4[i0][j0].finish[j].prev[1] = &(jpn4[i0][j0].start[j]);
                 }
-                if (mo == 0 || cond == false) {
-
-                    d = jpn4[i0][j0].start[j].next[2];
-
-                    while (d != &(jpn4[i0][j0].finish[j])) {
-                        c = (*d).next[2];
-                        if (jpn[(*d).m12][(*d).m22] == pusto) {
-                            b = jpn4[(*d).m12][(*d).m22].element[(*d).m32];
-                            if ((*b).notchoise) {
-                                (*b).notchoise = false;
-                                (*(*b).prev[1]).next[1] = (*b).next[1];
-                                (*(*b).next[1]).prev[1] = (*b).prev[1];
-                                (*b).next[1] = &finish;
-                                (*b).prev[1] = finish.prev[1];
-                                (*finish.prev[1]).next[1] = b;
-                                finish.prev[1] = b;
-                            }
+                d = jpn4[i0][j0].start[j].next[2];
+                while (d != &(jpn4[i0][j0].finish[j])) {
+                    c = (*d).next[2];
+                    if (jpn[(*d).m12][(*d).m22] == empty) {
+                        b = jpn4[(*d).m12][(*d).m22].element[(*d).m32];
+                        if ((*b).notchoise) {
+                            (*b).notchoise = false;
+                            (*(*b).prev[1]).next[1] = (*b).next[1];
+                            (*(*b).next[1]).prev[1] = (*b).prev[1];
+                            (*b).next[1] = &finish;
+                            (*b).prev[1] = finish.prev[1];
+                            (*finish.prev[1]).next[1] = b;
+                            finish.prev[1] = b;
                         }
-                        (*(*d).prev[1]).next[1] = (*d).next[1];
-                        (*(*d).next[1]).prev[1] = (*d).prev[1];
-
-                        if ((*d).cis < cis + 1) {
-                            (*d).prev[1] = (*passivedel2).prev[1];
-                            (*d).next[1] = passivedel2;
-                            (*(*passivedel2).prev[1]).next[1] = d;
-                            (*passivedel2).prev[1] = d;
-                            (*d).prev[2] = (*passivedel2).prev[2];
-                            (*d).next[2] = passivedel2;
-                            (*(*passivedel2).prev[2]).next[2] = d;
-                            (*passivedel2).prev[2] = d;
-
-                        } else {
-                            (*(*d).prev[0]).next[0] = (*d).next[0];
-                            (*(*d).next[0]).prev[0] = (*d).prev[0];
-                            free(d);
-                        }
-
-                        d = c;
-
                     }
-                    jpn4[i0][j0].start[j].next[2] = &(jpn4[i0][j0].finish[j]);
-                    jpn4[i0][j0].finish[j].prev[2] = &(jpn4[i0][j0].start[j]);
+                    (*(*d).prev[1]).next[1] = (*d).next[1];
+                    (*(*d).next[1]).prev[1] = (*d).prev[1];
+
+                    if ((*d).cis < cis + 1) {
+                        (*d).prev[1] = (*passivedel2).prev[1];
+                        (*d).next[1] = passivedel2;
+                        (*(*passivedel2).prev[1]).next[1] = d;
+                        (*passivedel2).prev[1] = d;
+                        (*d).prev[2] = (*passivedel2).prev[2];
+                        (*d).next[2] = passivedel2;
+                        (*(*passivedel2).prev[2]).next[2] = d;
+                        (*passivedel2).prev[2] = d;
+
+                    } else {
+                        (*(*d).prev[0]).next[0] = (*d).next[0];
+                        (*(*d).next[0]).prev[0] = (*d).prev[0];
+                        free(d);
+                    }
+
+                    d = c;
+
                 }
+                jpn4[i0][j0].start[j].next[2] = &(jpn4[i0][j0].finish[j]);
+                jpn4[i0][j0].finish[j].prev[2] = &(jpn4[i0][j0].start[j]);
 
             }
-            if (jpn[i0 + 1][j0] == pusto && jpn4[i0 + 1][j0].notchoise) {
+            if (jpn[i0 + 1][j0] == empty && jpn4[i0 + 1][j0].notchoise) {
                 jpn4[i0 + 1][j0].notchoise = false;
                 k++;
                 m12[k] = i0 + 1;
                 m22[k] = j0;
             }
-            if (jpn[i0 - 1][j0] == pusto && jpn4[i0 - 1][j0].notchoise) {
+            if (jpn[i0 - 1][j0] == empty && jpn4[i0 - 1][j0].notchoise) {
                 jpn4[i0 - 1][j0].notchoise = false;
                 k++;
                 m12[k] = i0 - 1;
                 m22[k] = j0;
             }
-            if (jpn[i0][j0 + 1] == pusto && jpn4[i0][j0 + 1].notchoise) {
+            if (jpn[i0][j0 + 1] == empty && jpn4[i0][j0 + 1].notchoise) {
                 jpn4[i0][j0 + 1].notchoise = false;
                 k++;
                 m12[k] = i0;
                 m22[k] = j0 + 1;
             }
-            if (jpn[i0][j0 - 1] == pusto && jpn4[i0][j0 - 1].notchoise) {
+            if (jpn[i0][j0 - 1] == empty && jpn4[i0][j0 - 1].notchoise) {
                 jpn4[i0][j0 - 1].notchoise = false;
                 k++;
                 m12[k] = i0;
@@ -6577,25 +6128,22 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
                         finish.prev[1] = b;
                     }
                 }
-                if (mo == 0 || cond == false) {
-
-                    d = jpn4[i0][j0].start[j].next[2];
-                    while (d != &(jpn4[i0][j0].finish[j])) {
+                d = jpn4[i0][j0].start[j].next[2];
+                while (d != &(jpn4[i0][j0].finish[j])) {
 
 
-                        b = jpn4[(*d).m12][(*d).m22].element[(*d).m32];
-                        if ((*b).notchoise) {
-                            (*b).notchoise = false;
-                            (*(*b).prev[1]).next[1] = (*b).next[1];
-                            (*(*b).next[1]).prev[1] = (*b).prev[1];
-                            (*b).next[1] = &finish;
-                            (*b).prev[1] = finish.prev[1];
-                            (*finish.prev[1]).next[1] = b;
-                            finish.prev[1] = b;
-                        }
-
-                        d = (*d).next[2];
+                    b = jpn4[(*d).m12][(*d).m22].element[(*d).m32];
+                    if ((*b).notchoise) {
+                        (*b).notchoise = false;
+                        (*(*b).prev[1]).next[1] = (*b).next[1];
+                        (*(*b).next[1]).prev[1] = (*b).prev[1];
+                        (*b).next[1] = &finish;
+                        (*b).prev[1] = finish.prev[1];
+                        (*finish.prev[1]).next[1] = b;
+                        finish.prev[1] = b;
                     }
+
+                    d = (*d).next[2];
                 }
 
             }
@@ -6630,10 +6178,10 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
             (*f).next[0] = lev2new2;
             (*(*lev2new2).prev[0]).next[0] = f;
             (*lev2new2).prev[0] = f;
-//				(*f).prev[1] = (*lev2new).prev[1];
-//				(*f).next[1]=lev2new;
-//				(*(*lev2new).prev[1]).next[1]=f;
-//				(*lev2new).prev[1]=f;
+//				(*f).prev[1] = (*lev2new0).prev[1];
+//				(*f).next[1]=lev2new0;
+//				(*(*lev2new0).prev[1]).next[1]=f;
+//				(*lev2new0).prev[1]=f;
             (*f).prev[1] = NULL;
             (*f).next[1] = NULL;
             f = (*e).prev[1];
@@ -6772,7 +6320,7 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
         passivedelfinish.prev[2] = passivedel;
 
         for (k = kolic1[cis - 1] + 1; k < kolic + 1; k++) {
-            jpn[m12[k]][m22[k]] = pusto;
+            jpn[m12[k]][m22[k]] = empty;
             netu++;
         }
 
@@ -6944,7 +6492,7 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
             (*g).prev = kluchlevfinish.prev;
             kluchlevfinish.prev = g;
         }
-        j1 = kolstr[m13] + 1;
+        j1 = rowNumCount[m13] + 1;
         while (m23 <= prav[m13][j1])
             j1--;
         j1++;
@@ -6970,7 +6518,7 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
             (*g).prev = kluchverhfinish.prev;
             kluchverhfinish.prev = g;
         }
-        j1 = kolsto[m23] + 1;
+        j1 = colNumCount[m23] + 1;
         while (m13 <= niz[m23][j1])
             j1--;
         j1++;
@@ -7005,17 +6553,7 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
 
         if (er)
             if (netu == 0) {
-                if (all || to > 0) {
-                    kol = kol + 1;
-                    if (to == kol)
-                        return;
-                    /*if (xpm)
-						postroenie1(jpn);
-					else
-						postroenie(jpn);*/
-                    er = false;
-                } else
-                    return;
+                return;
             }
         if (er == false) {
             e = lev2delfinish.prev[1];
@@ -7075,28 +6613,6 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
                             (*(*d).prev[2]).next[2] = (*d).next[2];
                             (*(*d).next[2]).prev[2] = (*d).prev[2];
 
-                            if ((mo == 1) && (jpn4[(*d).m1][(*d).m2].start[(*d).m3].next[2] ==
-                                              &(jpn4[(*d).m1][(*d).m2].finish[(*d).m3])) &&
-                                (jpn[(*d).m1][(*d).m2] == pusto)) {
-                                b = (struct active *) malloc(sizeof(struct active));
-                                (*b).cis = cis + 1;
-                                (*b).m1 = (*d).m1;
-                                (*b).m2 = (*d).m2;
-                                (*b).m3 = (*d).m3;
-                                (*b).netu = 0;
-                                (*b).notchoise = false;
-                                (*b).next[0] = activenew2;
-                                (*b).prev[0] = (*activenew2).prev[0];
-                                (*(*activenew2).prev[0]).next[0] = b;
-                                (*activenew2).prev[0] = b;
-                                (*b).next[1] = &finish;
-                                (*b).prev[1] = finish.prev[1];
-                                (*finish.prev[1]).next[1] = b;
-                                finish.prev[1] = b;
-                                jpn4[(*d).m1][(*d).m2].element[(*d).m3] = b;
-
-                            }
-
                             if ((*d).cis < cis + 1) {
                                 (*d).prev[1] = (*passivedel2).prev[1];
                                 (*d).next[1] = passivedel2;
@@ -7119,68 +6635,65 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
                         jpn4[i0][j0].start[j].next[1] = &(jpn4[i0][j0].finish[j]);
                         jpn4[i0][j0].finish[j].prev[1] = &(jpn4[i0][j0].start[j]);
                     }
-                    if (mo == 0 || cond == false) {
-
-                        d = jpn4[i0][j0].start[j].next[2];
-                        while (d != &(jpn4[i0][j0].finish[j])) {
-                            c = (*d).next[2];
-                            if (jpn[(*d).m12][(*d).m22] == pusto) {
-                                b = jpn4[(*d).m12][(*d).m22].element[(*d).m32];
-                                if ((*b).notchoise) {
-                                    (*b).notchoise = false;
-                                    (*(*b).prev[1]).next[1] = (*b).next[1];
-                                    (*(*b).next[1]).prev[1] = (*b).prev[1];
-                                    (*b).next[1] = &finish;
-                                    (*b).prev[1] = finish.prev[1];
-                                    (*finish.prev[1]).next[1] = b;
-                                    finish.prev[1] = b;
-                                }
+                    d = jpn4[i0][j0].start[j].next[2];
+                    while (d != &(jpn4[i0][j0].finish[j])) {
+                        c = (*d).next[2];
+                        if (jpn[(*d).m12][(*d).m22] == empty) {
+                            b = jpn4[(*d).m12][(*d).m22].element[(*d).m32];
+                            if ((*b).notchoise) {
+                                (*b).notchoise = false;
+                                (*(*b).prev[1]).next[1] = (*b).next[1];
+                                (*(*b).next[1]).prev[1] = (*b).prev[1];
+                                (*b).next[1] = &finish;
+                                (*b).prev[1] = finish.prev[1];
+                                (*finish.prev[1]).next[1] = b;
+                                finish.prev[1] = b;
                             }
-                            (*(*d).prev[1]).next[1] = (*d).next[1];
-                            (*(*d).next[1]).prev[1] = (*d).prev[1];
-                            if ((*d).cis < cis + 1) {
-                                (*d).prev[1] = (*passivedel2).prev[1];
-                                (*d).next[1] = passivedel2;
-                                (*(*passivedel2).prev[1]).next[1] = d;
-                                (*passivedel2).prev[1] = d;
-                                (*d).prev[2] = (*passivedel).prev[2];
-                                (*d).next[2] = passivedel;
-                                (*(*passivedel).prev[2]).next[2] = d;
-                                (*passivedel).prev[2] = d;
-
-                            } else {
-                                (*(*d).prev[0]).next[0] = (*d).next[0];
-                                (*(*d).next[0]).prev[0] = (*d).prev[0];
-                                free(d);
-                            }
-
-                            d = c;
-
                         }
-                        jpn4[i0][j0].start[j].next[2] = &(jpn4[i0][j0].finish[j]);
-                        jpn4[i0][j0].finish[j].prev[2] = &(jpn4[i0][j0].start[j]);
+                        (*(*d).prev[1]).next[1] = (*d).next[1];
+                        (*(*d).next[1]).prev[1] = (*d).prev[1];
+                        if ((*d).cis < cis + 1) {
+                            (*d).prev[1] = (*passivedel2).prev[1];
+                            (*d).next[1] = passivedel2;
+                            (*(*passivedel2).prev[1]).next[1] = d;
+                            (*passivedel2).prev[1] = d;
+                            (*d).prev[2] = (*passivedel).prev[2];
+                            (*d).next[2] = passivedel;
+                            (*(*passivedel).prev[2]).next[2] = d;
+                            (*passivedel).prev[2] = d;
+
+                        } else {
+                            (*(*d).prev[0]).next[0] = (*d).next[0];
+                            (*(*d).next[0]).prev[0] = (*d).prev[0];
+                            free(d);
+                        }
+
+                        d = c;
+
                     }
+                    jpn4[i0][j0].start[j].next[2] = &(jpn4[i0][j0].finish[j]);
+                    jpn4[i0][j0].finish[j].prev[2] = &(jpn4[i0][j0].start[j]);
 
                 }
-                if (jpn[i0 + 1][j0] == pusto && jpn4[i0 + 1][j0].notchoise) {
+                if (jpn[i0 + 1][j0] == empty && jpn4[i0 + 1][j0].notchoise) {
                     jpn4[i0 + 1][j0].notchoise = false;
                     k++;
                     m12[k] = i0 + 1;
                     m22[k] = j0;
                 }
-                if (jpn[i0 - 1][j0] == pusto && jpn4[i0 - 1][j0].notchoise) {
+                if (jpn[i0 - 1][j0] == empty && jpn4[i0 - 1][j0].notchoise) {
                     jpn4[i0 - 1][j0].notchoise = false;
                     k++;
                     m12[k] = i0 - 1;
                     m22[k] = j0;
                 }
-                if (jpn[i0][j0 + 1] == pusto && jpn4[i0][j0 + 1].notchoise) {
+                if (jpn[i0][j0 + 1] == empty && jpn4[i0][j0 + 1].notchoise) {
                     jpn4[i0][j0 + 1].notchoise = false;
                     k++;
                     m12[k] = i0;
                     m22[k] = j0 + 1;
                 }
-                if (jpn[i0][j0 - 1] == pusto && jpn4[i0][j0 - 1].notchoise) {
+                if (jpn[i0][j0 - 1] == empty && jpn4[i0][j0 - 1].notchoise) {
                     jpn4[i0][j0 - 1].notchoise = false;
                     k++;
                     m12[k] = i0;
@@ -7207,25 +6720,22 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
                             finish.prev[1] = b;
                         }
                     }
-                    if (mo == 0 || cond == false) {
-
-                        d = jpn4[i0][j0].start[j].next[2];
-                        while (d != &(jpn4[i0][j0].finish[j])) {
+                    d = jpn4[i0][j0].start[j].next[2];
+                    while (d != &(jpn4[i0][j0].finish[j])) {
 
 
-                            b = jpn4[(*d).m12][(*d).m22].element[(*d).m32];
-                            if ((*b).notchoise) {
-                                (*b).notchoise = false;
-                                (*(*b).prev[1]).next[1] = (*b).next[1];
-                                (*(*b).next[1]).prev[1] = (*b).prev[1];
-                                (*b).next[1] = &finish;
-                                (*b).prev[1] = finish.prev[1];
-                                (*finish.prev[1]).next[1] = b;
-                                finish.prev[1] = b;
-                            }
-
-                            d = (*d).next[2];
+                        b = jpn4[(*d).m12][(*d).m22].element[(*d).m32];
+                        if ((*b).notchoise) {
+                            (*b).notchoise = false;
+                            (*(*b).prev[1]).next[1] = (*b).next[1];
+                            (*(*b).next[1]).prev[1] = (*b).prev[1];
+                            (*b).next[1] = &finish;
+                            (*b).prev[1] = finish.prev[1];
+                            (*finish.prev[1]).next[1] = b;
+                            finish.prev[1] = b;
                         }
+
+                        d = (*d).next[2];
                     }
 
                 }
@@ -7260,10 +6770,6 @@ void podgon(int cis, struct active *activenew, struct active *activedel, struct 
                 (*f).next[0] = lev2new2;
                 (*(*lev2new2).prev[0]).next[0] = f;
                 (*lev2new2).prev[0] = f;
-//				(*f).prev[1] = (*lev2new).prev[1];
-//				(*f).next[1]=lev2new;
-//				(*(*lev2new).prev[1]).next[1]=f;
-//				(*lev2new).prev[1]=f;
                 (*f).prev[1] = NULL;
                 (*f).next[1] = NULL;
                 f = (*e).prev[1];
@@ -7311,18 +6817,65 @@ void kluchFree(struct kluch kl) {
 JNIEXPORT jint JNICALL
 Java_com_picross_nonocross_util_usergrid_CheckUnique_checkUniqueFromJNI(
         JNIEnv *env,
-        jobject this /* this */,
-        jstring string) {
-    kol = 0;
-    name = (*env)->GetStringUTFChars(env, string, NULL);
-    //__android_log_write(ANDROID_LOG_DEBUG, "Grid", name);
+        jobject this,
+        jint height0,
+        jint width0,
+        jintArray row_num_count0,
+        jintArray col_num_count0,
+        jintArray row_nums_flat,
+        jintArray col_nums_flat) {
+    //kol = 0;
+    height = height0;
+    width = width0;
+
+    jint *row_num_count_1 = (*env)->GetIntArrayElements(env, row_num_count0, 0);
+    jint *col_num_count_1 = (*env)->GetIntArrayElements(env, col_num_count0, 0);
+    jint *row_nums_flat0 = (*env)->GetIntArrayElements(env, row_nums_flat, 0);
+    jint *col_nums_flat0 = (*env)->GetIntArrayElements(env, col_nums_flat, 0);
+
+    rowNums = (int **) malloc((height + 2) * sizeof(int *));
+    colNums = (int **) malloc((width + 2) * sizeof(int *));
+    rowNumCount = (int *) malloc((height + 2) * sizeof(int));
+    colNumCount = (int *) malloc((width + 2) * sizeof(int));
+
+    int k = 0;
+    for(int i = 0; i<height; i++){
+        rowNumCount[i+2] = row_num_count_1[i];
+        rowNums[i + 2] = (int *) malloc((row_num_count_1[i] + 2) * sizeof(int));
+        for(int j = 0;j < rowNumCount[i+2]; j++){
+            rowNums[i+2][j+1] = row_nums_flat0[k];
+            k++;
+        }
+    }
+    __android_log_write(ANDROID_LOG_DEBUG, "Parsed", "rows");
+
+    (*env)->ReleaseIntArrayElements(env, row_num_count0, row_num_count_1, 0);
+    (*env)->ReleaseIntArrayElements(env, row_nums_flat, row_nums_flat0, 0);
+
+    k = 0;
+    for(int i = 0; i<width; i++){
+        colNumCount[i+2] = col_num_count_1[i];
+        colNums[i + 2] = (int *) malloc((col_num_count_1[i] + 2) * sizeof(int));
+        for(int j = 0;j < colNumCount[i+2]; j++){
+            colNums[i+2][j+1] = col_nums_flat0[k];
+            k++;
+        }
+    }
+
+    (*env)->ReleaseIntArrayElements(env, col_num_count0, col_num_count_1, 0);
+    (*env)->ReleaseIntArrayElements(env, col_nums_flat, col_nums_flat0, 0);
+
+    __android_log_write(ANDROID_LOG_DEBUG, "Parsed", "cols");
+
+    time1 = clock();
     if (mainy() == 0) {
-        char str[10];
+        /*char str[10];
         sprintf(str, "%d", kol);
         __android_log_write(ANDROID_LOG_DEBUG, "Solutions", str);
         time2 = clock() - time1;
         sprintf(str, "%f", (double) time2 / (double) CLOCKS_PER_SEC);
-        __android_log_write(ANDROID_LOG_DEBUG, "TimeTaken", str);
+        __android_log_write(ANDROID_LOG_DEBUG, "TimeTaken", str);*/
+        postroenie(jpn);
         deallocate();
         return kol;
     } else {

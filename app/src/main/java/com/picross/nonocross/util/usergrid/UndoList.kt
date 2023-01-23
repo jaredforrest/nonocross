@@ -13,25 +13,25 @@ data class UndoList(
 
     operator fun get(i: Int) = data[i]
 
-    fun undo() : Either<UndoListException.NoMoreUndo, Unit> {
+    fun undo() : Option<UndoListException.NoMoreUndo> {
         return try {
             val last = prev.removeLast()
             next.add(data)
             data = last
-            Either.Right(Unit)
+            none()
         } catch (err: NoSuchElementException) {
-            Either.Left(UndoListException.NoMoreUndo)
+            Some(UndoListException.NoMoreUndo)
         }
     }
 
-    fun redo() : Either<UndoListException.NoMoreRedo, Unit> {
+    fun redo() : Option<UndoListException.NoMoreRedo> {
         return try {
             val last = next.removeLast()
             prev.add(data)
             data = last
-            Either.Right(Unit)
+            none()
         } catch (err: NoSuchElementException) {
-            Either.Left(UndoListException.NoMoreRedo)
+            Some(UndoListException.NoMoreRedo)
         }
     }
 

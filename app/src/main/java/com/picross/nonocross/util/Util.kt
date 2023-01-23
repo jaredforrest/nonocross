@@ -49,8 +49,9 @@ suspend fun newUniqueRandomGrid(
     var ret = none<GridData>()
     coroutineScope {
         while (isActive && ret is None) {
+            val ( width, height, _) = wHD
             rec = newRandomGrid(wHD, random)
-            ret = rec.checkUnique(wHD.second)
+            ret = rec.checkUnique(width, height)
         }
     }
     return ret
@@ -123,7 +124,7 @@ tailrec fun addCustomLevel(
 
 
 fun saveCurrentGridState(context: Context, lT: LevelType, userGrid: UserGrid) {
-    val fileContents = userGrid.currentState.toByteArray()
+    val fileContents = userGrid.toBytes().toByteArray()
     val saveDir = context.getDir("saves", Context.MODE_PRIVATE)
     when (lT) {
         is LevelType.Random -> {
@@ -168,7 +169,9 @@ fun errorToast(context: Context, err: String) {
     Toast.makeText(context, "Error: $err ", Toast.LENGTH_LONG).show()
 }
 
-fun secondsToTime(seconds: UInt): String {
+// qsecond is a quater-second
+fun secondsToTime(qseconds: UInt): String {
+    val seconds = qseconds / 4u
     val hours: UInt = seconds / 3600u
     val minutes: UInt = seconds % 3600u / 60u
     val secs: UInt = seconds % 60u
