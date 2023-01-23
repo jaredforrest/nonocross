@@ -10,6 +10,8 @@ There are two modes, you can play either a pre-made level or a randomly generate
 
 Currently there are very few pre-made levels, so I would recommend the random mode.
 
+You can share levels using QR codes which is why the camera permission is needed.
+
 # License
 This program is Free Software: You can use, study share and improve it at your will. Specifically you can redistribute and/or modify it under the terms of the [GNU General Public License](https://www.gnu.org/licenses/gpl-3.0.html) as published by the Free Software Foundation, version 3 of the License.
 
