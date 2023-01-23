@@ -23,7 +23,7 @@
     <string name="fat_finger_summary">Enable if it is difficult to touch individual squares</string>
     <string name="vibrate_summary">Vibrate when performing certain actions</string>
     <string name="appearance_header">Appearance</string>
-    <string name="show_blue_hints">Show Blue Hints</string>
+    <string name="show_blue_hints">Show Blue/Red Hints</string>
     <string name="import_level">Import Level</string>
     <string name="custom_level">Saved Levels</string>
     <string name="remove_level">remove</string>

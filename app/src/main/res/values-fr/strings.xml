@@ -23,7 +23,7 @@
     <string name="fat_finger_summary">Activer s\'il est trop difficile de sélectionner les carrés</string>
     <string name="vibrate_summary">Vibrer pour certaines actions</string>
     <string name="appearance_header">Apparence</string>
-    <string name="show_blue_hints">Afficher l\'aide en bleu sur le coté</string>
+    <string name="show_blue_hints">Afficher l\'aide bleu/rouge sur le coté</string>
     <string name="import_level">Importer Niveau</string>
     <string name="custom_level">Niveaux Sauvegardés</string>
     <string name="remove_level">Supprimer</string>
@@ -58,9 +58,9 @@
         <item>Strict</item>
     </string-array>
     <string-array name="dark_mode_entries">
-        <item>Système</item>
-        <item>Sombre</item>
-        <item>Lumineux</item>
+        <item>System</item>
+        <item>Dark</item>
+        <item>Light</item>
     </string-array>
 
 </resources>
