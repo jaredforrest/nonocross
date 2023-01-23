@@ -8,5 +8,6 @@ There are two game modes. You can either practice on a pre-made grid, or you can
 - How to play
 The game is relatively simple, the number in each row/column corresponds to the number of filled cells in that row/column. So '3 5' at the beginning of a column means there is a block of 3 cell and a block of 5 cell in that column which are not touching. Once you have the grid in front of you it will all make sense
 
-- Note
+- Notes
+The camera permission is used to share puzzles using QR codes
 Nonograms are also known by many other names, including Paint by Numbers, Griddlers, Pic-a-Pix, Picross, Picma, PrismaPixels, Pixel Puzzles, Crucipixel, Edel, FigurePic, Hanjie, HeroGlyphix, Illust-Logic, Japanese Crosswords, Japanese Puzzles, Kare Karala!, Logic Art, Logic Square, Logicolor, Logik-Puzzles, Logimage, Oekaki Logic, Oekaki-Mate, Paint Logic, Picture Logic, Tsunamii, Paint by Sudoku and Binary Coloring Books

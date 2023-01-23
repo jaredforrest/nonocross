@@ -1,44 +1,13 @@
 package com.picross.nonocross.util.usergrid
 
-import android.graphics.Canvas
-import android.graphics.Paint
-import arrow.core.*
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.none
 import com.picross.nonocross.util.CellShade
 import com.picross.nonocross.util.click
-import com.picross.nonocross.views.grid.CellView
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.toPersistentList
-import java.security.InvalidParameterException
-
-class UserGridView(width: Int, height: Int, cellLength: Int, paintEmpty: Paint, paintShade: Paint, paintCross: Paint) {
-
-    private val gridView = List(width * height) {
-        CellView(
-            it / width,
-            it % width,
-            cellLength,
-            paintEmpty,
-            paintShade,
-            paintCross
-        )
-    }
-
-    /** Returns position of Cell which contains coordinate */
-    fun getCellAt(x: Float, y: Float): Option<Int> {
-        val cellView = this.gridView.indexOfFirst { cellView -> cellView.isInside(x, y) }
-        return if (cellView != -1) {
-            Some(cellView)
-        } else none()
-    }
-
-    fun isInside(index: Int, x: Float, y: Float) = gridView[index].isInside(x, y)
-
-    fun draw(userGrid: List<CellShade>, canvas: Canvas) {
-        for(i in gridView.indices)
-            gridView[i].draw(userGrid[i], canvas)
-    }
-
-}
 
 /** UserGrid is a 1D list encoding a 2D array (the grid) */
 class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArrayOf(), private val autoFill: Boolean,  resetComplete: Boolean) {
@@ -52,8 +21,8 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
 
     var grid: PersistentList<CellShade>
 
-    var rowNums : List<List<Int>>//get() = data.getRowNums(gridData.height)
-    var colNums : List<List<Int>>//get() = data.getColNums(gridData.height)
+    var rowNums : List<List<Int>>
+    var colNums : List<List<Int>>
 
     init {
         /** No save */
@@ -102,13 +71,13 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
                 }
             }.toPersistentList()
         }
-        rowNums = grid.getRowNums(gridData.height)
-        colNums = grid.getColNums(gridData.height)
+        rowNums = grid.getRowNums(gridData.width, gridData.height)
+        colNums = grid.getColNums(gridData.width, gridData.height)
     }
 
-    val currentState: List<Byte>
+    fun toBytes() =
         /** First Byte is version code (2), 2-5 time elapsed, 6 whether complete, 7+ the grid, last byte also version code */
-        get() = listOf(
+        listOf(
             2,
             (timeElapsed / 256u / 256u / 256u).toUByte().toByte(),
             (timeElapsed / 256u / 256u).toUByte().toByte(),
@@ -124,9 +93,7 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
                     }
                 } + listOf(2)
 
-    fun checkDone(): Boolean {
-        return rowNums == gridData.rowNums && colNums == gridData.colNums
-    }
+    fun checkDone() = rowNums == gridData.rowNums && colNums == gridData.colNums
 
     fun clear() {
         grid = List(size) { CellShade.EMPTY }.toPersistentList()
@@ -135,47 +102,45 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
             autoFill()
         }
         undoAddStack()
-        rowNums = grid.getRowNums(gridData.height)
-        colNums = grid.getColNums(gridData.height)
+        rowNums = grid.getRowNums(gridData.width, gridData.height)
+        colNums = grid.getColNums(gridData.width, gridData.height)
     }
 
     fun superClear() {
         clear()
-        undoList = UndoList(none(), grid, none())
+        undoList.reset(grid)
         timeElapsed = 0u
         complete = false
     }
 
-    private var undoList = UndoList(none(), grid, none())
+    private val undoList = UndoList(mutableListOf(), grid, mutableListOf())
 
-    fun undo(): Either<UndoListException.NoMoreUndo, Unit> {
+    fun undo(): Option<UndoListException.NoMoreUndo> {
         return when (val _undoList = undoList.undo()) {
-            is Either.Left -> _undoList
-            is Either.Right -> {
-                undoList = _undoList.value
+            is Some -> _undoList
+            is None -> {
                 grid = undoList.data
-                rowNums = grid.getRowNums(gridData.height)
-                colNums = grid.getColNums(gridData.height)
-                Either.Right(Unit)
+                rowNums = grid.getRowNums(gridData.width, gridData.height)
+                colNums = grid.getColNums(gridData.width, gridData.height)
+                none()
             }
         }
     }
 
-    fun redo(): Either<UndoListException.NoMoreRedo, Unit> {
+    fun redo(): Option<UndoListException.NoMoreRedo> {
         return when (val _undoList = undoList.redo()) {
-            is Either.Left -> _undoList
-            is Either.Right -> {
-                undoList = _undoList.value
+            is Some -> _undoList
+            is None -> {
                 grid = undoList.data
-                rowNums = grid.getRowNums(gridData.height)
-                colNums = grid.getColNums(gridData.height)
-                Either.Right(Unit)
+                rowNums = grid.getRowNums(gridData.width, gridData.height)
+                colNums = grid.getColNums(gridData.width, gridData.height)
+                none()
             }
         }
     }
 
     fun undoAddStack() {
-        undoList = undoList.addToList(grid)
+        undoList.addToList(grid)
     }
 
     private fun fillRow(row: Int, cellShade: CellShade) =
@@ -237,8 +202,8 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
                 grid = grid.set(index, if (grid[index] == initShade) cellShade else grid[index])
             }
         }
-        rowNums = grid.getRowNums(gridData.height)
-        colNums = grid.getColNums(gridData.height)
+        rowNums = grid.getRowNums(gridData.width, gridData.height)
+        colNums = grid.getColNums(gridData.width, gridData.height)
     }
 
     private fun autoFill() {
@@ -254,8 +219,8 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
 
     fun click(index: Int, toggleCross: Boolean) {
         grid = grid.set(index,grid[index].click(toggleCross))
-        rowNums = grid.getRowNums(gridData.height)
-        colNums = grid.getColNums(gridData.height)
+        rowNums = grid.getRowNums(gridData.width, gridData.height)
+        colNums = grid.getColNums(gridData.width, gridData.height)
     }
 
     fun countSecond() {
@@ -267,58 +232,9 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
 
     fun copyShade(fromIndex: Int, toIndex: Int) {
         grid = grid.set(toIndex, grid[fromIndex])
-        rowNums = grid.getRowNums(gridData.height)
-        colNums = grid.getColNums(gridData.height)
+        rowNums = grid.getRowNums(gridData.width, gridData.height)
+        colNums = grid.getColNums(gridData.width, gridData.height)
     }
 
     fun sameRow(index1: Int, index2: Int) = (index1 / width == index2 / width)
-
-
-}
-
-data class GridData(
-    val width: Int,
-    val height: Int,
-    val rowNums: List<List<Int>>,
-    val colNums: List<List<Int>>,
-) {
-
-    init {
-        if (height <= 0) throw InvalidParameterException("Height must be greater than 0")
-        else if (width <= 0) throw InvalidParameterException("Width must be greater than 0")
-    }
-
-    /** Gets the width and height of the longest row and column */
-    val longestRowNum =
-        rowNums.fold(
-            0
-        ) { acc, i -> (i.size + if (i.count { it >= 10 } > 0) 1 else 0).coerceAtLeast(acc) }
-    val longestColNum = colNums.fold(0) { acc, i -> i.size.coerceAtLeast(acc) }
-}
-
-/* this is like a linked list */
-data class UndoList(
-    val prev: Option<UndoList>,
-    val data: PersistentList<CellShade>,
-    val next: Option<UndoList>
-) {
-
-    operator fun get(i: Int) = data[i]
-
-    fun undo() = when (prev) {
-        is Some -> Either.Right(UndoList(prev.value.prev, prev.value.data, Some(this)))
-        is None -> Either.Left(UndoListException.NoMoreUndo)
-    }
-
-    fun redo() = when (next) {
-        is Some -> Either.Right(UndoList(Some(this), next.value.data, next.value.next))
-        is None -> Either.Left(UndoListException.NoMoreRedo)
-    }
-
-    fun addToList(data: PersistentList<CellShade>) = UndoList(Some(this), data, none())
-}
-
-sealed class UndoListException {
-    object NoMoreRedo : UndoListException()
-    object NoMoreUndo : UndoListException()
 }
