@@ -63,4 +63,17 @@
         <item>Chiaro</item>
     </string-array>
 
+
+    <!-- Do not change in other languages -->
+    <string-array name="fill_mode_entry_values">
+        <item>Default</item>
+        <item>Lax</item>
+        <item>Strict</item>
+    </string-array>
+    <string-array name="dark_mode_entry_values">
+        <item>System</item>
+        <item>Dark</item>
+        <item>Light</item>
+    </string-array>
+
 </resources>
