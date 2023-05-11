@@ -33,9 +33,8 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.45" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/level_select"
-        style="@style/Button.Normal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="96dp"
@@ -49,9 +48,8 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/random_level"
-        style="@style/Button.Normal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="96dp"
@@ -66,9 +64,8 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/custom_level"
-        style="@style/Button.Normal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="96dp"
@@ -81,9 +78,8 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/online"
-        style="@style/Button.Normal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
@@ -93,9 +89,8 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/custom_level" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/preferences"
-        style="@style/Button.Normal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="96dp"

@@ -1,31 +1,36 @@
-<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory app:title="@string/usability_header">
 
         <SwitchPreferenceCompat
             app:key="vibrate"
             app:summary="@string/vibrate_summary"
-            app:title="@string/vibrate_title" />
+            app:title="@string/vibrate_title"
+            android:widgetLayout="@layout/preference_material_switch" />
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
             app:key="fatFinger"
             app:summary="@string/fat_finger_summary"
-            app:title="@string/fat_finger_title" />
+            app:title="@string/fat_finger_title"
+            android:widgetLayout="@layout/preference_material_switch" />
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
             app:key="uniqueLevel"
             app:summary="@string/unique_level_summary"
-            app:title="@string/unique_level" />
+            app:title="@string/unique_level"
+            android:widgetLayout="@layout/preference_material_switch" />
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
             app:key="resetComplete"
             app:summary="@string/reset_complete_summary"
-            app:title="@string/reset_complete" />
+            app:title="@string/reset_complete"
+            android:widgetLayout="@layout/preference_material_switch" />
 
-        <DropDownPreference
+        <ListPreference
             app:entries="@array/fill_mode_entries"
             app:entryValues="@array/fill_mode_entry_values"
             app:key="fillMode"
@@ -36,7 +41,7 @@
 
     <PreferenceCategory app:title="@string/appearance_header">
 
-        <DropDownPreference
+        <ListPreference
             app:key="darkMode2"
             app:entries="@array/dark_mode_entries"
             app:entryValues="@array/dark_mode_entry_values"
@@ -46,28 +51,32 @@
         <SwitchPreferenceCompat
             app:defaultValue="false"
             app:key="showBlueHints"
-            app:title="@string/show_blue_hints" />
+            app:title="@string/show_blue_hints"
+            android:widgetLayout="@layout/preference_material_switch" />
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
             app:key="saveWarn"
             app:summary="@string/show_save_warning_summary"
             app:title="@string/show_save_warning"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="true"
+            android:widgetLayout="@layout/preference_material_switch" />
 
         <SwitchPreferenceCompat
             app:defaultValue="true"
             app:key="tracktimer"
             app:summary="@string/track_time_summary"
             app:title="@string/track_time"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="true"
+            android:widgetLayout="@layout/preference_material_switch" />
 
         <SwitchPreferenceCompat
             app:dependency="tracktimer"
             app:key="timer"
             app:summary="@string/show_timer_summary"
             app:title="@string/show_timer"
-            app:useSimpleSummaryProvider="true" />
+            app:useSimpleSummaryProvider="true"
+            android:widgetLayout="@layout/preference_material_switch" />
 
     </PreferenceCategory>
 
