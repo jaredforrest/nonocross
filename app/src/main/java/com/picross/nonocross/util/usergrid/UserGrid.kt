@@ -15,7 +15,7 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
     var complete: Boolean
     var timeElapsed: UInt
 
-    private val height = gridData.height
+    val height = gridData.height
     val width = gridData.width
     val size = gridData.width * gridData.height
 

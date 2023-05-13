@@ -52,6 +52,8 @@
     <string name="not_save">Don\'t save</string>
     <string name="easy">Easy %1$d</string>
     <string name="level">Level %1$d</string>
+    <string name="high_score">High-score %s</string>
+    <string name="no_high_score">No high-score</string>
     <string-array name="fill_mode_entries">
         <item>Default</item>
         <item>Lax</item>

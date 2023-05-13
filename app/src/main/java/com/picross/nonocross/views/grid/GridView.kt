@@ -33,9 +33,11 @@ import com.picross.nonocross.GameActivity
 import com.picross.nonocross.GameActivity.TransformDetails.mScaleFactor
 import com.picross.nonocross.GameActivity.TransformDetails.mTransX
 import com.picross.nonocross.GameActivity.TransformDetails.mTransY
+import com.picross.nonocross.HighScoreManager
 import com.picross.nonocross.LevelType
 import com.picross.nonocross.R
 import com.picross.nonocross.util.CellShade
+import com.picross.nonocross.util.getRandomGridPrefs
 import com.picross.nonocross.util.secondsToTime
 import com.picross.nonocross.util.usergrid.UserGridView
 import com.picross.nonocross.util.vibrate
@@ -242,6 +244,8 @@ class GridView @JvmOverloads constructor(
 
     /** When the game is finished show a dialog */
     private fun gameDoneAlert() {
+        HighScoreManager.handleNewScore(context, LD.userGrid, getRandomGridPrefs(context).third)
+
         LD.userGrid.complete = true
         val done = AlertDialog.Builder(context)
             .setTitle(R.string.finished)
