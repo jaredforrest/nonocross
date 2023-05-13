@@ -5,6 +5,7 @@ android {
     compileSdkVersion 33
 
     defaultConfig {
+        namespace 'com.picross.nonocross'
         applicationId "com.picross.nonocross"
         minSdkVersion 21
         targetSdkVersion 33
@@ -26,8 +27,8 @@ android {
         // Flag to enable support for the new language APIs
         coreLibraryDesugaringEnabled true
         // Sets Java compatibility to Java 8
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     lint {
@@ -61,7 +62,6 @@ android {
             version '3.18.1'
         }
     }
-    namespace 'com.picross.nonocross'
 }
 
 dependencies {
