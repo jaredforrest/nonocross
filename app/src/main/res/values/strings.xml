@@ -47,6 +47,7 @@
     <string name="show_save_warning_summary">Show warning when leaving a level with unsaved progress</string>
     <string name="show_save_warning">Show Save Warning</string>
     <string name="confirm_exit">Are you sure you want to exit?</string>
+    <string name="confirm_new">Are you sure you want a new grid?</string>
     <string name="lose_unsaved_data">Any unsaved data will be lost.</string>
     <string name="save">Save</string>
     <string name="not_save">Don\'t save</string>

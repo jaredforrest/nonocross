@@ -169,7 +169,11 @@ class GameActivity : AppCompatActivity() {
         if (LD.levelType is LevelType.Random) {
             refresh.visibility = VISIBLE
             refresh.setOnClickListener {
-                resetGrid()
+                if (!LD.userGrid.initial && saveWarn) {
+                    confirmReset()
+                } else {
+                    resetGrid()
+                }
             }
         }
 
@@ -382,6 +386,21 @@ class GameActivity : AppCompatActivity() {
         var mTransY = 0f
     }
 
+    private fun confirmReset() {
+        AlertDialog.Builder(this@GameActivity)
+            .setTitle(R.string.confirm_new)
+            .setMessage(R.string.lose_unsaved_data)
+            .setNeutralButton(R.string.not_save) { _, _ ->
+                resetGrid()
+            }
+            .setPositiveButton(R.string.save) { _, _ ->
+                saveGrid(true)
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .create()
+            .show()
+    }
+
     private val confirmExit = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             // dialog message view
@@ -389,13 +408,10 @@ class GameActivity : AppCompatActivity() {
             AlertDialog.Builder(this@GameActivity)
                 .setTitle(R.string.confirm_exit)
                 .setMessage(R.string.lose_unsaved_data)
-                .setNeutralButton(
-                    R.string.not_save
-                ) { _, _ ->
+                .setNeutralButton(R.string.not_save) { _, _ ->
                     finish()
                 }
-                .setPositiveButton(R.string.save)
-                { _, _ ->
+                .setPositiveButton(R.string.save) { _, _ ->
                     saveGrid(true)
                 }
                 .setNegativeButton(android.R.string.cancel, null)

@@ -13,6 +13,7 @@ import kotlinx.collections.immutable.toPersistentList
 class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArrayOf(), private val autoFill: Boolean,  resetComplete: Boolean) {
 
     var complete: Boolean
+    var initial: Boolean
     var timeElapsed: UInt
 
     private val height = gridData.height
@@ -29,6 +30,7 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
         if (initialState.isEmpty()) {
             timeElapsed = 0u
             complete = false
+            initial = true
             grid = List(size) { CellShade.EMPTY }.toPersistentList()
             if(autoFill) {
                 autoFill()
@@ -39,6 +41,7 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
                     initialState[2].toUByte().toUInt() * 256u * 256u +
                     initialState[3].toUByte().toUInt() * 256u +
                     initialState[4].toUByte().toUInt()
+            initial = false
             complete = when (initialState[5]) {
                 0b1.toByte() -> true
                 0b0.toByte() -> false
@@ -62,6 +65,7 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
         } else {
             timeElapsed = 0u//There is an overflow bug initialState.first().toUInt()
             complete = false
+            initial = false
             grid = initialState.drop(1).map {
                 when (it) {
                     0x00.toByte() -> CellShade.EMPTY
@@ -104,6 +108,7 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
         undoAddStack()
         rowNums = grid.getRowNums(gridData.width, gridData.height)
         colNums = grid.getColNums(gridData.width, gridData.height)
+        initial = true
     }
 
     fun superClear() {
@@ -221,6 +226,7 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
         grid = grid.set(index,grid[index].click(toggleCross))
         rowNums = grid.getRowNums(gridData.width, gridData.height)
         colNums = grid.getColNums(gridData.width, gridData.height)
+        initial = false
     }
 
     fun countSecond() {
