@@ -15,7 +15,4 @@
     <color name="colorCross">#EF3340</color>
     <color name="colorEmpty">#222222</color>
     <color name="colorText">@android:color/white</color>
-
-    <style name="Button.Normal" parent="@style/Widget.AppCompat.Button.Colored" />
-
 </resources>
