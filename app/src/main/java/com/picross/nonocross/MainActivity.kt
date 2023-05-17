@@ -22,6 +22,7 @@ import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
 import android.widget.NumberPicker
+import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -31,7 +32,12 @@ import androidx.preference.PreferenceManager
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
-import com.picross.nonocross.util.*
+import com.picross.nonocross.util.errorToast
+import com.picross.nonocross.util.getRandomGridPrefs
+import com.picross.nonocross.util.newRandomGrid
+import com.picross.nonocross.util.newUniqueRandomGrid
+import com.picross.nonocross.util.openGridFile
+import com.picross.nonocross.util.secondsToTime
 import com.picross.nonocross.util.usergrid.GridData
 import com.picross.nonocross.util.usergrid.UserGrid
 import com.picross.nonocross.util.usergrid.toGridData
@@ -113,6 +119,7 @@ class MainActivity : AppCompatActivity() {
         val rowsPicker = dialogView.findViewById<NumberPicker>(R.id.rows_picker)
         val colsPicker = dialogView.findViewById<NumberPicker>(R.id.cols_picker)
         val diffPicker = dialogView.findViewById<NumberPicker>(R.id.difficulty_picker)
+        val highscoreTextView = dialogView.findViewById<TextView>(R.id.highscore)
         rowsPicker.maxValue = 25
         rowsPicker.minValue = 2
         rowsPicker.value = preferences.getInt("rows", 10)
@@ -125,6 +132,25 @@ class MainActivity : AppCompatActivity() {
         diffPicker.minValue = 1
         diffPicker.value = preferences.getInt("difficulty", 5)
         diffPicker.wrapSelectorWheel = false
+
+        fun updateHighScore() {
+            val highScore = HighScoreManager.getHighScore(this, rowsPicker.value, colsPicker.value, diffPicker.value)
+            highscoreTextView.text = if (highScore == null) {
+                getString(R.string.no_high_score)
+            } else {
+                getString(R.string.high_score, secondsToTime(highScore))
+            }
+        }
+
+        val listener = NumberPicker.OnValueChangeListener { _, _, _ ->
+            updateHighScore()
+        }
+
+        rowsPicker.setOnValueChangedListener(listener)
+        colsPicker.setOnValueChangedListener(listener)
+        diffPicker.setOnValueChangedListener(listener)
+        updateHighScore()
+
         AlertDialog.Builder(this@MainActivity)
             .setTitle(R.string.grid_size)
             .setView(dialogView)

@@ -85,6 +85,18 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/difficultyTextView" />
 
+        <TextView
+            android:id="@+id/highscore"
+            tools:text="Highscore: 1:23"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/difficulty_picker"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp" />
+
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
