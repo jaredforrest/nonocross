@@ -43,14 +43,14 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         app:layout_constraintStart_toStartOf="parent"
         app:singleSelection="true">
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/toggleFill"
-            style="@style/Widget.App.Button.OutlinedButton.IconOnly"
+            style="@style/Widget.App.Button.OutlinedButton.IconOnly.Primary"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:icon="@drawable/ic_square" />
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             style="@style/Widget.App.Button.OutlinedButton.IconOnly.Cross"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

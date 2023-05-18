@@ -13,10 +13,11 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="bottom"
-    android:orientation="vertical">
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:orientation="vertical">
 
     <TextView
         android:id="@+id/level_name"
@@ -24,7 +25,7 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text=""
-        android:textColor="@color/colorPrimary" />
+        tools:text="Level foo" />
 
     <TextView
         android:id="@+id/gridData"
@@ -32,19 +33,17 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text=""
-        android:textColor="@color/colorPrimary" />
+        tools:text="10 x 10" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/level_select"
-        style="@style/Widget.AppCompat.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:text="@string/play" />
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/remove_level"
-        style="@style/Widget.AppCompat.Button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

@@ -1,20 +1,5 @@
 <resources>
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Buttons -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <!-- Top Bar -->
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <!-- Toggles and less important text -->
-        <item name="colorAccent">@color/colorAccent</item>
-        <item name="colorOnPrimary">@color/colorOnPrimary</item>
-
-        <item name="colorSecondary">@color/colorSecondary</item>
-        <item name="colorOnSecondary">@color/colorOnSecondary</item>
-        <item name="colorOnSurface">@color/colorOnSurface</item>
-    </style>
-
-    <style name="Widget.App.Button.OutlinedButton.IconOnly" parent="Widget.MaterialComponents.Button.OutlinedButton">
+    <style name="Widget.App.Button.OutlinedButton.IconOnly" parent="Widget.Material3.Button.OutlinedButton">
         <item name="iconPadding">0dp</item>
         <item name="android:insetTop">0dp</item>
         <item name="android:insetBottom">0dp</item>
@@ -24,12 +9,11 @@
         <item name="android:minHeight">16dp</item>
     </style>
 
+    <style name="Widget.App.Button.OutlinedButton.IconOnly.Primary" parent="Widget.App.Button.OutlinedButton.IconOnly">
+        <item name="iconTint">@color/icon_tint_selector_primary</item>
+    </style>
+
     <style name="Widget.App.Button.OutlinedButton.IconOnly.Cross" parent="Widget.App.Button.OutlinedButton.IconOnly">
-        <item name="materialThemeOverlay">@style/CrossButtonThemeOverlay</item>
+        <item name="iconTint">@color/icon_tint_selector_cross</item>
     </style>
-
-    <style name="CrossButtonThemeOverlay">
-        <item name="colorPrimary">@color/colorCross</item>
-    </style>
-
 </resources>

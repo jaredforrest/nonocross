@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <attr name="colorShade" format="color" />
+    <attr name="colorCross" format="color" />
+    <attr name="colorOnCross" format="color" />
+    <attr name="colorCrossContainer" format="color" />
+    <attr name="colorOnCrossContainer" format="color" />
+    <attr name="harmonizeCross" format="boolean" />
+</resources>

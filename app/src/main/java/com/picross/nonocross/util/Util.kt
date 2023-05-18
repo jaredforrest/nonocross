@@ -23,9 +23,16 @@ import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
 import android.util.Log
+import android.util.TypedValue
 import android.widget.Toast
+import androidx.annotation.AttrRes
+import androidx.annotation.ColorInt
 import androidx.preference.PreferenceManager
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.none
 import com.picross.nonocross.LevelType
 import com.picross.nonocross.R
 import com.picross.nonocross.util.usergrid.GridData
@@ -212,4 +219,15 @@ fun vibrate(context: Context) {
 fun Context.getLevelName(index: Int): String {
     return if(index <= 3) getString(R.string.easy, index + 1)
     else getString(R.string.level, index - 3)
+}
+
+@ColorInt
+fun Context.resolveThemedColor(@AttrRes colorAttr: Int, @ColorInt fallbackColor: Int = 0): Int {
+    val tv = TypedValue()
+    theme.resolveAttribute(colorAttr, tv, true)
+    return if (tv.type >= TypedValue.TYPE_FIRST_COLOR_INT && tv.type <= TypedValue.TYPE_LAST_COLOR_INT) {
+        tv.data
+    } else {
+        fallbackColor
+    }
 }

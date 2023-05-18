@@ -32,7 +32,6 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="@string/rows"
-            android:textColor="@color/colorPrimary"
             app:layout_constraintEnd_toEndOf="@+id/rows_picker"
             app:layout_constraintStart_toStartOf="@+id/rows_picker"
             app:layout_constraintTop_toTopOf="parent" />
@@ -51,7 +50,6 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
             android:text="@string/columns"
-            android:textColor="@color/colorPrimary"
             app:layout_constraintEnd_toEndOf="@+id/cols_picker"
             app:layout_constraintStart_toStartOf="@+id/cols_picker"
             app:layout_constraintTop_toTopOf="parent" />
@@ -71,7 +69,6 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/difficulty"
-            android:textColor="@color/colorPrimary"
             app:layout_constraintBottom_toTopOf="@+id/difficulty_picker"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
