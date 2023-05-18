@@ -17,6 +17,7 @@ package com.picross.nonocross
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.View.INVISIBLE
@@ -27,6 +28,9 @@ import androidx.activity.addCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.content.pm.ShortcutInfoCompat
+import androidx.core.content.pm.ShortcutManagerCompat
+import androidx.core.graphics.drawable.IconCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import arrow.core.Either
@@ -61,11 +65,20 @@ class MainActivity : AppCompatActivity() {
         initialize()
         File(this.getDir("saves", Context.MODE_PRIVATE), "default").mkdirs()
         File(this.getDir("saves", Context.MODE_PRIVATE), "custom").mkdirs()
+        handleIntent(intent)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N_MR1) {
+            ShortcutManagerCompat.addDynamicShortcuts(this, listOf(getShortcutInfo()))
+        }
     }
 
     override fun onResume() {
         super.onResume()
         initialize()
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
     }
 
     /** Called when the user taps the Start Level button */
@@ -163,36 +176,7 @@ class MainActivity : AppCompatActivity() {
                 editor.putInt("difficulty", diffPicker.value)
                 editor.apply()
 
-                LevelDetails.levelType = LevelType.Random()
-
-                if (preferences.getBoolean("uniqueLevel", true)) {
-                    loadingMenu(true)
-
-                    val randomJob = lifecycleScope.launch(Dispatchers.IO) {
-                        when (val temp =
-                            newUniqueRandomGrid(getRandomGridPrefs(this@MainActivity))) {
-                            is Some -> {
-                                LevelDetails.gridData = temp.value
-                                LevelDetails.userGrid = UserGrid(LevelDetails.gridData, autoFill = true, resetComplete = preferences.getBoolean("resetComplete", true))
-                                val intent = Intent(this@MainActivity, GameActivity::class.java)
-                                startActivity(intent)
-                            }
-                            is None -> TODO()
-                        }
-                    }
-                    onBackPressedDispatcher.addCallback(this@MainActivity) {
-                        randomJob.cancel()
-                        loadingMenu(false)
-                        onBackPressedDispatcher.addCallback(this@MainActivity) { finish() }
-                    }
-                } else {
-                    val wHD = getRandomGridPrefs(this)
-                    LevelDetails.gridData = newRandomGrid(wHD).toGridData(wHD.first, wHD.second)
-                    LevelDetails.userGrid = UserGrid(LevelDetails.gridData, autoFill = true, resetComplete = preferences.getBoolean("resetComplete", true))
-                    val intent = Intent(this, GameActivity::class.java)
-                    startActivity(intent)
-                }
-
+                startRandomLevel()
             }
             .setNegativeButton(
                 android.R.string.cancel
@@ -201,9 +185,46 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun startRandomLevel() {
+        LevelDetails.levelType = LevelType.Random()
+        if (preferences.getBoolean("uniqueLevel", true)) {
+            loadingMenu(true)
+
+            val randomJob = lifecycleScope.launch(Dispatchers.IO) {
+                when (val temp =
+                    newUniqueRandomGrid(getRandomGridPrefs(this@MainActivity))) {
+                    is Some -> {
+                        LevelDetails.gridData = temp.value
+                        LevelDetails.userGrid = UserGrid(LevelDetails.gridData, autoFill = true, resetComplete = preferences.getBoolean("resetComplete", true))
+                        val intent = Intent(this@MainActivity, GameActivity::class.java)
+                        startActivity(intent)
+                    }
+                    is None -> TODO()
+                }
+            }
+            onBackPressedDispatcher.addCallback(this@MainActivity) {
+                randomJob.cancel()
+                loadingMenu(false)
+                onBackPressedDispatcher.addCallback(this@MainActivity) { finish() }
+            }
+        } else {
+            val wHD = getRandomGridPrefs(this)
+            LevelDetails.gridData = newRandomGrid(wHD).toGridData(wHD.first, wHD.second)
+            LevelDetails.userGrid = UserGrid(LevelDetails.gridData, autoFill = true, resetComplete = preferences.getBoolean("resetComplete", true))
+            val intent = Intent(this, GameActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
     private fun openPreferences() {
         val intent = Intent(this, SettingsActivity::class.java)
         startActivity(intent)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        if (intent.action == ACTION_RANDOM) {
+            startRandomLevel()
+        }
     }
 
     private fun initialize() {
@@ -244,6 +265,22 @@ class MainActivity : AppCompatActivity() {
         savedLevelSelect.visibility = invisibility
         findViewById<View>(R.id.game_text).visibility = invisibility
         findViewById<View>(R.id.indeterminateBar).visibility = visibility
+    }
+
+    private fun getShortcutInfo(): ShortcutInfoCompat {
+        val intent = Intent(this, MainActivity::class.java)
+            .setAction(ACTION_RANDOM)
+        return ShortcutInfoCompat.Builder(this, "random")
+            .setIntent(intent)
+            .setShortLabel(getString(R.string.random_grid_short))
+            .setLongLabel(getString(R.string.random_grid))
+            .setIcon(IconCompat.createWithResource(this, R.mipmap.ic_launcher))
+            .setAlwaysBadged()
+            .build()
+    }
+
+    companion object {
+        private const val ACTION_RANDOM = "action_random"
     }
 
 }
