@@ -33,7 +33,11 @@ import com.google.zxing.client.android.Intents
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
 import com.picross.nonocross.levelselect.CustomLevelSelectAdapter
-import com.picross.nonocross.util.*
+import com.picross.nonocross.util.addCustomLevel
+import com.picross.nonocross.util.applyNotError
+import com.picross.nonocross.util.errorToast
+import com.picross.nonocross.util.getNonFile
+import com.picross.nonocross.util.parseNonFile
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileInputStream
@@ -78,7 +82,7 @@ class CustomLevelSelectActivity : AppCompatActivity(), CustomLevelSelectAdapter.
                         }
                         R.id.import_qr -> {
                             val scanOptions = ScanOptions()
-                            scanOptions.setPrompt("Scan a QR Code")
+                            scanOptions.setPrompt(getString(R.string.scan_a_qr_code))
                             scanOptions.setOrientationLocked(false)
                             scanOptions.setDesiredBarcodeFormats("QR_CODE")
                             scanOptions.addExtra(Intents.Scan.SCAN_TYPE, Intents.Scan.MIXED_SCAN)
@@ -146,7 +150,7 @@ class CustomLevelSelectActivity : AppCompatActivity(), CustomLevelSelectAdapter.
     private val gettyQR =
         registerForActivityResult(ScanContract()) {
                 if (it.contents == null) {
-                    Toast.makeText(baseContext, "Cancelled", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(baseContext, R.string.cancelled, Toast.LENGTH_SHORT).show()
                 } else {
                     parseNonFile(it.contents).applyNotError(baseContext) {
                         val constraintLayout =

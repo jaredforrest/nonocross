@@ -25,7 +25,11 @@ import android.os.VibratorManager
 import android.util.Log
 import android.widget.Toast
 import androidx.preference.PreferenceManager
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.none
 import com.picross.nonocross.LevelType
 import com.picross.nonocross.R
 import com.picross.nonocross.util.usergrid.GridData
@@ -166,7 +170,7 @@ fun <T, U> Either<T, U>.applyNotError(baseContext: Context, f: U.() -> Unit) {
 }
 
 fun errorToast(context: Context, err: String) {
-    Toast.makeText(context, "Error: $err ", Toast.LENGTH_LONG).show()
+    Toast.makeText(context, context.getString(R.string.error, err), Toast.LENGTH_LONG).show()
 }
 
 // qsecond is a quater-second
