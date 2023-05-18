@@ -26,7 +26,7 @@ android {
     compileOptions {
         // Flag to enable support for the new language APIs
         coreLibraryDesugaringEnabled true
-        // Sets Java compatibility to Java 8
+        // Sets Java compatibility to Java 17
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
@@ -37,6 +37,11 @@ android {
 
     buildFeatures {
         viewBinding true
+    }
+
+    kotlinOptions  {
+        jvmTarget = JavaVersion.VERSION_17.toString()
+        allWarningsAsErrors = true
     }
 
     buildTypes {

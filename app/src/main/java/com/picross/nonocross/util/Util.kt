@@ -25,7 +25,11 @@ import android.os.VibratorManager
 import android.util.Log
 import android.widget.Toast
 import androidx.preference.PreferenceManager
-import arrow.core.*
+import arrow.core.Either
+import arrow.core.None
+import arrow.core.Option
+import arrow.core.Some
+import arrow.core.none
 import com.picross.nonocross.LevelType
 import com.picross.nonocross.R
 import com.picross.nonocross.util.usergrid.GridData
@@ -196,6 +200,7 @@ fun vibrate(context: Context) {
             )
         }
         Build.VERSION.SDK_INT >= 26 -> {
+            @Suppress("DEPRECATION")
             (context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator).vibrate(
                 VibrationEffect.createOneShot(
                     50,
@@ -204,6 +209,7 @@ fun vibrate(context: Context) {
             )
         }
         else -> {
+            @Suppress("DEPRECATION")
             (context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator).vibrate(50)
         }
     }
