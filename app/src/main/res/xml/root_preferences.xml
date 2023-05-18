@@ -78,6 +78,13 @@
             app:useSimpleSummaryProvider="true"
             android:widgetLayout="@layout/preference_material_switch" />
 
+        <SwitchPreferenceCompat
+            app:key="enable_zoom"
+            app:title="@string/enable_zoom"
+            app:defaultValue="true"
+            app:useSimpleSummaryProvider="true"
+            android:widgetLayout="@layout/preference_material_switch" />
+
     </PreferenceCategory>
 
     <!--PreferenceCategory app:title="@string/beta_features">

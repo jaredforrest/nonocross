@@ -36,6 +36,7 @@ class ColNumsView(context: Context) : View(context) {
     private val preferences: SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(context)
     private val showHints = preferences.getBoolean("showBlueHints", false)
+    private val enableZoom = preferences.getBoolean("enable_zoom", true)
 
     var cellLength = 0
     private val colorNumber = context.resolveThemedColor(R.attr.colorOnSurface)
@@ -77,13 +78,15 @@ class ColNumsView(context: Context) : View(context) {
                 oldTransY = transY
             }
             MotionEvent.ACTION_MOVE -> {
-                transY = max(
-                    min(
-                        event.getY(0) - initY + oldTransY,
-                        (LD.gridData.longestColNum * cellLength * 0.75f) * mScaleFactor - mHeight
-                    ), 0f
-                )
-                invalidate()
+                if (enableZoom) {
+                    transY = max(
+                        min(
+                            event.getY(0) - initY + oldTransY,
+                            (LD.gridData.longestColNum * cellLength * 0.75f) * mScaleFactor - mHeight
+                        ), 0f
+                    )
+                    invalidate()
+                }
             }
         }
         return true

@@ -28,6 +28,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
 import androidx.preference.PreferenceManager
 import arrow.core.None
@@ -107,6 +108,7 @@ class GameActivity : AppCompatActivity() {
         gameView = findViewById(R.id.nonocrossGameView)
         timeView = findViewById(R.id.time_view)
         zoom = findViewById(R.id.zoom)
+        zoom.isVisible = preferences.getBoolean("enable_zoom", true)
 
         colNumsView = gameView.getChildAt(0) as ColNumsView
         rowNumsView = gameView.getChildAt(1) as RowNumsView
