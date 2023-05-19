@@ -272,7 +272,7 @@ class GridView @JvmOverloads constructor(
             }
 
         val lT = LD.levelType
-        if(lT is LevelType.Random && lT.levelName is None) done.setNeutralButton("Save"){ _, _ ->
+        if(lT is LevelType.Random && lT.levelName is None) done.setNeutralButton(R.string.save){ _, _ ->
             (context as? GameActivity)?.saveGrid(false)
         }
 

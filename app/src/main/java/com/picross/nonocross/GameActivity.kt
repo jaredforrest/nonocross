@@ -36,7 +36,14 @@ import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.journeyapps.barcodescanner.BarcodeEncoder
-import com.picross.nonocross.util.*
+import com.picross.nonocross.util.addCustomLevel
+import com.picross.nonocross.util.getRandomGridPrefs
+import com.picross.nonocross.util.invertBitmap
+import com.picross.nonocross.util.newRandomGrid
+import com.picross.nonocross.util.newUniqueRandomGrid
+import com.picross.nonocross.util.saveCurrentGridState
+import com.picross.nonocross.util.secondsToTime
+import com.picross.nonocross.util.toNonFile
 import com.picross.nonocross.util.usergrid.UserGrid
 import com.picross.nonocross.util.usergrid.toGridData
 import com.picross.nonocross.views.grid.ColNumsView
@@ -125,7 +132,7 @@ class GameActivity : AppCompatActivity() {
                     rowNumsView.invalidate()
                     colNumsView.invalidate()
                 }
-                is Some -> Toast.makeText(this, "Nothing to undo", Toast.LENGTH_SHORT).show()
+                is Some -> Toast.makeText(this, R.string.nothing_to_undo, Toast.LENGTH_SHORT).show()
             }
         }
         redo.setOnClickListener {
@@ -135,7 +142,7 @@ class GameActivity : AppCompatActivity() {
                     rowNumsView.invalidate()
                     colNumsView.invalidate()
                 }
-                is Some -> Toast.makeText(this, "Nothing to redo", Toast.LENGTH_SHORT).show()
+                is Some -> Toast.makeText(this, R.string.nothing_to_redo, Toast.LENGTH_SHORT).show()
             }
         }
         clear.setOnClickListener {

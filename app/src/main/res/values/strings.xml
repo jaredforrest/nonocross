@@ -55,6 +55,11 @@
     <string name="level">Level %1$d</string>
     <string name="high_score">High-score %s</string>
     <string name="no_high_score">No high-score</string>
+    <string name="scan_a_qr_code">Scan a QR Code</string>
+    <string name="cancelled">Cancelled</string>
+    <string name="nothing_to_undo">Nothing to undo</string>
+    <string name="nothing_to_redo">Nothing to redo</string>
+    <string name="error">Error: %s</string>
     <string-array name="fill_mode_entries">
         <item>Default</item>
         <item>Lax</item>
