@@ -22,11 +22,11 @@ import android.graphics.Paint
 import android.graphics.Picture
 import android.view.MotionEvent
 import android.view.View
-import androidx.core.content.res.ResourcesCompat
 import androidx.preference.PreferenceManager
 import com.picross.nonocross.GameActivity.TransformDetails.mScaleFactor
 import com.picross.nonocross.GameActivity.TransformDetails.mTransX
 import com.picross.nonocross.R
+import com.picross.nonocross.util.resolveThemedColor
 import kotlin.math.max
 import kotlin.math.min
 import com.picross.nonocross.LevelDetails as LD
@@ -35,22 +35,22 @@ class ColNumsView(context: Context) : View(context) {
 
     private val preferences: SharedPreferences =
         PreferenceManager.getDefaultSharedPreferences(context)
-    private val blueHints = preferences.getBoolean("showBlueHints", false)
+    private val showHints = preferences.getBoolean("showBlueHints", false)
 
     var cellLength = 0
-    private val colorNumber = ResourcesCompat.getColor(context.resources, R.color.colorText, null)
-    private val colorBlue = ResourcesCompat.getColor(context.resources, R.color.colorShade, null)
-    private val colorRed = ResourcesCompat.getColor(context.resources, R.color.colorCross, null)
-    private val blackPaint = Paint()
+    private val colorNumber = context.resolveThemedColor(R.attr.colorOnSurface)
+    private val colorShade = context.resolveThemedColor(R.attr.colorPrimary)
+    private val colorCross = context.resolveThemedColor(R.attr.colorCross)
+    private val paintNumber = Paint()
         .apply { color = colorNumber }
         .apply { isAntiAlias = true }
         .apply { textAlign = Paint.Align.CENTER }
-    private val bluePaint = Paint()
-        .apply { color = colorBlue }
+    private val paintShade = Paint()
+        .apply { color = colorShade }
         .apply { isAntiAlias = true }
         .apply { textAlign = Paint.Align.CENTER }
-    private val redPaint = Paint()
-        .apply { color = colorRed }
+    private val paintCross = Paint()
+        .apply { color = colorCross }
         .apply { isAntiAlias = true }
         .apply { textAlign = Paint.Align.CENTER }
 
@@ -58,9 +58,9 @@ class ColNumsView(context: Context) : View(context) {
         super.onLayout(changed, left, top, right, bottom)
         if (changed) {
             mHeight = height
-            blackPaint.apply { textSize = cellLength * 0.5F }
-            bluePaint.apply { textSize = cellLength * 0.5F }
-            redPaint.apply { textSize = cellLength * 0.5F }
+            paintNumber.apply { textSize = cellLength * 0.5F }
+            paintShade.apply { textSize = cellLength * 0.5F }
+            paintCross.apply { textSize = cellLength * 0.5F }
         }
     }
 
@@ -89,9 +89,9 @@ class ColNumsView(context: Context) : View(context) {
         return true
     }
 
-    private lateinit var blackTemplate: MutableList<Picture>
-    private lateinit var blueTemplate: MutableList<Picture>
-    private lateinit var redTemplate: MutableList<Picture>
+    private lateinit var templateNumber: MutableList<Picture>
+    private lateinit var templateShade: MutableList<Picture>
+    private lateinit var templateCross: MutableList<Picture>
     var refreshTemplates = true
 
     override fun onDraw(canvas: Canvas) {
@@ -100,13 +100,13 @@ class ColNumsView(context: Context) : View(context) {
         canvas.translate(mTransX, transY + mHeight * (1 - mScaleFactor))
         canvas.scale(mScaleFactor, mScaleFactor)
         if (refreshTemplates) {
-            blackTemplate = getTemplate(width, height, blackPaint)
-            blueTemplate = getTemplate(width, height, bluePaint)
-            redTemplate = getTemplate(width, height, redPaint)
+            templateNumber = getTemplate(width, height, paintNumber)
+            templateShade = getTemplate(width, height, paintShade)
+            templateCross = getTemplate(width, height, paintCross)
             refreshTemplates = false
         }
 
-        if (blueHints) {
+        if (showHints) {
             var counter = 0
             LD.gridData.colNums.forEachIndexed { i, col ->
                 col.reversed().forEachIndexed { j, num ->
@@ -114,23 +114,23 @@ class ColNumsView(context: Context) : View(context) {
                         LD.userGrid.colNums.getOrElse(i) { listOf(0) }.reversed()
                             .getOrElse(j) { 0 } == num
                     ) {
-                        canvas.drawPicture(blueTemplate[counter])
+                        canvas.drawPicture(templateShade[counter])
                     }
                     else if (
                         LD.userGrid.colNums.getOrElse(i) { listOf(0) }.reversed()
                             .getOrElse(j) { 0 } > num
                     ) {
-                        canvas.drawPicture(redTemplate[counter])
+                        canvas.drawPicture(templateCross[counter])
                     }
                     else {
-                        canvas.drawPicture(blackTemplate[counter])
+                        canvas.drawPicture(templateNumber[counter])
                     }
                     counter++
                 }
 
             }
         } else {
-            blackTemplate.forEach { canvas.drawPicture(it) }
+            templateNumber.forEach { canvas.drawPicture(it) }
         }
 
         canvas.restore()

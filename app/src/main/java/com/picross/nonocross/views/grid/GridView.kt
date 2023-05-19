@@ -26,7 +26,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.res.ResourcesCompat
 import androidx.preference.PreferenceManager
 import arrow.core.None
 import com.picross.nonocross.GameActivity
@@ -38,6 +37,7 @@ import com.picross.nonocross.LevelType
 import com.picross.nonocross.R
 import com.picross.nonocross.util.CellShade
 import com.picross.nonocross.util.getRandomGridPrefs
+import com.picross.nonocross.util.resolveThemedColor
 import com.picross.nonocross.util.secondsToTime
 import com.picross.nonocross.util.usergrid.UserGridView
 import com.picross.nonocross.util.vibrate
@@ -50,9 +50,9 @@ class GridView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    private val colorCross = ResourcesCompat.getColor(context.resources, R.color.colorCross, null)
-    private val colorShade = ResourcesCompat.getColor(context.resources, R.color.colorShade, null)
-    private val colorEmpty = ResourcesCompat.getColor(context.resources, R.color.colorEmpty, null)
+    private val colorCross =  context.resolveThemedColor(R.attr.colorCross)
+    private val colorShade =  context.resolveThemedColor(R.attr.colorPrimary)
+    private val colorEmpty = context.resolveThemedColor(R.attr.colorSurface)
 
     private val paintEmpty = Paint().apply { color = colorEmpty }
     private val paintShade = Paint().apply { color = colorShade }
