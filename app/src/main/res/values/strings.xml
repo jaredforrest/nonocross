@@ -3,6 +3,7 @@
     <string name="app_name">Nonocross</string>
     <string name="default_levels">Default Levels</string>
     <string name="random_grid">Random Level</string>
+    <string name="random_grid_short">Random</string>
     <string name="play">play</string>
     <string name="height_x_width">%1$d x %2$d</string>
     <string name="level_complete">Level Complete\n\nTime Taken: %1$s</string>
