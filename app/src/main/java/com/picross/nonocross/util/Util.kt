@@ -203,6 +203,7 @@ fun vibrate(context: Context) {
             )
         }
         Build.VERSION.SDK_INT >= 26 -> {
+            @Suppress("DEPRECATION")
             (context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator).vibrate(
                 VibrationEffect.createOneShot(
                     50,
@@ -211,6 +212,7 @@ fun vibrate(context: Context) {
             )
         }
         else -> {
+            @Suppress("DEPRECATION")
             (context.getSystemService(Context.VIBRATOR_SERVICE) as Vibrator).vibrate(50)
         }
     }
