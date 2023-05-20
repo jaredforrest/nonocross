@@ -95,4 +95,10 @@
             app:title="@string/api_key" />
 
     </PreferenceCategory-->
+
+    <PreferenceCategory>
+        <Preference
+            android:key="about"
+            android:title="@string/about" />
+    </PreferenceCategory>
 </PreferenceScreen>

@@ -72,6 +72,13 @@
         <item>Light</item>
     </string-array>
 
+
+    <!-- About -->
+    <string name="about">About</string>
+    <string name="error_no_browser_found">No browser found</string>
+    <string name="aboutLibraries_description_special1_name" translatable="false">GitHub</string>
+    <string name="aboutLibraries_description_special2_name" translatable="false">F-Droid</string>
+
     <!-- Do not change in other languages -->
     <string-array name="fill_mode_entry_values" translatable="false">
         <item>Default</item>
