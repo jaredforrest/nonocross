@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="AppTheme.Colors">
+        <item name="android:windowLightStatusBar">?isLightTheme</item>
+        <item name="android:statusBarColor">?android:colorBackground</item>
+        <item name="android:windowLightNavigationBar">?isLightTheme</item>
+        <item name="android:navigationBarColor">?android:colorBackground</item>
+    </style>
+</resources>

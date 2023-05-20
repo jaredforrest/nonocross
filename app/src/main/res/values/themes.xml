@@ -4,7 +4,10 @@
         <item name="colorShade">?colorPrimary</item>
     </style>
 
-    <style name="AppTheme" parent="AppTheme.Base">
+    <!-- Overridden in values-v27 -->
+    <style name="AppTheme" parent="AppTheme.Colors" />
+
+    <style name="AppTheme.Colors" parent="AppTheme.Base">
         <item name="colorPrimary">@color/md_theme_light_primary</item>
         <item name="colorOnPrimary">@color/md_theme_light_onPrimary</item>
         <item name="colorPrimaryContainer">@color/md_theme_light_primaryContainer</item>
