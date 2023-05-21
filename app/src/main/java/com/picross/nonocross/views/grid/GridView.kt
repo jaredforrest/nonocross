@@ -53,6 +53,9 @@ class GridView @JvmOverloads constructor(
     private val colorCross =  context.resolveThemedColor(R.attr.colorCross)
     private val colorShade =  context.resolveThemedColor(R.attr.colorPrimary)
     private val colorEmpty = context.resolveThemedColor(R.attr.colorSurface)
+    private val preferences: SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(context)
+    private val enableZoom = preferences.getBoolean("enable_zoom", true)
 
     private val paintEmpty = Paint().apply { color = colorEmpty }
     private val paintShade = Paint().apply { color = colorShade }
@@ -105,7 +108,7 @@ class GridView @JvmOverloads constructor(
             }
             MotionEvent.ACTION_MOVE -> if (event.pointerCount == 1) {
                 startFill(event.getX(0), event.getY(0))
-            } else {
+            } else if (enableZoom) {
                 val currX1 = event.getX(0)
                 val currY1 = event.getY(0)
                 val currX2 = event.getX(1)
