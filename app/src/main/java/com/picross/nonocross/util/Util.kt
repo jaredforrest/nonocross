@@ -14,7 +14,9 @@ You should have received a copy of the GNU General Public License
 along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross.util
 
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.content.res.AssetManager
 import android.net.Uri
 import android.os.Build
@@ -231,5 +233,15 @@ fun Context.resolveThemedColor(@AttrRes colorAttr: Int, @ColorInt fallbackColor:
         tv.data
     } else {
         fallbackColor
+    }
+}
+
+fun String.openInBrowser(context: Context) {
+    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(this))
+    try {
+        context.startActivity(intent)
+    } catch (e: ActivityNotFoundException) {
+        Log.d("Utils", "Unable to open url in browser: $intent")
+        Toast.makeText(context, R.string.error_no_browser_found, Toast.LENGTH_SHORT).show()
     }
 }
