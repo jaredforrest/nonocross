@@ -247,7 +247,10 @@ class GridView @JvmOverloads constructor(
 
     /** When the game is finished show a dialog */
     private fun gameDoneAlert() {
-        HighScoreManager.handleNewScore(context, LD.userGrid, getRandomGridPrefs(context).third)
+        val newHighScore =
+            HighScoreManager.handleNewScore(context, LD.userGrid, getRandomGridPrefs(context).third)
+
+        val timeMessage = if (newHighScore) R.string.level_complete_new_high_score else R.string.level_complete
 
         LD.userGrid.complete = true
         val done = AlertDialog.Builder(context)
@@ -255,7 +258,7 @@ class GridView @JvmOverloads constructor(
             .setMessage(
                 if (LD.userGrid.timeElapsed > 0u) {
                     context.getString(
-                        R.string.level_complete,
+                        timeMessage,
                         secondsToTime(LD.userGrid.timeElapsed)
                     )
                 } else {
