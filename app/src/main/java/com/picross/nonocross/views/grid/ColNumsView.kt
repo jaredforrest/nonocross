@@ -16,55 +16,17 @@ package com.picross.nonocross.views.grid
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.SharedPreferences
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.Picture
 import android.view.MotionEvent
-import android.view.View
-import androidx.preference.PreferenceManager
 import com.picross.nonocross.GameActivity.TransformDetails.mScaleFactor
 import com.picross.nonocross.GameActivity.TransformDetails.mTransX
-import com.picross.nonocross.R
-import com.picross.nonocross.util.resolveThemedColor
 import kotlin.math.max
 import kotlin.math.min
 import com.picross.nonocross.LevelDetails as LD
 
-class ColNumsView(context: Context) : View(context) {
-
-    private val preferences: SharedPreferences =
-        PreferenceManager.getDefaultSharedPreferences(context)
-    private val showHints = preferences.getBoolean("showBlueHints", false)
-    private val enableZoom = preferences.getBoolean("enable_zoom", true)
-
-    var cellLength = 0
-    private val colorNumber = context.resolveThemedColor(R.attr.colorOnSurface)
-    private val colorShade = context.resolveThemedColor(R.attr.colorPrimary)
-    private val colorCross = context.resolveThemedColor(R.attr.colorCross)
-    private val paintNumber = Paint()
-        .apply { color = colorNumber }
-        .apply { isAntiAlias = true }
-        .apply { textAlign = Paint.Align.CENTER }
-    private val paintShade = Paint()
-        .apply { color = colorShade }
-        .apply { isAntiAlias = true }
-        .apply { textAlign = Paint.Align.CENTER }
-    private val paintCross = Paint()
-        .apply { color = colorCross }
-        .apply { isAntiAlias = true }
-        .apply { textAlign = Paint.Align.CENTER }
-
-    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
-        super.onLayout(changed, left, top, right, bottom)
-        if (changed) {
-            mHeight = height
-            paintNumber.apply { textSize = cellLength * 0.5F }
-            paintShade.apply { textSize = cellLength * 0.5F }
-            paintCross.apply { textSize = cellLength * 0.5F }
-        }
-    }
-
+class ColNumsView(context: Context) : AbstractNumsView(context) {
     private var initY = 0f
     private var transY = 0f
     private var oldTransY = 0f
@@ -91,11 +53,6 @@ class ColNumsView(context: Context) : View(context) {
         }
         return true
     }
-
-    private lateinit var templateNumber: MutableList<Picture>
-    private lateinit var templateShade: MutableList<Picture>
-    private lateinit var templateCross: MutableList<Picture>
-    var refreshTemplates = true
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)

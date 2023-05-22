@@ -16,7 +16,6 @@ package com.picross.nonocross
 
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -31,11 +30,11 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.PreferenceManager
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.picross.nonocross.util.Preferences
 import com.picross.nonocross.util.errorToast
 import com.picross.nonocross.util.getRandomGridPrefs
 import com.picross.nonocross.util.newRandomGrid
@@ -54,7 +53,7 @@ import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var preferences: SharedPreferences
+    private lateinit var preferences: Preferences
     private lateinit var randomLevelButton: View
     private lateinit var levelSelectButton: View
     private lateinit var preferencesButton: View
@@ -135,15 +134,15 @@ class MainActivity : AppCompatActivity() {
         val highscoreTextView = dialogView.findViewById<TextView>(R.id.highscore)
         rowsPicker.maxValue = 25
         rowsPicker.minValue = 2
-        rowsPicker.value = preferences.getInt("rows", 10)
+        rowsPicker.value = preferences.randomGridHeight
         rowsPicker.wrapSelectorWheel = false
         colsPicker.maxValue = 25
         colsPicker.minValue = 2
-        colsPicker.value = preferences.getInt("columns", 10)
+        colsPicker.value = preferences.randomGridWidth
         colsPicker.wrapSelectorWheel = false
         diffPicker.maxValue = 10
         diffPicker.minValue = 1
-        diffPicker.value = preferences.getInt("difficulty", 5)
+        diffPicker.value = preferences.randomGridDifficulty
         diffPicker.wrapSelectorWheel = false
 
         fun updateHighScore() {
@@ -170,11 +169,9 @@ class MainActivity : AppCompatActivity() {
             .setPositiveButton(
                 android.R.string.ok
             ) { _, _ ->
-                val editor = preferences.edit()
-                editor.putInt("columns", colsPicker.value)
-                editor.putInt("rows", rowsPicker.value)
-                editor.putInt("difficulty", diffPicker.value)
-                editor.apply()
+                preferences.randomGridWidth = colsPicker.value
+                preferences.randomGridHeight = rowsPicker.value
+                preferences.randomGridDifficulty = diffPicker.value
 
                 startRandomLevel()
             }
@@ -187,7 +184,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun startRandomLevel() {
         LevelDetails.levelType = LevelType.Random()
-        if (preferences.getBoolean("uniqueLevel", true)) {
+        if (preferences.uniqueLevel) {
             loadingMenu(true)
 
             val randomJob = lifecycleScope.launch(Dispatchers.IO) {
@@ -195,7 +192,7 @@ class MainActivity : AppCompatActivity() {
                     newUniqueRandomGrid(getRandomGridPrefs(this@MainActivity))) {
                     is Some -> {
                         LevelDetails.gridData = temp.value
-                        LevelDetails.userGrid = UserGrid(LevelDetails.gridData, autoFill = true, resetComplete = preferences.getBoolean("resetComplete", true))
+                        LevelDetails.userGrid = UserGrid(LevelDetails.gridData, autoFill = true, resetComplete = preferences.resetComplete)
                         val intent = Intent(this@MainActivity, GameActivity::class.java)
                         startActivity(intent)
                     }
@@ -210,7 +207,7 @@ class MainActivity : AppCompatActivity() {
         } else {
             val wHD = getRandomGridPrefs(this)
             LevelDetails.gridData = newRandomGrid(wHD).toGridData(wHD.first, wHD.second)
-            LevelDetails.userGrid = UserGrid(LevelDetails.gridData, autoFill = true, resetComplete = preferences.getBoolean("resetComplete", true))
+            LevelDetails.userGrid = UserGrid(LevelDetails.gridData, autoFill = true, resetComplete = preferences.resetComplete)
             val intent = Intent(this, GameActivity::class.java)
             startActivity(intent)
         }
@@ -230,18 +227,8 @@ class MainActivity : AppCompatActivity() {
     private fun initialize() {
         setContentView(R.layout.activity_main)
 
-        preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        when (preferences.getString("darkMode2", "System")) {
-            "System" -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-            }
-            "Dark" -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            }
-            else -> {
-                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-            }
-        }
+        preferences = Preferences(this)
+        AppCompatDelegate.setDefaultNightMode(preferences.theme)
 
         randomLevelButton = findViewById(R.id.random_level)
         levelSelectButton = findViewById(R.id.level_select)

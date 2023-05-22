@@ -29,7 +29,6 @@ import android.util.TypedValue
 import android.widget.Toast
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
-import androidx.preference.PreferenceManager
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Option
@@ -73,11 +72,12 @@ fun newRandomGrid(wHD: Triple<Int, Int, Int>, random: Random = Random) =
     }
 
 fun getRandomGridPrefs(context: Context): Triple<Int, Int, Int> {
-    val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-    val width = preferences.getInt("columns", 10)
-    val height = preferences.getInt("rows", 10)
-    val difficulty = preferences.getInt("difficulty", 5)
-    return Triple(width, height, difficulty)
+    val preferences = Preferences(context)
+    return Triple(
+        preferences.randomGridWidth,
+        preferences.randomGridHeight,
+        preferences.randomGridDifficulty
+    )
 }
 
 fun readTextFromUri(uri: Uri, context: Context): String {

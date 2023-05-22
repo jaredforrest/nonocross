@@ -17,7 +17,6 @@ package com.picross.nonocross.views.grid
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.DialogInterface
-import android.content.SharedPreferences
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
@@ -25,7 +24,6 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
 import androidx.appcompat.app.AppCompatActivity
-import androidx.preference.PreferenceManager
 import arrow.core.None
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.picross.nonocross.GameActivity
@@ -36,6 +34,7 @@ import com.picross.nonocross.HighScoreManager
 import com.picross.nonocross.LevelType
 import com.picross.nonocross.R
 import com.picross.nonocross.util.CellShade
+import com.picross.nonocross.util.Preferences
 import com.picross.nonocross.util.getRandomGridPrefs
 import com.picross.nonocross.util.resolveThemedColor
 import com.picross.nonocross.util.secondsToTime
@@ -53,9 +52,8 @@ class GridView @JvmOverloads constructor(
     private val colorCross =  context.resolveThemedColor(R.attr.colorCross)
     private val colorShade =  context.resolveThemedColor(R.attr.colorPrimary)
     private val colorEmpty = context.resolveThemedColor(R.attr.colorSurface)
-    private val preferences: SharedPreferences =
-        PreferenceManager.getDefaultSharedPreferences(context)
-    private val enableZoom = preferences.getBoolean("enable_zoom", true)
+    private val preferences = Preferences(context)
+    private val enableZoom = preferences.enableZoom
 
     private val paintEmpty = Paint().apply { color = colorEmpty }
     private val paintShade = Paint().apply { color = colorShade }
@@ -161,16 +159,9 @@ class GridView @JvmOverloads constructor(
     private lateinit var nonoGrid: UserGridView
 
     // Get Preferences
-    private val sharedPreferences: SharedPreferences =
-        PreferenceManager.getDefaultSharedPreferences(context)
-    private val fatFingerMode = sharedPreferences.getBoolean("fatFinger", true)
-    private val vibrateOn = sharedPreferences.getBoolean("vibrate", false)
-    private val fillMode = when (val fM = sharedPreferences.getString("fillMode", "Default")) {
-        "Lax" -> 0
-        "Default" -> 1
-        "Strict" -> 2
-        else -> 1
-    }
+    private val fatFingerMode = preferences.fatFingerMode
+    private val vibrateOn = preferences.vibrate
+    private val fillMode = preferences.fillMode
 
     private var isFirstCell = true
     private var isLongPress = false

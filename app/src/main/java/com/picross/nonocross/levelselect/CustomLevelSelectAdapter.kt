@@ -22,11 +22,11 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.get
-import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
 import com.picross.nonocross.LevelDetails
 import com.picross.nonocross.LevelType
 import com.picross.nonocross.R
+import com.picross.nonocross.util.Preferences
 import com.picross.nonocross.util.getLevelName
 import com.picross.nonocross.util.usergrid.GridData
 import com.picross.nonocross.util.usergrid.UserGrid
@@ -94,9 +94,12 @@ class CustomLevelSelectAdapter(
                 LevelDetails.levelType = startGame.levelType(levelName)
                 LevelDetails.gridData = level
                 LevelDetails.userGrid =
-                    UserGrid(LevelDetails.gridData, startGame.openSave(levelName),
+                    UserGrid(
+                        LevelDetails.gridData,
+                        startGame.openSave(levelName),
                         LevelDetails.levelType !is LevelType.Default,
-                    PreferenceManager.getDefaultSharedPreferences(context).getBoolean("resetComplete", true))
+                        Preferences(context).resetComplete
+                    )
                 startGame.startGame()
             }
             if (startGame.isCustom) {
