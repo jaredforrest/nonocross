@@ -24,6 +24,7 @@ import android.widget.TextView
 import androidx.core.view.get
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.picross.nonocross.LevelDetails
 import com.picross.nonocross.LevelType
 import com.picross.nonocross.R
@@ -102,8 +103,15 @@ class CustomLevelSelectAdapter(
             if (startGame.isCustom) {
                 holder.itemView.findViewById<Button>(R.id.remove_level).setOnClickListener {
                     val pos = holder.bindingAdapterPosition
-                    startGame.levels = startGame.levels.removeAt(pos)
-                    startGame.removeLevel(levelName, pos)
+                    val title = context.getString(R.string.remove_level_confirm, startGame.levels[pos].first)
+                    MaterialAlertDialogBuilder(context)
+                        .setTitle(title)
+                        .setPositiveButton(android.R.string.ok) { _, _ ->
+                            startGame.levels = startGame.levels.removeAt(pos)
+                            startGame.removeLevel(levelName, pos)
+                        }
+                        .setNegativeButton(android.R.string.cancel, null)
+                        .show()
                 }
             }
         }
