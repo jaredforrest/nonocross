@@ -25,7 +25,6 @@ import android.view.View.VISIBLE
 import android.widget.NumberPicker
 import android.widget.TextView
 import androidx.activity.addCallback
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.content.pm.ShortcutInfoCompat
@@ -36,6 +35,7 @@ import androidx.preference.PreferenceManager
 import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.picross.nonocross.util.errorToast
 import com.picross.nonocross.util.getRandomGridPrefs
 import com.picross.nonocross.util.newRandomGrid
@@ -164,7 +164,7 @@ class MainActivity : AppCompatActivity() {
         diffPicker.setOnValueChangedListener(listener)
         updateHighScore()
 
-        AlertDialog.Builder(this@MainActivity)
+        MaterialAlertDialogBuilder(this@MainActivity)
             .setTitle(R.string.grid_size)
             .setView(dialogView)
             .setPositiveButton(

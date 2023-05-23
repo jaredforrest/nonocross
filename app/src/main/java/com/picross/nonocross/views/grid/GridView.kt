@@ -15,7 +15,6 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.*/
 package com.picross.nonocross.views.grid
 
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.SharedPreferences
@@ -28,6 +27,7 @@ import android.view.ViewConfiguration
 import androidx.appcompat.app.AppCompatActivity
 import androidx.preference.PreferenceManager
 import arrow.core.None
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.picross.nonocross.GameActivity
 import com.picross.nonocross.GameActivity.TransformDetails.mScaleFactor
 import com.picross.nonocross.GameActivity.TransformDetails.mTransX
@@ -253,7 +253,7 @@ class GridView @JvmOverloads constructor(
         val timeMessage = if (newHighScore) R.string.level_complete_new_high_score else R.string.level_complete
 
         LD.userGrid.complete = true
-        val done = AlertDialog.Builder(context)
+        val done = MaterialAlertDialogBuilder(context)
             .setTitle(R.string.finished)
             .setMessage(
                 if (LD.userGrid.timeElapsed > 0u) {

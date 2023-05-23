@@ -21,12 +21,10 @@ import android.os.Looper
 import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
@@ -34,6 +32,7 @@ import androidx.preference.PreferenceManager
 import arrow.core.None
 import arrow.core.Some
 import com.google.android.material.button.MaterialButtonToggleGroup
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.journeyapps.barcodescanner.BarcodeEncoder
@@ -47,6 +46,7 @@ import com.picross.nonocross.util.secondsToTime
 import com.picross.nonocross.util.toNonFile
 import com.picross.nonocross.util.usergrid.UserGrid
 import com.picross.nonocross.util.usergrid.toGridData
+import com.picross.nonocross.views.LevelSaveDialog
 import com.picross.nonocross.views.grid.ColNumsView
 import com.picross.nonocross.views.grid.GameView
 import com.picross.nonocross.views.grid.GridView
@@ -318,28 +318,13 @@ class GameActivity : AppCompatActivity() {
     fun saveGrid(andQuit: Boolean = false) {
         val fileContents = LD.gridData.toNonFile()
 
-        // dialog message view
-        val constraintLayout = layoutInflater.inflate(R.layout.edit_text_layout, null)
-
-        AlertDialog.Builder(this)
-            .setTitle(R.string.level_name)
-            .setMessage(R.string.enter_level_name)
-            .setView(constraintLayout)
-            .setPositiveButton(
-                android.R.string.ok
-            ) { _, _ ->
-                val temp =
-                    constraintLayout.findViewById<EditText>(R.id.edit_level_name).text.toString()
-                val fileName = if (temp == "") "Untitled Level" else temp
-                addCustomLevel(fileName, fileContents, this, LD.userGrid)
-                if (andQuit) finish()
-                save.visibility = INVISIBLE
-                LD.levelType = LevelType.Random(Some(fileName))
-                confirmExit.isEnabled = false
-            }
-            .setNegativeButton(android.R.string.cancel, null)
-            .create()
-            .show()
+        LevelSaveDialog.showDialog(this, layoutInflater) { name ->
+            addCustomLevel(name, fileContents, this, LD.userGrid)
+            if (andQuit) finish()
+            save.visibility = INVISIBLE
+            LD.levelType = LevelType.Random(Some(name))
+            confirmExit.isEnabled = false
+        }
     }
 
     private fun runTimer() {
@@ -396,7 +381,7 @@ class GameActivity : AppCompatActivity() {
     }
 
     private fun confirmReset() {
-        AlertDialog.Builder(this@GameActivity)
+        MaterialAlertDialogBuilder(this@GameActivity)
             .setTitle(R.string.confirm_new)
             .setMessage(R.string.lose_unsaved_data)
             .setNeutralButton(R.string.not_save) { _, _ ->
@@ -414,7 +399,7 @@ class GameActivity : AppCompatActivity() {
         override fun handleOnBackPressed() {
             // dialog message view
 
-            AlertDialog.Builder(this@GameActivity)
+            MaterialAlertDialogBuilder(this@GameActivity)
                 .setTitle(R.string.confirm_exit)
                 .setMessage(R.string.lose_unsaved_data)
                 .setNeutralButton(R.string.not_save) { _, _ ->

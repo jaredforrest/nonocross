@@ -18,10 +18,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.lifecycleScope
@@ -38,6 +36,7 @@ import com.picross.nonocross.util.applyNotError
 import com.picross.nonocross.util.errorToast
 import com.picross.nonocross.util.getNonFile
 import com.picross.nonocross.util.parseNonFile
+import com.picross.nonocross.views.LevelSaveDialog
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileInputStream
@@ -153,29 +152,15 @@ class CustomLevelSelectActivity : AppCompatActivity(), CustomLevelSelectAdapter.
                     Toast.makeText(baseContext, R.string.cancelled, Toast.LENGTH_SHORT).show()
                 } else {
                     parseNonFile(it.contents).applyNotError(baseContext) {
-                        val constraintLayout =
-                            layoutInflater.inflate(R.layout.edit_text_layout, null)
-
-                        AlertDialog.Builder(this@CustomLevelSelectActivity)
-                            .setTitle(R.string.level_name)
-                            .setMessage(R.string.enter_level_name)
-                            .setView(constraintLayout)
-                            .setPositiveButton(
-                                android.R.string.ok
-                            ) { _, _ ->
-                                val temp =
-                                    constraintLayout.findViewById<EditText>(R.id.edit_level_name).text.toString()
-                                val filename = addCustomLevel(
-                                    temp.substringBefore('\n'),
-                                    it.contents,
-                                    this@CustomLevelSelectActivity
-                                )
-                                levels.add(Pair(filename,this))
-                                viewAdapter.notifyItemInserted(levels.size - 1)
-                            }
-                            .setNegativeButton(android.R.string.cancel, null)
-                            .create()
-                            .show()
+                        LevelSaveDialog.showDialog(this@CustomLevelSelectActivity, layoutInflater) { name ->
+                            val filename = addCustomLevel(
+                                name.substringBefore('\n'),
+                                it.contents,
+                                this@CustomLevelSelectActivity
+                            )
+                            levels.add(Pair(filename,this))
+                            viewAdapter.notifyItemInserted(levels.size - 1)
+                        }
                     }
                 }
         }
