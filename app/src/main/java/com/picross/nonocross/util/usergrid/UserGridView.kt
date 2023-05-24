@@ -8,12 +8,12 @@ import arrow.core.none
 import com.picross.nonocross.util.CellShade
 import com.picross.nonocross.views.grid.CellView
 
-class UserGridView(width: Int, height: Int, cellLength: Int, paintEmpty: Paint, paintShade: Paint, paintCross: Paint) {
+class UserGridView(attributes: GridAttributes, cellLength: Int, paintEmpty: Paint, paintShade: Paint, paintCross: Paint) {
 
-    private val gridView = List(width * height) {
+    private val gridView = List(attributes.width * attributes.height) {
         CellView(
-            it / width,
-            it % width,
+            it / attributes.width,
+            it % attributes.width,
             cellLength,
             paintEmpty,
             paintShade,

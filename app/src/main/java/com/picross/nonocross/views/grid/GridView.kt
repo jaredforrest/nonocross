@@ -20,6 +20,7 @@ import android.content.DialogInterface
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.util.AttributeSet
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
@@ -35,7 +36,6 @@ import com.picross.nonocross.LevelType
 import com.picross.nonocross.R
 import com.picross.nonocross.util.CellShade
 import com.picross.nonocross.util.Preferences
-import com.picross.nonocross.util.getRandomGridPrefs
 import com.picross.nonocross.util.resolveThemedColor
 import com.picross.nonocross.util.secondsToTime
 import com.picross.nonocross.util.usergrid.UserGridView
@@ -82,7 +82,8 @@ class GridView @JvmOverloads constructor(
     @SuppressLint("DrawAllocation")
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        nonoGrid = UserGridView(LD.gridData.width, LD.gridData.height, cellLength, paintEmpty, paintShade, paintCross)
+        nonoGrid = UserGridView(LD.gridData.attributes, cellLength, paintEmpty, paintShade, paintCross)
+        Log.d(TAG, "Draw grid: ${LD.gridData.attributes}")
         mWidth = width.toFloat()
         midpoint = (width / 2).toFloat()
         //mHeight = height
@@ -239,7 +240,7 @@ class GridView @JvmOverloads constructor(
     /** When the game is finished show a dialog */
     private fun gameDoneAlert() {
         val newHighScore =
-            HighScoreManager.handleNewScore(context, LD.userGrid, getRandomGridPrefs(context).third)
+            HighScoreManager.handleNewScore(context, LD.userGrid, LD.gridData.attributes.difficulty)
 
         val timeMessage = if (newHighScore) R.string.level_complete_new_high_score else R.string.level_complete
 
@@ -289,7 +290,10 @@ class GridView @JvmOverloads constructor(
     fun superClear() = LD.userGrid.superClear()
 
     fun updateNonoGrid() {
-        nonoGrid = UserGridView(LD.gridData.width, LD.gridData.height, cellLength, paintEmpty, paintShade, paintCross)
+        nonoGrid = UserGridView(LD.gridData.attributes, cellLength, paintEmpty, paintShade, paintCross)
     }
 
+    companion object {
+        private val TAG = GridView::class.java.simpleName
+    }
 }

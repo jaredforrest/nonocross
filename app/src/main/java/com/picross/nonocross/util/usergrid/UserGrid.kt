@@ -17,9 +17,9 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
     var initial: Boolean
     var timeElapsed: UInt
 
-    val height = gridData.height
-    val width = gridData.width
-    val size = gridData.width * gridData.height
+    val height = gridData.attributes.height
+    val width = gridData.attributes.width
+    val size = gridData.attributes.width * gridData.attributes.height
 
     var grid: PersistentList<CellShade>
 
@@ -76,8 +76,8 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
                 }
             }.toPersistentList()
         }
-        rowNums = grid.getRowNums(gridData.width, gridData.height)
-        colNums = grid.getColNums(gridData.width, gridData.height)
+        rowNums = grid.getRowNums(gridData.attributes.width, gridData.attributes.height)
+        colNums = grid.getColNums(gridData.attributes.width, gridData.attributes.height)
     }
 
     fun toBytes() =
@@ -107,8 +107,8 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
             autoFill()
         }
         undoAddStack()
-        rowNums = grid.getRowNums(gridData.width, gridData.height)
-        colNums = grid.getColNums(gridData.width, gridData.height)
+        rowNums = grid.getRowNums(gridData.attributes.width, gridData.attributes.height)
+        colNums = grid.getColNums(gridData.attributes.width, gridData.attributes.height)
         initial = true
     }
 
@@ -126,8 +126,8 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
             is Some -> _undoList
             is None -> {
                 grid = undoList.data
-                rowNums = grid.getRowNums(gridData.width, gridData.height)
-                colNums = grid.getColNums(gridData.width, gridData.height)
+                rowNums = grid.getRowNums(gridData.attributes.width, gridData.attributes.height)
+                colNums = grid.getColNums(gridData.attributes.width, gridData.attributes.height)
                 none()
             }
         }
@@ -138,8 +138,8 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
             is Some -> _undoList
             is None -> {
                 grid = undoList.data
-                rowNums = grid.getRowNums(gridData.width, gridData.height)
-                colNums = grid.getColNums(gridData.width, gridData.height)
+                rowNums = grid.getRowNums(gridData.attributes.width, gridData.attributes.height)
+                colNums = grid.getColNums(gridData.attributes.width, gridData.attributes.height)
                 none()
             }
         }
@@ -208,8 +208,8 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
                 grid = grid.set(index, if (grid[index] == initShade) cellShade else grid[index])
             }
         }
-        rowNums = grid.getRowNums(gridData.width, gridData.height)
-        colNums = grid.getColNums(gridData.width, gridData.height)
+        rowNums = grid.getRowNums(gridData.attributes.width, gridData.attributes.height)
+        colNums = grid.getColNums(gridData.attributes.width, gridData.attributes.height)
     }
 
     private fun autoFill() {
@@ -225,8 +225,8 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
 
     fun click(index: Int, toggleCross: Boolean) {
         grid = grid.set(index,grid[index].click(toggleCross))
-        rowNums = grid.getRowNums(gridData.width, gridData.height)
-        colNums = grid.getColNums(gridData.width, gridData.height)
+        rowNums = grid.getRowNums(gridData.attributes.width, gridData.attributes.height)
+        colNums = grid.getColNums(gridData.attributes.width, gridData.attributes.height)
         initial = false
     }
 
@@ -239,8 +239,8 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
 
     fun copyShade(fromIndex: Int, toIndex: Int) {
         grid = grid.set(toIndex, grid[fromIndex])
-        rowNums = grid.getRowNums(gridData.width, gridData.height)
-        colNums = grid.getColNums(gridData.width, gridData.height)
+        rowNums = grid.getRowNums(gridData.attributes.width, gridData.attributes.height)
+        colNums = grid.getColNums(gridData.attributes.width, gridData.attributes.height)
     }
 
     fun sameRow(index1: Int, index2: Int) = (index1 / width == index2 / width)

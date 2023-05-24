@@ -26,14 +26,14 @@ object CheckUnique {
 }
 
 /** If it is unique return a GridData of it otherwise return None() */
-fun List<CellShade>.checkUnique(width: Int, height: Int): Option<GridData> {
-    val rowNums = this.getRowNums(width, height)
+fun List<CellShade>.checkUnique(attributes: GridAttributes): Option<GridData> {
+    val rowNums = this.getRowNums(attributes.width, attributes.height)
     val rowNumCount = rowNums.map { it.size }.toIntArray()
-    val colNums = this.getColNums(width, height)
+    val colNums = this.getColNums(attributes.width, attributes.height)
     val colNumCount = colNums.map { it.size }.toIntArray()
-    val check = CheckUnique.checkUniqueFromJNI(height, width, rowNumCount, colNumCount, rowNums.flatten().toIntArray(), colNums.flatten().toIntArray()) == 1
+    val check = CheckUnique.checkUniqueFromJNI(attributes.height, attributes.width, rowNumCount, colNumCount, rowNums.flatten().toIntArray(), colNums.flatten().toIntArray()) == 1
 
-    return if (check) Some(GridData(size / height, height, rowNums, colNums))
+    return if (check) Some(GridData(attributes, rowNums, colNums))
     else none<GridData>()
 }
 
