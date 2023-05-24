@@ -9,9 +9,6 @@
     <string name="level_complete_no_time">Niveau Accompli</string>
     <string name="menu">Menu</string>
     <string name="reset">Recommencer</string>
-    <string name="difficulty">Difficulté</string>
-    <string name="rows">Lignes</string>
-    <string name="columns">Colonnes</string>
     <string name="grid_size">Taille de la grille</string>
     <string name="finished">Terminé</string>
 
