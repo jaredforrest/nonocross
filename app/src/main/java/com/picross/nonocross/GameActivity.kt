@@ -28,7 +28,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.lifecycle.lifecycleScope
-import androidx.preference.PreferenceManager
 import arrow.core.None
 import arrow.core.Some
 import com.google.android.material.button.MaterialButtonToggleGroup
@@ -36,6 +35,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.MultiFormatWriter
 import com.journeyapps.barcodescanner.BarcodeEncoder
+import com.picross.nonocross.util.Preferences
 import com.picross.nonocross.util.addCustomLevel
 import com.picross.nonocross.util.getRandomGridPrefs
 import com.picross.nonocross.util.invertBitmap
@@ -75,6 +75,7 @@ class GameActivity : AppCompatActivity() {
     private lateinit var rowNumsView: RowNumsView
     private lateinit var nonocrossGridView: GridView
 
+    private lateinit var preferences: Preferences
     private var showTime by Delegates.notNull<Boolean>()
     private var trackTime by Delegates.notNull<Boolean>()
 
@@ -91,10 +92,10 @@ class GameActivity : AppCompatActivity() {
 
         resetZoom()
 
-        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        trackTime = preferences.getBoolean("tracktimer", true)
-        showTime = preferences.getBoolean("timer", false)
-        val saveWarn = preferences.getBoolean("saveWarn", true)
+        preferences = Preferences(this)
+        trackTime = preferences.trackTimer
+        showTime = preferences.showTimer
+        val saveWarn = preferences.showSaveWarning
 
         toggleGroup = findViewById(R.id.toggleGroup)
         undo = findViewById(R.id.undo)
@@ -108,7 +109,7 @@ class GameActivity : AppCompatActivity() {
         gameView = findViewById(R.id.nonocrossGameView)
         timeView = findViewById(R.id.time_view)
         zoom = findViewById(R.id.zoom)
-        zoom.isVisible = preferences.getBoolean("enable_zoom", true)
+        zoom.isVisible = preferences.enableZoom
 
         colNumsView = gameView.getChildAt(0) as ColNumsView
         rowNumsView = gameView.getChildAt(1) as RowNumsView
@@ -241,15 +242,13 @@ class GameActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-            runTimer()
+        runTimer()
     }
 
     fun resetGrid() {
         when (LD.levelType) {
             is LevelType.Random -> {
-                if (PreferenceManager.getDefaultSharedPreferences(this)
-                        .getBoolean("uniqueLevel", true)
-                ) {
+                if (preferences.uniqueLevel) {
                     hideShowBoard(true)
                     qrCode.visibility = INVISIBLE
                     progress.visibility = VISIBLE
@@ -260,7 +259,7 @@ class GameActivity : AppCompatActivity() {
                             newUniqueRandomGrid(getRandomGridPrefs(this@GameActivity))) {
                             is Some -> runOnUiThread {
                                 LD.gridData = temp.value
-                                LD.userGrid = UserGrid(LD.gridData, autoFill = true, resetComplete = PreferenceManager.getDefaultSharedPreferences(this@GameActivity).getBoolean("resetComplete", true))
+                                LD.userGrid = UserGrid(LD.gridData, autoFill = true, resetComplete = preferences.resetComplete)
                                 LD.levelType = LevelType.Random()
                                 nonocrossGridView.updateNonoGrid()
                                 gameView.refreshLayout()
@@ -297,7 +296,7 @@ class GameActivity : AppCompatActivity() {
                 } else {
                     val wHD = getRandomGridPrefs(this)
                     LD.gridData = newRandomGrid(wHD).toGridData(wHD.first, wHD.second)
-                    LD.userGrid = UserGrid(LD.gridData, autoFill = true, resetComplete = PreferenceManager.getDefaultSharedPreferences(this@GameActivity).getBoolean("resetComplete", true))
+                    LD.userGrid = UserGrid(LD.gridData, autoFill = true, resetComplete = preferences.resetComplete)
                     nonocrossGridView.updateNonoGrid()
                     gameView.refreshLayout()
                     rowNumsView.invalidate()

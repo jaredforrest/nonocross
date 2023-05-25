@@ -5,13 +5,14 @@
 
         <SwitchPreferenceCompat
             app:key="vibrate"
+            app:defaultValue="false"
             app:summary="@string/vibrate_summary"
             app:title="@string/vibrate_title"
             android:widgetLayout="@layout/preference_material_switch" />
 
         <SwitchPreferenceCompat
-            app:defaultValue="true"
             app:key="fatFinger"
+            app:defaultValue="true"
             app:summary="@string/fat_finger_summary"
             app:title="@string/fat_finger_title"
             android:widgetLayout="@layout/preference_material_switch" />
@@ -31,9 +32,10 @@
             android:widgetLayout="@layout/preference_material_switch" />
 
         <ListPreference
+            app:key="fillMode"
             app:entries="@array/fill_mode_entries"
             app:entryValues="@array/fill_mode_entry_values"
-            app:key="fillMode"
+            app:defaultValue="Default"
             app:title="@string/overwrite_cell_mode"
             app:useSimpleSummaryProvider="true" />
 
@@ -45,6 +47,7 @@
             app:key="darkMode2"
             app:entries="@array/dark_mode_entries"
             app:entryValues="@array/dark_mode_entry_values"
+            app:defaultValue="System"
             app:title="@string/dark_mode"
             app:useSimpleSummaryProvider="true" />
 
@@ -73,6 +76,7 @@
         <SwitchPreferenceCompat
             app:dependency="tracktimer"
             app:key="timer"
+            app:defaultValue="true"
             app:summary="@string/show_timer_summary"
             app:title="@string/show_timer"
             app:useSimpleSummaryProvider="true"

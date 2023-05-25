@@ -5,6 +5,7 @@ import arrow.core.Option
 import arrow.core.Some
 import arrow.core.none
 import com.picross.nonocross.util.CellShade
+import com.picross.nonocross.util.Preferences
 import com.picross.nonocross.util.click
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.toPersistentList
@@ -149,16 +150,16 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
     }
 
     private fun fillRow(row: Int, cellShade: CellShade) =
-        copyInSlice(row * width until (row + 1) * width, cellShade, CellShade.EMPTY, 0)
+        copyInSlice(row * width until (row + 1) * width, cellShade, CellShade.EMPTY, Preferences.FillMode.Lax)
 
     private fun fillCol(col: Int, cellShade: CellShade) =
-        copyInSlice(col until col + height * width step width, cellShade, CellShade.EMPTY, 0)
+        copyInSlice(col until col + height * width step width, cellShade, CellShade.EMPTY, Preferences.FillMode.Lax)
 
     fun copyRowInRange(
         index1: Int,
         index2: Int,
         initShade: CellShade,
-        mode: Int
+        mode: Preferences.FillMode
     ) {
         val initCol = index1 % width
         val currCol = index2 % width
@@ -175,7 +176,7 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
         index1: Int,
         index2: Int,
         initShade: CellShade,
-        mode: Int
+        mode: Preferences.FillMode
     ) {
         val initRow = index1 / width
         val currRow = index2 / width
@@ -192,13 +193,13 @@ class UserGrid(private val gridData: GridData, initialState: ByteArray = byteArr
         slice: Iterable<Int>,
         cellShade: CellShade,
         initShade: CellShade,
-        mode: Int
+        mode: Preferences.FillMode
     ) {
-        if (mode == 0 || (mode == 1 && cellShade == CellShade.EMPTY)) {
+        if (mode == Preferences.FillMode.Lax || (mode == Preferences.FillMode.Default && cellShade == CellShade.EMPTY)) {
             for(index in slice) {
                 grid = grid.set(index, cellShade)
             }
-        } else if (mode == 1) {
+        } else if (mode == Preferences.FillMode.Default) {
             for(index in slice){
                 grid = grid.set(index, (if (grid[index] == CellShade.EMPTY) cellShade else grid[index]))
             }
