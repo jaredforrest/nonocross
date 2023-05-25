@@ -26,7 +26,7 @@
     <string name="show_blue_hints">Zeige blaue Hinweise</string>
     <string name="import_level">Importiere Level</string>
     <string name="custom_level">Gespeicherte Levels</string>
-    <string name="remove_level">entfernen</string>
+    <string name="remove_level">Entfernen</string>
     <string name="level_name">Level-Name</string>
     <string name="enter_level_name">Gib einen Namen für das Level an</string>
     <string name="import_from_file">Importiere aus Datei</string>
