@@ -9,9 +9,6 @@
     <string name="level_complete_no_time">Level beendet</string>
     <string name="menu">Menü</string>
     <string name="reset">Zurücksetzen</string>
-    <string name="difficulty">Schwierigkeit</string>
-    <string name="rows">Reihen</string>
-    <string name="columns">Spalten</string>
     <string name="grid_size">Gittergröße</string>
     <string name="finished">Beendet</string>
 

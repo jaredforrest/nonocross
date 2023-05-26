@@ -11,10 +11,9 @@
     <string name="level_complete_no_time">Level Complete</string>
     <string name="menu">Menu</string>
     <string name="reset">Reset</string>
-    <string name="difficulty">Difficulty</string>
-    <string name="rows">Rows</string>
-    <string name="columns">Columns</string>
-    <string name="grid_size">Grid Size</string>
+    <string name="difficulty">Difficulty: %d</string>
+    <string name="rows">Rows: %d</string>
+    <string name="columns">Columns: %d</string>
     <string name="finished">Finished</string>
 
     <!-- Preferences -->

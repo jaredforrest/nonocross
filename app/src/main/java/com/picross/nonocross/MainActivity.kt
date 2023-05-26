@@ -21,8 +21,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.View.INVISIBLE
 import android.view.View.VISIBLE
-import android.widget.NumberPicker
-import android.widget.TextView
 import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
@@ -34,6 +32,8 @@ import arrow.core.Either
 import arrow.core.None
 import arrow.core.Some
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.slider.Slider
+import com.picross.nonocross.databinding.DialogueRandomGridBinding
 import com.picross.nonocross.util.Preferences
 import com.picross.nonocross.util.errorToast
 import com.picross.nonocross.util.getRandomGridPrefs
@@ -44,6 +44,7 @@ import com.picross.nonocross.util.secondsToTime
 import com.picross.nonocross.util.usergrid.GridData
 import com.picross.nonocross.util.usergrid.UserGrid
 import com.picross.nonocross.util.usergrid.toGridData
+import com.picross.nonocross.views.intValue
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.plus
 import kotlinx.coroutines.Dispatchers
@@ -126,52 +127,47 @@ class MainActivity : AppCompatActivity() {
 
     /** Called when the user taps the Random Level button */
     private fun openRandomLevel() {
-        val inflater = this@MainActivity.layoutInflater
-        val dialogView: View = inflater.inflate(R.layout.dialogue_random_grid, null)
-        val rowsPicker = dialogView.findViewById<NumberPicker>(R.id.rows_picker)
-        val colsPicker = dialogView.findViewById<NumberPicker>(R.id.cols_picker)
-        val diffPicker = dialogView.findViewById<NumberPicker>(R.id.difficulty_picker)
-        val highscoreTextView = dialogView.findViewById<TextView>(R.id.highscore)
-        rowsPicker.maxValue = 25
-        rowsPicker.minValue = 2
-        rowsPicker.value = preferences.randomGridHeight
-        rowsPicker.wrapSelectorWheel = false
-        colsPicker.maxValue = 25
-        colsPicker.minValue = 2
-        colsPicker.value = preferences.randomGridWidth
-        colsPicker.wrapSelectorWheel = false
-        diffPicker.maxValue = 10
-        diffPicker.minValue = 1
-        diffPicker.value = preferences.randomGridDifficulty
-        diffPicker.wrapSelectorWheel = false
+        val binding = DialogueRandomGridBinding.inflate(this@MainActivity.layoutInflater)
+        binding.rowsSlider.intValue(preferences.randomGridHeight)
+        binding.columnsSlider.intValue(preferences.randomGridWidth)
+        binding.difficultySlider.intValue(preferences.randomGridDifficulty)
 
-        fun updateHighScore() {
-            val highScore = HighScoreManager.getHighScore(this, rowsPicker.value, colsPicker.value, diffPicker.value)
-            highscoreTextView.text = if (highScore == null) {
+        fun updateTextViews() {
+            val highScore = HighScoreManager.getHighScore(
+                this,
+                binding.rowsSlider.intValue(),
+                binding.columnsSlider.intValue(),
+                binding.difficultySlider.intValue()
+            )
+            binding.highscoreTextView.text = if (highScore == null) {
                 getString(R.string.no_high_score)
             } else {
                 getString(R.string.high_score, secondsToTime(highScore))
             }
+
+            binding.rowsTextView.text = getString(R.string.rows, binding.rowsSlider.intValue())
+            binding.columnsTextView.text = getString(R.string.columns, binding.columnsSlider.intValue())
+            binding.difficultyTextView.text = getString(R.string.difficulty, binding.difficultySlider.intValue())
         }
 
-        val listener = NumberPicker.OnValueChangeListener { _, _, _ ->
-            updateHighScore()
+        val listener = Slider.OnChangeListener { _, _, _ ->
+            updateTextViews()
         }
 
-        rowsPicker.setOnValueChangedListener(listener)
-        colsPicker.setOnValueChangedListener(listener)
-        diffPicker.setOnValueChangedListener(listener)
-        updateHighScore()
+        binding.rowsSlider.addOnChangeListener(listener)
+        binding.columnsSlider.addOnChangeListener(listener)
+        binding.difficultySlider.addOnChangeListener(listener)
+        updateTextViews()
 
         MaterialAlertDialogBuilder(this@MainActivity)
-            .setTitle(R.string.grid_size)
-            .setView(dialogView)
+            .setTitle(R.string.random_grid)
+            .setView(binding.root)
             .setPositiveButton(
                 android.R.string.ok
             ) { _, _ ->
-                preferences.randomGridWidth = colsPicker.value
-                preferences.randomGridHeight = rowsPicker.value
-                preferences.randomGridDifficulty = diffPicker.value
+                preferences.randomGridWidth = binding.columnsSlider.intValue()
+                preferences.randomGridHeight = binding.rowsSlider.intValue()
+                preferences.randomGridDifficulty = binding.difficultySlider.intValue()
 
                 startRandomLevel()
             }

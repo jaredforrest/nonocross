@@ -18,82 +18,61 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:padding="16dp"
     tools:context=".MainActivity">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <LinearLayout
         android:layout_width="match_parent"
-
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="vertical"
+        android:gravity="center">
 
         <TextView
-            android:id="@+id/minTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/rows"
-            app:layout_constraintEnd_toEndOf="@+id/rows_picker"
-            app:layout_constraintStart_toStartOf="@+id/rows_picker"
-            app:layout_constraintTop_toTopOf="parent" />
+                android:id="@+id/rowsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/rows" />
 
-        <NumberPicker
-            android:id="@+id/rows_picker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toStartOf="@id/cols_picker"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/minTextView" />
+        <com.google.android.material.slider.Slider
+                android:id="@+id/rowsSlider"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:valueFrom="2"
+                android:valueTo="25"
+                android:stepSize="1" />
 
         <TextView
-            android:id="@+id/maxTextView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="@string/columns"
-            app:layout_constraintEnd_toEndOf="@+id/cols_picker"
-            app:layout_constraintStart_toStartOf="@+id/cols_picker"
-            app:layout_constraintTop_toTopOf="parent" />
+                android:id="@+id/columnsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/columns" />
 
-        <NumberPicker
-            android:id="@+id/cols_picker"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/rows_picker"
-            app:layout_constraintTop_toBottomOf="@+id/maxTextView" />
-
+        <com.google.android.material.slider.Slider
+                android:id="@+id/columnsSlider"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:valueFrom="2"
+                android:valueTo="25"
+                android:stepSize="1" />
 
         <TextView
             android:id="@+id/difficultyTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/difficulty"
-            app:layout_constraintBottom_toTopOf="@+id/difficulty_picker"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/cols_picker" />
+            android:text="@string/difficulty" />
 
-        <NumberPicker
-            android:id="@+id/difficulty_picker"
+        <com.google.android.material.slider.Slider
+            android:id="@+id/difficultySlider"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/difficultyTextView" />
+            android:valueFrom="1"
+            android:valueTo="10"
+            android:stepSize="1" />
 
         <TextView
-            android:id="@+id/highscore"
+            android:id="@+id/highscoreTextView"
             tools:text="Highscore: 1:23"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/difficulty_picker"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="8dp" />
-
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_height="wrap_content" />
+    </LinearLayout>
 </ScrollView>
