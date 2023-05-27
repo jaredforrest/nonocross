@@ -10,7 +10,7 @@
     </style>
 
     <style name="Widget.App.Button.OutlinedButton.IconOnly.Primary" parent="Widget.App.Button.OutlinedButton.IconOnly">
-        <item name="iconTint">@color/icon_tint_selector_primary</item>
+        <item name="iconTint">@color/icon_tint_selector_shade</item>
     </style>
 
     <style name="Widget.App.Button.OutlinedButton.IconOnly.Cross" parent="Widget.App.Button.OutlinedButton.IconOnly">

@@ -2,6 +2,7 @@
 <resources>
     <style name="AppTheme.Base" parent="Theme.Material3.DayNight.NoActionBar">
         <item name="colorShade">?colorPrimary</item>
+        <item name="colorCross">?colorSecondary</item>
     </style>
 
     <!-- Overridden in values-v27 -->
@@ -33,11 +34,6 @@
         <item name="colorOutline">@color/md_theme_light_outline</item>
         <item name="colorOnSurfaceInverse">@color/md_theme_light_inverseOnSurface</item>
         <item name="colorSurfaceInverse">@color/md_theme_light_inverseSurface</item>
-        <item name="colorCross">#bf0124</item>
-        <item name="colorOnCross">#ffffff</item>
-        <item name="colorCrossContainer">#ffdad8</item>
-        <item name="colorOnCrossContainer">#410006</item>
-        <item name="harmonizeCross">true</item>
         <item name="colorPrimaryInverse">@color/md_theme_light_inversePrimary</item>
     </style>
 </resources>

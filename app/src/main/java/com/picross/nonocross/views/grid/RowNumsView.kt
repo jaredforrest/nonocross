@@ -61,8 +61,8 @@ class RowNumsView(context: Context) : AbstractNumsView(context) {
         canvas.scale(mScaleFactor, mScaleFactor)
         if (refreshTemplates) {
             templateNumber = getTemplate(width, height, paintNumber)
-            templateShade = getTemplate(width, height, paintShade)
-            templateCross = getTemplate(width, height, paintCross)
+            templateValidHint = getTemplate(width, height, paintValidHint)
+            templateErrorHint = getTemplate(width, height, paintErrorHint)
             refreshTemplates = false
         }
 
@@ -74,13 +74,13 @@ class RowNumsView(context: Context) : AbstractNumsView(context) {
                         LD.userGrid.rowNums.getOrElse(i) { listOf(0) }.reversed()
                             .getOrElse(j) { 0 } == num
                     ) {
-                        canvas.drawPicture(templateShade[counter])
+                        canvas.drawPicture(templateValidHint[counter])
                     }
                     else if (
                         LD.userGrid.rowNums.getOrElse(i) { listOf(0) }.reversed()
                             .getOrElse(j) { 0 } > num
                     ) {
-                        canvas.drawPicture(templateCross[counter])
+                        canvas.drawPicture(templateErrorHint[counter])
                     }
                     else {
                         canvas.drawPicture(templateNumber[counter])

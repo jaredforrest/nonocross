@@ -48,16 +48,12 @@ import com.picross.nonocross.LevelDetails as LD
 class GridView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
-
-    private val colorCross =  context.resolveThemedColor(R.attr.colorCross)
-    private val colorShade =  context.resolveThemedColor(R.attr.colorPrimary)
-    private val colorEmpty = context.resolveThemedColor(R.attr.colorSurface)
     private val preferences = Preferences(context)
     private val enableZoom = preferences.enableZoom
 
-    private val paintEmpty = Paint().apply { color = colorEmpty }
-    private val paintShade = Paint().apply { color = colorShade }
-    private val paintCross = Paint().apply { color = colorCross }
+    private val paintEmpty = Paint().apply { color = context.resolveThemedColor(R.attr.colorSurface) }
+    private val paintShade = Paint().apply { color = context.resolveThemedColor(R.attr.colorShade) }
+    private val paintCross = Paint().apply { color = context.resolveThemedColor(R.attr.colorCross) }
         .apply { strokeCap = Paint.Cap.ROUND }
         .apply { isAntiAlias = true }
 
