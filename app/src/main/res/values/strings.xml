@@ -31,8 +31,8 @@
     <string name="remove_level_confirm">Are you sure you want to delete \"%s\"?</string>
     <string name="level_name">Level Name</string>
     <string name="enter_level_name">Enter the name of the level</string>
-    <string name="import_from_file">Import from file</string>
-    <string name="import_from_qr">Import from QR code</string>
+    <string name="import_from_file">Open file</string>
+    <string name="import_from_qr">QR code</string>
     <string name="qr_code">QR code</string>
     <string name="untitled_level">Untitled Level</string>
     <string name="online">online</string>
