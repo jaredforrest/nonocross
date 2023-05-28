@@ -201,8 +201,8 @@ class MainActivity : AppCompatActivity() {
                 onBackPressedDispatcher.addCallback(this@MainActivity) { finish() }
             }
         } else {
-            val wHD = getRandomGridPrefs(this)
-            LevelDetails.gridData = newRandomGrid(wHD).toGridData(wHD.first, wHD.second)
+            val gridAttributes = getRandomGridPrefs(this)
+            LevelDetails.gridData = newRandomGrid(gridAttributes).toGridData(gridAttributes)
             LevelDetails.userGrid = UserGrid(LevelDetails.gridData, autoFill = true, resetComplete = preferences.resetComplete)
             val intent = Intent(this, GameActivity::class.java)
             startActivity(intent)

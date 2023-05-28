@@ -294,8 +294,8 @@ class GameActivity : AppCompatActivity() {
                     //}, "Native Thread", 1024L * 1024L)
                     //myThread?.start()
                 } else {
-                    val wHD = getRandomGridPrefs(this)
-                    LD.gridData = newRandomGrid(wHD).toGridData(wHD.first, wHD.second)
+                    val attributes = getRandomGridPrefs(this)
+                    LD.gridData = newRandomGrid(attributes).toGridData(attributes)
                     LD.userGrid = UserGrid(LD.gridData, autoFill = true, resetComplete = preferences.resetComplete)
                     nonocrossGridView.updateNonoGrid()
                     gameView.refreshLayout()

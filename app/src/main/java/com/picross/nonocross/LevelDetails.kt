@@ -16,13 +16,14 @@ package com.picross.nonocross
 
 import arrow.core.Option
 import arrow.core.none
+import com.picross.nonocross.util.usergrid.GridAttributes
 import com.picross.nonocross.util.usergrid.GridData
 import com.picross.nonocross.util.usergrid.UserGrid
 import kotlinx.collections.immutable.PersistentList
 
 object LevelDetails {
     var gridData =
-        GridData(1, 1, listOf(listOf(2), listOf(2)), listOf(listOf(2), listOf(2)))//: GridData
+        GridData(GridAttributes(1, 1, null), listOf(listOf(2), listOf(2)), listOf(listOf(2), listOf(2)))//: GridData
     lateinit var userGrid: UserGrid
     //var levelName
 

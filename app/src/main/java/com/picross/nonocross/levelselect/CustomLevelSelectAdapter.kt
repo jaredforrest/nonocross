@@ -88,8 +88,8 @@ class CustomLevelSelectAdapter(
             holder.itemView.findViewById<TextView>(R.id.level_name).text = if(startGame.isCustom) levelName else context.getLevelName(levelName.toIntOrNull() ?: 0)
             holder.itemView.findViewById<TextView>(R.id.gridData).text = context.getString(
                 R.string.height_x_width,
-                level.height,
-                level.width
+                level.attributes.height,
+                level.attributes.width
             )
             holder.itemView.findViewById<Button>(R.id.level_select).setOnClickListener {
                 LevelDetails.levelType = startGame.levelType(levelName)

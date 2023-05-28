@@ -36,6 +36,7 @@ import arrow.core.Some
 import arrow.core.none
 import com.picross.nonocross.LevelType
 import com.picross.nonocross.R
+import com.picross.nonocross.util.usergrid.GridAttributes
 import com.picross.nonocross.util.usergrid.GridData
 import com.picross.nonocross.util.usergrid.UserGrid
 import com.picross.nonocross.util.usergrid.checkUnique
@@ -50,30 +51,31 @@ import kotlin.random.Random
 
 /* wHD is triple(width, height, difficulty) */
 suspend fun newUniqueRandomGrid(
-    wHD: Triple<Int, Int, Int>,
+    attributes: GridAttributes,
     random: Random = Random
 ): Option<GridData> {
     var rec: List<CellShade>
     var ret = none<GridData>()
     coroutineScope {
         while (isActive && ret is None) {
-            val ( width, height, _) = wHD
-            rec = newRandomGrid(wHD, random)
-            ret = rec.checkUnique(width, height)
+            rec = newRandomGrid(attributes, random)
+            ret = rec.checkUnique(attributes)
         }
     }
     return ret
 }
 
-fun newRandomGrid(wHD: Triple<Int, Int, Int>, random: Random = Random) =
-    List(wHD.second * wHD.first) {
-        if (random.nextInt(0, 100) > 4 * wHD.third + 16) CellShade.SHADE
+fun newRandomGrid(gridAttributes: GridAttributes, random: Random = Random): List<CellShade> {
+    val difficulty = gridAttributes.difficulty ?: 10
+    return List(gridAttributes.width * gridAttributes.height) {
+        if (random.nextInt(0, 100) > 4 * difficulty + 16) CellShade.SHADE
         else CellShade.EMPTY
     }
+}
 
-fun getRandomGridPrefs(context: Context): Triple<Int, Int, Int> {
+fun getRandomGridPrefs(context: Context): GridAttributes {
     val preferences = Preferences(context)
-    return Triple(
+    return GridAttributes(
         preferences.randomGridWidth,
         preferences.randomGridHeight,
         preferences.randomGridDifficulty

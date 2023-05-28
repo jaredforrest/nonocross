@@ -4,8 +4,8 @@ import com.picross.nonocross.util.CellShade
 
 /** Helper functions GridData*/
 
-fun List<CellShade>.toGridData(width: Int, height: Int) =
-    GridData(width, height, this.getRowNums(width, height), this.getColNums(width, height))
+fun List<CellShade>.toGridData(attributes: GridAttributes) =
+    GridData(attributes, this.getRowNums(attributes.width, attributes.height), this.getColNums(attributes.width, attributes.height))
 
 fun List<CellShade>.getRowNums(width: Int, height: Int): List<List<Int>> {
     return List(height) { i -> this.subList(i * width, i * width + width).countCellNums() }
