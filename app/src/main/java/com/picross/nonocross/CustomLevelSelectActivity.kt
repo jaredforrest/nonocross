@@ -21,15 +21,14 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.PopupMenu
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import arrow.core.Either
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.zxing.client.android.Intents
 import com.journeyapps.barcodescanner.ScanContract
 import com.journeyapps.barcodescanner.ScanOptions
+import com.leinardi.android.speeddial.SpeedDialView
 import com.picross.nonocross.levelselect.CustomLevelSelectAdapter
 import com.picross.nonocross.util.addCustomLevel
 import com.picross.nonocross.util.applyNotError
@@ -71,29 +70,24 @@ class CustomLevelSelectActivity : AppCompatActivity(), CustomLevelSelectAdapter.
             adapter = viewAdapter
 
         }
-        findViewById<FloatingActionButton>(R.id.import_level_button).setOnClickListener {
-            PopupMenu(this, it).apply {
-                setOnMenuItemClickListener { item ->
-                    when (item.itemId) {
-                        R.id.import_file -> {
-                            getContent.launch("*/*")
-                            true
-                        }
-                        R.id.import_qr -> {
-                            val scanOptions = ScanOptions()
-                            scanOptions.setPrompt(getString(R.string.scan_a_qr_code))
-                            scanOptions.setOrientationLocked(false)
-                            scanOptions.setDesiredBarcodeFormats("QR_CODE")
-                            scanOptions.addExtra(Intents.Scan.SCAN_TYPE, Intents.Scan.MIXED_SCAN)
-                            gettyQR.launch(scanOptions)
-                            true
-                        }
-                        else -> false
-                    }
-
+        val fab = findViewById<SpeedDialView>(R.id.import_level_button)
+        fab.inflate(R.menu.add_level_menu)
+        fab.setOnActionSelectedListener { item ->
+            when (item.id) {
+                R.id.import_file -> {
+                    getContent.launch("*/*")
+                    true
                 }
-                inflate(R.menu.add_level_menu)
-                show()
+                R.id.import_qr -> {
+                    val scanOptions = ScanOptions()
+                    scanOptions.setPrompt(getString(R.string.scan_a_qr_code))
+                    scanOptions.setOrientationLocked(false)
+                    scanOptions.setDesiredBarcodeFormats(ScanOptions.QR_CODE)
+                    scanOptions.addExtra(Intents.Scan.SCAN_TYPE, Intents.Scan.MIXED_SCAN)
+                    gettyQR.launch(scanOptions)
+                    true
+                }
+                else -> false
             }
         }
     }

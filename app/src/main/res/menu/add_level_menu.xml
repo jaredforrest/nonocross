@@ -2,8 +2,10 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/import_file"
-        android:title="@string/import_from_file" />
+        android:title="@string/import_from_file"
+        android:icon="@drawable/baseline_file_24" />
     <item
         android:id="@+id/import_qr"
-        android:title="@string/import_from_qr" />
+        android:title="@string/import_from_qr"
+        android:icon="@drawable/ic_baseline_qr_code_32"/>
 </menu>
