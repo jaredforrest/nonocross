@@ -69,7 +69,7 @@ class GameActivity : AppCompatActivity() {
     private lateinit var progress: View
     private lateinit var gameView: GameView
     private lateinit var timeView: TextView
-    private lateinit var zoom: View
+    private lateinit var resetZoomButton: View
 
     private lateinit var colNumsView: ColNumsView
     private lateinit var rowNumsView: RowNumsView
@@ -108,8 +108,8 @@ class GameActivity : AppCompatActivity() {
         progress = findViewById(R.id.indeterminateBar)
         gameView = findViewById(R.id.nonocrossGameView)
         timeView = findViewById(R.id.time_view)
-        zoom = findViewById(R.id.zoom)
-        zoom.isVisible = preferences.enableZoom
+        resetZoomButton = findViewById(R.id.zoom)
+        resetZoomButton.isVisible = preferences.enableZoom
 
         colNumsView = gameView.getChildAt(0) as ColNumsView
         rowNumsView = gameView.getChildAt(1) as RowNumsView
@@ -169,7 +169,7 @@ class GameActivity : AppCompatActivity() {
             true
         }
 
-        zoom.setOnClickListener {
+        resetZoomButton.setOnClickListener {
             resetZoom()
             nonocrossGridView.invalidate()
             rowNumsView.invalidate()
@@ -364,7 +364,9 @@ class GameActivity : AppCompatActivity() {
         clear.visibility = invisibility
         save.visibility = invisibility
         refresh.visibility = invisibility
-        zoom.visibility = invisibility
+        if(preferences.enableZoom) {
+            resetZoomButton.visibility = invisibility
+        }
     }
 
     private fun resetZoom() {
