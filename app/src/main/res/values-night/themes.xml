@@ -26,11 +26,6 @@
         <item name="colorOutline">@color/md_theme_dark_outline</item>
         <item name="colorOnSurfaceInverse">@color/md_theme_dark_inverseOnSurface</item>
         <item name="colorSurfaceInverse">@color/md_theme_dark_inverseSurface</item>
-        <item name="colorCross">#ffb3b0</item>
-        <item name="colorOnCross">#68000f</item>
-        <item name="colorCrossContainer">#930019</item>
-        <item name="colorOnCrossContainer">#ffdad8</item>
-        <item name="harmonizeCross">true</item>
         <item name="colorPrimaryInverse">@color/md_theme_dark_inversePrimary</item>
     </style>
 </resources>

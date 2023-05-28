@@ -17,12 +17,12 @@ abstract class AbstractNumsView(context: Context) : View(context) {
         .apply { color = context.resolveThemedColor(R.attr.colorOnSurface) }
         .apply { isAntiAlias = true }
         .apply { textAlign = Paint.Align.CENTER }
-    protected val paintShade = Paint()
-        .apply { color = context.resolveThemedColor(R.attr.colorPrimary) }
+    protected val paintValidHint = Paint()
+        .apply { color = context.resolveThemedColor(R.attr.colorShade) }
         .apply { isAntiAlias = true }
         .apply { textAlign = Paint.Align.CENTER }
-    protected val paintCross = Paint()
-        .apply { color = context.resolveThemedColor(R.attr.colorCross) }
+    protected val paintErrorHint = Paint()
+        .apply { color = context.resolveThemedColor(R.attr.colorError) }
         .apply { isAntiAlias = true }
         .apply { textAlign = Paint.Align.CENTER }
 
@@ -32,13 +32,13 @@ abstract class AbstractNumsView(context: Context) : View(context) {
         super.onLayout(changed, left, top, right, bottom)
         if (changed) {
             paintNumber.apply { textSize = cellLength * 0.5F }
-            paintShade.apply { textSize = cellLength * 0.5F }
-            paintCross.apply { textSize = cellLength * 0.5F }
+            paintValidHint.apply { textSize = cellLength * 0.5F }
+            paintErrorHint.apply { textSize = cellLength * 0.5F }
         }
     }
 
     protected lateinit var templateNumber: MutableList<Picture>
-    protected lateinit var templateShade: MutableList<Picture>
-    protected lateinit var templateCross: MutableList<Picture>
+    protected lateinit var templateValidHint: MutableList<Picture>
+    protected lateinit var templateErrorHint: MutableList<Picture>
     var refreshTemplates = true
 }
