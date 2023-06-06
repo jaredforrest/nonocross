@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Nonocross</string>
     <string name="default_levels">Vorgegebene Levels</string>
-    <string name="random_grid">Zufällige Levels</string>
+    <string name="random_grid">Zufälliges Level</string>
     <string name="random_grid_short">Zufällig</string>
     <string name="play">Spielen</string>
     <string name="height_x_width">%1$d x %2$d</string>
@@ -42,7 +42,7 @@
     <string name="fat_finger_summary">Einschalten falls es schwierig ist, einzelne Quadrate zu treffen</string>
     <string name="vibrate_summary">Vibriere bei bestimmten Aktionen</string>
     <string name="appearance_header">Erscheinungsbild</string>
-    <string name="show_blue_hints">Zeige blaue Hinweise</string>
+    <string name="show_blue_hints">Zeige Hinweise</string>
     <string name="import_level">Importiere Level</string>
     <string name="custom_level">Gespeicherte Levels</string>
     <string name="remove_level">Entfernen</string>
