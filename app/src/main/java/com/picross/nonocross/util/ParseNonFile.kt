@@ -50,8 +50,8 @@ fun parseNonFile(text: String): Either<ParseError, GridData> {
         if (data.width > 0 && data.height > 0 && (data.difficulty ?: 0) > 0) {
             // All three values are set => Return data
             Pair(lines, data).right()
-        } else if (lines.isEmpty() && data.width > 0 && data.height > 0) {
-            // Reached end of file and width and height is set => Return data
+        } else if (lines.firstOrNull()?.isBlank() == true && data.width > 0 && data.height > 0) {
+            // Reached empty line and width and height is set. Save data has no difficulty set => Return data
             Pair(lines, data).right()
         } else if (lines.isEmpty()) {
             // Reached end of file but width and/or height not set => Error
