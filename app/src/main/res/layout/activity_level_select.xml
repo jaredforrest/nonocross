@@ -28,6 +28,8 @@ along with Nonocross.  If not, see <https://www.gnu.org/licenses/>.-->
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_gravity="bottom|end"
+        app:sdMainFabClosedIconColor="?colorOnTertiary"
+        app:sdMainFabOpenedIconColor="?colorOnTertiary"
         app:sdMainFabClosedSrc="@drawable/ic_baseline_add_32" />
 
     <androidx.recyclerview.widget.RecyclerView
