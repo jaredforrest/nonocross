@@ -142,7 +142,7 @@ fun parseNonFile(text: String): Either<ParseError, GridData> {
         }
 
 
-    val lines = text.split('\n').toImmutableList()
+    val lines = text.split("\r?\n|\r".toRegex()).toImmutableList()
 
     val (lines2, attributes) = when (val a = heightWidthAcc(lines)){
         is Either.Left -> return a
