@@ -2,14 +2,36 @@
 <resources>
     <string name="app_name">Nonocross</string>
     <string name="default_levels">Vorgegebene Levels</string>
-    <string name="random_grid">Zufällige Levels</string>
+    <string name="random_grid">Zufälliges Level</string>
+    <string name="random_grid_short">Zufällig</string>
     <string name="play">Spielen</string>
     <string name="height_x_width">%1$d x %2$d</string>
     <string name="level_complete">Level beendet\n\nBenötigte Zeit: %1$s</string>
+    <string name="level_complete_new_high_score">Level mit neuem Highscore beendet\n\nBenötigte Zeit: %1$s</string>
     <string name="level_complete_no_time">Level beendet</string>
     <string name="menu">Menü</string>
     <string name="reset">Zurücksetzen</string>
+    <string name="confirm_exit">Möchtest du das Spiel beenden?</string>
+    <string name="confirm_new">Möchtest du ein neues Spiel?</string>
+    <string name="lose_unsaved_data">Ungespeicherter Fortschritt geht verloren</string>
+    <string name="save">Speichern</string>
+    <string name="not_save">Nicht speichern</string>
+    <string name="easy">Einfach %1$d</string>
+    <string name="level">Level %1$d</string>
+    <string name="high_score">Highscore %s</string>
+    <string name="no_high_score">Kein Highscore</string>
+    <string name="scan_a_qr_code">QR-Code scannen</string>
+    <string name="cancelled">Abgebrochen</string>
+    <string name="nothing_to_undo">Rückgängig nicht möglich</string>
+    <string name="nothing_to_redo">Wiederholen nicht möglich</string>
+    <string name="error">Fehler: %s</string>
+    <string name="enable_zoom">Aktiviere Zoom auf dem Gitter</string>
+    <string name="about">Über</string>
+    <string name="error_no_browser_found">Kein Browser gefunden</string>
     <string name="grid_size">Gittergröße</string>
+    <string name="difficulty">Schwierigkeit: %d</string>
+    <string name="rows">Zeilen: %d</string>
+    <string name="columns">Spalten: %d</string>
     <string name="finished">Beendet</string>
 
     <!-- Preferences -->
@@ -20,10 +42,11 @@
     <string name="fat_finger_summary">Einschalten falls es schwierig ist, einzelne Quadrate zu treffen</string>
     <string name="vibrate_summary">Vibriere bei bestimmten Aktionen</string>
     <string name="appearance_header">Erscheinungsbild</string>
-    <string name="show_blue_hints">Zeige blaue Hinweise</string>
+    <string name="show_blue_hints">Zeige Hinweise</string>
     <string name="import_level">Importiere Level</string>
     <string name="custom_level">Gespeicherte Levels</string>
     <string name="remove_level">Entfernen</string>
+    <string name="remove_level_confirm">Möchtest du \"%s\" wirklich löschen?</string>
     <string name="level_name">Level-Name</string>
     <string name="enter_level_name">Gib einen Namen für das Level an</string>
     <string name="import_from_file">Importiere aus Datei</string>
