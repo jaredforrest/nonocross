@@ -1,0 +1,2 @@
+- Material Design 3 redesign
+- Save high score for random leve
