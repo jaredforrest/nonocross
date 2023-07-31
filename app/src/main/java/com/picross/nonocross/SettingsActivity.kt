@@ -1,8 +1,11 @@
 package com.picross.nonocross
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.commit
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
@@ -10,6 +13,7 @@ import com.mikepenz.aboutlibraries.LibsBuilder
 import com.mikepenz.aboutlibraries.LibsConfiguration
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.util.SpecialButton
+import com.picross.nonocross.util.Preferences
 import com.picross.nonocross.util.openInBrowser
 
 class SettingsActivity : AppCompatActivity() {
@@ -29,6 +33,14 @@ class SettingsActivity : AppCompatActivity() {
     class SettingsFragment : PreferenceFragmentCompat() {
         override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
             setPreferencesFromResource(R.xml.root_preferences, rootKey)
+
+            val themePref = preferenceManager.findPreference<Preference>("darkMode2")!!
+            themePref.setOnPreferenceChangeListener { preference, _ ->
+                Handler(Looper.getMainLooper()).post {
+                    AppCompatDelegate.setDefaultNightMode(Preferences(preference.context).theme)
+                }
+                true
+            }
 
             val aboutPref = preferenceManager.findPreference<Preference>("about")!!
             aboutPref.setOnPreferenceClickListener {
